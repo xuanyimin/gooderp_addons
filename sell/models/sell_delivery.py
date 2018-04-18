@@ -109,7 +109,7 @@ class SellDelivery(models.Model):
                                help=u'是否处于差错修改中')
     origin_id = fields.Many2one('sell.delivery', u'来源单据')
     voucher_id = fields.Many2one('voucher', u'出库凭证', readonly=True,
-                                 help=u'审核时产生的出库凭证')
+                                 help=u'发货时产生的出库凭证')
 
     @api.onchange('address_id')
     def onchange_address_id(self):
@@ -207,7 +207,7 @@ class SellDelivery(models.Model):
     def _wrong_delivery_done(self):
         '''审核时不合法的给出报错'''
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！')
+            raise UserError(u'请不要重复发货！')
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'商品 %s 的数量和商品含税单价不能小于0！' % line.goods_id.name)
@@ -235,7 +235,7 @@ class SellDelivery(models.Model):
                 else:
                     line.sell_line_id.quantity_out -= line.goods_qty
             for line in self.line_out_ids:
-                line.sell_line_id.quantity_out += line.goods_qty
+                line.sell_line_id.write({'quantity_out':line.sell_line_id.quantity_out + line.goods_qty})
 
         return
 
@@ -482,8 +482,19 @@ class SellDelivery(models.Model):
         source_line = self.env['source.order.line'].search(
             [('name', '=', self.invoice_id.id)])
         for line in source_line:
-            line.money_id.money_order_draft()
-            line.money_id.unlink()
+            line.money_id.money_order_draft() # 反审核收款单
+            # 判断收款单 源单行 是否有别的行存在
+            other_source_line = []
+            for s_line in line.money_id.source_ids:
+                if s_line.id != line.id:
+                    other_source_line.append(s_line)
+            # 收款单 源单行 不存在别的行，删除收款单；否则删除收款单行，并对原收款单审核
+            if not other_source_line:
+                line.money_id.unlink()
+            else:
+                line.unlink()
+                other_source_line[0].money_id.money_order_done()
+
             # FIXME:查找产生的核销单，反审核后删掉
         # 查找产生的结算单
         invoice_ids = self.env['money.invoice'].search(
@@ -491,7 +502,7 @@ class SellDelivery(models.Model):
         # 不能反审核已核销的发货单
         for invoice in invoice_ids:
             if invoice.to_reconcile == 0 and invoice.reconciled == invoice.amount:
-                raise UserError(u'发货单已核销，不能反审核！')
+                raise UserError(u'发货单已核销，不能撤销发货！')
         invoice_ids.money_invoice_draft()
         invoice_ids.unlink()
         # 如果存在分单，则将差错修改中置为 True，再次审核时不生成分单

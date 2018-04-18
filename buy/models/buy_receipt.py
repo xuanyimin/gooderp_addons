@@ -101,7 +101,7 @@ class BuyReceipt(models.Model):
     modifying = fields.Boolean(u'差错修改中', default=False,
                                help=u'是否处于差错修改中')
     voucher_id = fields.Many2one('voucher', u'入库凭证', readonly=True,
-                                 help=u'审核时产生的入库凭证')
+                                 help=u'入库时产生的入库凭证')
     origin_id = fields.Many2one('buy.receipt', u'来源单据')
     currency_id = fields.Many2one('res.currency',
                                   u'外币币别',
@@ -164,7 +164,7 @@ class BuyReceipt(models.Model):
     @api.one
     def _wrong_receipt_done(self):
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！')
+            raise UserError(u'请不要重复入库！')
         batch_one_list_wh = []
         batch_one_list = []
         for line in self.line_in_ids:
@@ -416,8 +416,19 @@ class BuyReceipt(models.Model):
         source_line = self.env['source.order.line'].search(
             [('name', '=', self.invoice_id.id)])
         for line in source_line:
-            line.money_id.money_order_draft()
-            line.money_id.unlink()
+            line.money_id.money_order_draft()  # 反审核付款单
+            # 判断付款单 源单行 是否有别的行存在
+            other_source_line = []
+            for s_line in line.money_id.source_ids:
+                if s_line.id != line.id:
+                    other_source_line.append(s_line)
+            # 付款单 源单行 不存在别的行，删除付款单；否则删除付款单行，并对原付款单审核
+            if not other_source_line:
+                line.money_id.unlink()
+            else:
+                line.unlink()
+                other_source_line[0].money_id.money_order_done()
+
         # 查找产生的结算单
         invoice_ids = self.env['money.invoice'].search(
             [('name', '=', self.invoice_id.name)])

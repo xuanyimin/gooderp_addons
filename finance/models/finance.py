@@ -82,7 +82,7 @@ class Voucher(models.Model):
     amount_text = fields.Float(u'总计', compute='_compute_amount', store=True,
                                track_visibility='always', help=u'凭证金额')
     state = fields.Selection([('draft', u'草稿'),
-                              ('done', u'已审核'),
+                              ('done', u'已确认'),
                               ('cancel', u'已作废')], u'状态', default='draft',
                              index=True,
                              track_visibility='always', help=u'凭证所属状态!')
@@ -99,13 +99,13 @@ class Voucher(models.Model):
     @api.one
     def voucher_done(self):
         """
-        审核 凭证按钮 所调用的方法
+        确认 凭证按钮 所调用的方法
         :return: 主要是把 凭证的 state改变
         """
         if self.state == 'done':
-            raise UserError(u'凭证%s已经审核,请不要重复审核！' % self.name)
+            raise UserError(u'凭证%s已经确认,请不要重复确认！' % self.name)
         if self.period_id.is_closed:
-            raise UserError(u'该会计期间已结账！不能审核')
+            raise UserError(u'该会计期间已结账！不能确认')
         if not self.line_ids:
             raise ValidationError(u'请输入凭证行')
         for line in self.line_ids:
@@ -120,7 +120,7 @@ class Voucher(models.Model):
         debit_sum = round(debit_sum, precision)
         credit_sum = round(credit_sum, precision)
         if debit_sum != credit_sum:
-            raise ValidationError(u'借贷方不平，无法审核!\n 借方合计:%s 贷方合计:%s' %
+            raise ValidationError(u'借贷方不平，无法确认!\n 借方合计:%s 贷方合计:%s' %
                                   (debit_sum, credit_sum))
 
         self.state = 'done'
@@ -139,15 +139,15 @@ class Voucher(models.Model):
     @api.one
     def voucher_can_be_draft(self):
         if self.ref:
-            raise UserError(u'不能反审核由其他单据生成的凭证！')
+            raise UserError(u'不能撤销确认由其他单据生成的凭证！')
         self.voucher_draft()
 
     @api.one
     def voucher_draft(self):
         if self.state == 'draft':
-            raise UserError(u'凭证%s已经反审核,请不要重复反审核！' % self.name)
+            raise UserError(u'凭证%s已经撤销确认,请不要重复撤销！' % self.name)
         if self.period_id.is_closed:
-            raise UserError(u'%s期 会计期间已结账！不能反审核' % self.period_id.name)
+            raise UserError(u'%s期 会计期间已结账！不能撤销确认' % self.period_id.name)
 
         self.state = 'draft'
 
@@ -165,12 +165,12 @@ class Voucher(models.Model):
                 return super(Voucher, self).write(vals)
             if order.period_id.is_closed is True:
                 raise UserError(u'%s期 会计期间已结账，凭证不能再修改！' % order.period_id.name)
-            if len(vals) == 1 and vals.get('state', False):  # 审核or反审核
+            if len(vals) == 1 and vals.get('state', False):  # 确认or撤销确认
                 return super(Voucher, self).write(vals)
             else:
                 order = self.browse(order.id)
                 if order.state == 'done':
-                    raise UserError(u'凭证%s已审核！修改请先反审核！' % order.name)
+                    raise UserError(u'凭证%s已确认！修改请先撤销！' % order.name)
             return super(Voucher, self).write(vals)
 
 
@@ -208,7 +208,7 @@ class VoucherLine(models.Model):
     name = fields.Char(u'摘要', required=True, help=u'描述本条凭证行的缘由')
     account_id = fields.Many2one(
         'finance.account', u'会计科目',
-        ondelete='restrict', required=True)
+        ondelete='restrict', required=True, domain="[('account_type','=','normal')]")
 
     debit = fields.Float(u'借方金额', digits=dp.get_precision('Amount'), help=u'每条凭证行中只能记录借方金额或者贷方金额中的一个，\
     一张凭证中所有的凭证行的借方余额，必须等于贷方余额。')
@@ -230,7 +230,7 @@ class VoucherLine(models.Model):
         以适应企业管理和决策的需要.辅助核算一般通过核算项目来实现', ondelete='restrict')
     date = fields.Date(compute='_compute_voucher_date',
                        store=True, string=u'凭证日期')
-    state = fields.Selection([('draft', u'草稿'), ('done', u'已审核'),('cancel', u'已作废')], compute='_compute_voucher_state',
+    state = fields.Selection([('draft', u'草稿'), ('done', u'已确认'),('cancel', u'已作废')], compute='_compute_voucher_state',
                              index=True,
                              store=True, string=u'状态')
     init_obj = fields.Char(u'初始化对象', help=u'描述本条凭证行由哪个单证生成而来')
@@ -279,7 +279,7 @@ class VoucherLine(models.Model):
     def unlink(self):
         for active_voucher_line in self:
             if active_voucher_line.voucher_id.state == 'done':
-                raise UserError(u'不能删除已审核的凭证行\n 所属凭证%s  凭证行摘要%s'
+                raise UserError(u'不能删除已确认的凭证行\n 所属凭证%s  凭证行摘要%s'
                                 % (active_voucher_line.voucher_id.name, active_voucher_line.name))
         return super(VoucherLine, self).unlink()
 
@@ -294,6 +294,11 @@ class VoucherLine(models.Model):
             'type': 'ir.actions.act_window',
         }
 
+    @api.constrains('account_id')
+    def _check_account_id(self):
+        for record in self:
+            if record.account_id.account_type == 'view':
+                raise UserError('只能往下级科目记账!')
 
 class FinancePeriod(models.Model):
     '''会计期间'''
@@ -442,12 +447,44 @@ class DocumentWord(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
+class FinanceAccountType(models.Model):
+    """ 会计要素
+    """
+    _name = 'finance.account.type'
+    _description = u'会计要素'
+
+    _rec_name = 'name'
+    _order = 'name ASC'
+
+    name = fields.Char(u'名称', required="1")
+    active = fields.Boolean(string=u'启用', default="True")
+    costs_types = fields.Selection([
+        ('assets', u'资产'),
+        ('debt', u'负债'),
+        ('equity', u'所有者权益'),
+        ('in', u'收入类'),
+        ('out', u'费用类'),
+        ('inout', u'收入费用类'),
+        ('cost', u'成本类'),
+    ], u'类型', required="1", help=u'用于会计报表的生成。')
 
 class FinanceAccount(models.Model):
     '''科目'''
     _name = 'finance.account'
     _order = "code"
     _description = u'会计科目'
+    _parent_store = True
+
+    @api.depends('parent_id')
+    def _compute_level(self):
+        for record in self:
+            level = 1
+            parent = record.parent_id
+            while parent:
+                level = level + 1
+                parent = parent.parent_id
+
+            record.level = level
 
     @api.one
     def compute_balance(self):
@@ -478,8 +515,16 @@ class FinanceAccount(models.Model):
         ('equity', u'所有者权益'),
         ('in', u'收入类'),
         ('out', u'费用类'),
+        ('inout', u'收入费用类'),
         ('cost', u'成本类'),
-    ], u'类型', required="1")
+    ], u'类型', required="1", help=u'废弃不用，改为使用 user_type字段 动态维护', related='user_type.costs_types')
+    account_type = fields.Selection(string=u'科目类型', selection=[('view', 'View'), ('normal', 'Normal')], default='normal')
+    user_type = fields.Many2one(string=u'会计要素', comodel_name='finance.account.type', ondelete='restrict', required=True )
+    parent_left = fields.Integer('Left Parent', index=1)
+    parent_right = fields.Integer('Right Parent', index=1)
+    parent_id = fields.Many2one(string=u'上级科目', comodel_name='finance.account', ondelete='restrict', domain="[('account_type','=','view')]" )
+    child_ids = fields.One2many(string=u'下级科目', comodel_name='finance.account', inverse_name='parent_id', )
+    level = fields.Integer(string=u'科目级别', compute='_compute_level' )
     currency_id = fields.Many2one('res.currency', u'外币币别')
     exchange = fields.Boolean(u'是否期末调汇')
     active = fields.Boolean(u'启用', default=True)
@@ -494,6 +539,10 @@ class FinanceAccount(models.Model):
                            digits=dp.get_precision('Amount'),
                            help=u'科目的当前余额',
                            )
+    source = fields.Selection(
+        string=u'创建来源',
+        selection=[('init', '初始化'), ('manual', '手工创建')], default='init'
+    )
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', u'科目名称必须唯一。'),
@@ -544,6 +593,144 @@ class FinanceAccount(models.Model):
         finance_account_row = self.search([], order='code desc')
         return finance_account_row and finance_account_row[0]
 
+    @api.multi
+    def write(self, values):
+        """
+        限制科目修改条件
+        """
+        for record in self:
+            if record.source == 'init' and record.env.context.get('modify_from_webclient', False):
+                raise UserError(u'不能删改预设会计科目!')
+
+        return super(FinanceAccount, self).write(values)
+
+class WizardAccountAddChild(models.TransientModel):
+    """ 向导，用于新增下级科目.
+
+    """
+
+    _name = 'wizard.account.add.child'
+    _description = u'Wizard Account Add Child'
+
+    parent_id = fields.Many2one(
+        string=u'上级科目',
+        comodel_name='finance.account',
+        ondelete='set null',
+    )
+
+    parent_name = fields.Char(
+        string=u'上级科目名称',
+        related='parent_id.name',
+        readonly=True,
+    )
+
+    parent_code = fields.Char(
+        string=u'上级科目编码',
+        related='parent_id.code',
+        readonly=True,
+    )
+
+    account_code = fields.Char(
+        string=u'科目编码', required=True
+    )
+
+    full_account_code = fields.Char(
+        string=u'完整科目编码',
+    )
+
+    account_name = fields.Char(
+        string=u'科目名称',
+    )
+
+    @api.model
+    def default_get(self, fields):
+        if len(self.env.context.get('active_ids', list())) > 1:
+            raise UserError(u"一次只能为一个科目增加下级科目!")
+
+        account_id = self.env.context.get('active_id')
+        account = self.env['finance.account'].browse(account_id)
+        if account.level >= self.env['ir.values'].get_default('finance.config.settings', 'default_account_hierarchy_level'):
+            raise UserError('选择的科目层级是%s级，已经是最低层级科目了，不能建立在它下面建立下级科目！'% account.level)
+
+        res = super(WizardAccountAddChild, self).default_get(fields)
+
+        res.update( {
+            'parent_id': account_id,
+            })
+    
+        return res
+
+    @api.multi
+    def create_account(self):
+        self.ensure_one()
+        account_type = self.parent_id.account_type
+        new_account = False
+        if account_type == 'normal':
+            # 挂账科目，需要进行科目转换
+            # step1, 老科目改为临时名
+            origin_name = self.parent_id.name
+            origin_code = self.parent_id.code
+            self.parent_id.write({
+                'code': 'tmp_%s' % self.parent_id.code,
+                'name': 'tmp_%s' % self.parent_id.name,
+            })
+            # step2, 建新科目用作上级，类型为view，将上级科目设置为老科目的上级科目
+            new_account = self.parent_id.copy(
+                {
+                    'code': origin_name,
+                    'name': origin_code,
+                    'account_type': 'view',
+                    'parent_id': self.parent_id.id
+                })
+            # step3, 老科目改为正式名
+            self.parent_id.write({
+                'code': self.full_account_code,
+                'name': self.account_name,
+                'account_type': 'normal',
+                'parent_id': new_account.id
+            })
+
+        elif account_type == 'view':
+            # 直接新增下级科目，无需转换科目
+            new_account=self.parent_id.copy({
+                'code': self.full_account_code,
+                'name': self.account_name,
+                'account_type': 'normal',
+                'parent_id': self.parent_id.id
+            })
+
+        if not new_account:
+            raise UserError('新科目创建失败！')
+
+        view_id = self.env.ref(
+            'finance.finance_account_tree', False
+        )
+
+        return {
+            'name': _(' 新建的科目'),
+            'type': 'ir.actions.act_window',
+            'view_mode': 'tree',
+            'res_model': 'finance.account',
+            'target': 'inline',
+            'res_id': new_account.id,
+            'views': [(view_id.id if view_id else False, 'tree')],
+        } 
+
+    @api.onchange('account_code')
+    def _onchange_account_code(self):
+        default_child_step = self.env['ir.values'].get_default('finance.config.settings', 'default_child_step')
+        if self.account_code:
+            self.full_account_code = "%s%s"%(self.parent_code, self.account_code)
+
+        if self.account_code and len(self.account_code) != int(default_child_step):
+            self.account_code = False
+            self.full_account_code = self.parent_code
+            return {
+            'warning': {
+                'title': u'错误',
+                'message': '下级科目编码长度与"下级科目编码递增长度"规则不符合！'
+            }
+        }
 
 class AuxiliaryFinancing(models.Model):
     '''辅助核算'''
