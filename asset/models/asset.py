@@ -21,18 +21,19 @@ class AssetCategory(models.Model):
     # 字段，命名问题很严重
     name = fields.Char(u'名称', required=True)
     # 一些带到固定资产上的默认值
+    is_depreciation = fields.Boolean(u'永不折旧', default=False)
     account_accumulated_depreciation = fields.Many2one(
-        'finance.account', u'累计折旧科目', required=True)
+        'finance.account', u'累计折旧科目')
     account_asset = fields.Many2one(
-        'finance.account', u'固定资产科目', required=True)
+        'finance.account', u'固定资产科目')
     account_depreciation = fields.Many2one(
-        'finance.account', u'折旧费用科目', required=True)
-    depreciation_number = fields.Float(u'折旧期间数', required=True)
-    depreciation_value = fields.Float(u'最终残值率%', required=True)
+        'finance.account', u'折旧费用科目')
+    depreciation_number = fields.Float(u'折旧期间数')
+    depreciation_value = fields.Float(u'最终残值率%')
     clean_income = fields.Many2one(
-        'finance.account', u'固定资产清理收入科目', required=True)
+        'finance.account', u'固定资产清理收入科目')
     clean_costs = fields.Many2one(
-        'finance.account', u'固定资产清理成本科目', required=True)
+        'finance.account', u'固定资产清理成本科目')
     # 用于软删除归档
     active = fields.Boolean(u'启用', default=True)
     # 未来支持多公司
