@@ -35,7 +35,7 @@
             <field name="line_type">category</field>
         </record>
 
-        <record id="money.cft_6" model="cash.flow.template">
+        <!--record id="money.cft_6" model="cash.flow.template">
             <field name="name">支付其他与经营活动有关的现金</field>
             <field name="line_num" eval="6"/>
             <field name="line_type">category</field>
@@ -48,7 +48,7 @@
             <field name="line_type">lines</field>
             <field name="plus_ids" eval="[(6, 0, [ref('money.cft_1'),ref('money.cft_2')])]"/>
             <field name="nega_ids" eval="[(6, 0, [ref('money.cft_3'),ref('money.cft_4'),ref('money.cft_5'),ref('money.cft_6')])]"/>
-        </record>
+        </record-->
 
         <record id="money.cft_02" model="cash.flow.template">
             <field name="name">二、投资活动产生的现金流量：</field>
@@ -84,13 +84,13 @@
             <field name="line_type">category</field>
         </record>
 
-        <record id="money.cft_13" model="cash.flow.template">
+        <!--record id="money.cft_13" model="cash.flow.template">
             <field name="name">投资活动产生的现金流量净额</field>
             <field name="line_num" eval="13"/>
             <field name="line_type">lines</field>
             <field name="plus_ids" eval="[(6, 0, [ref('money.cft_8'),ref('money.cft_9'),ref('money.cft_10')])]"/>
             <field name="nega_ids" eval="[(6, 0, [ref('money.cft_11'),ref('money.cft_12')])]"/>
-        </record>
+        </record-->
 
         <record id="money.cft_03" model="cash.flow.template">
             <field name="name">三、筹资活动产生的现金流量：</field>
@@ -126,7 +126,7 @@
             <field name="line_type">category</field>
         </record>
 
-        <record id="money.cft_19" model="cash.flow.template">
+        <!--record id="money.cft_19" model="cash.flow.template">
             <field name="name">筹资活动产生的现金流量净额</field>
             <field name="line_num" eval="19"/>
             <field name="line_type">lines</field>
@@ -155,6 +155,6 @@
             <field name="line_type">end</field>
             <field name="begin_ids" eval="[(6, 0, [ref('finance.account_cash'), ref('finance.account_bank')])]"/>
             <field name="end_ids" eval="[(6, 0, [ref('finance.account_cash'), ref('finance.account_bank')])]"/>
-        </record>
+        </record-->
     </data>
 </openerp>

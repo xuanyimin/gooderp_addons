@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <openerp>
     <data noupdate="1">
-        <record id="small_business_chart160101" model='finance.account'>
+        <!--record id="small_business_chart160101" model='finance.account'>
             <field name='code'>1601</field>
             <field name='name'>固定资产</field>
             <field name='costs_types'>assets</field>
@@ -44,7 +44,7 @@
             <field name='balance_directions'>in</field>
         </record>
 
-        <!-- 固定资产分类 -->
+        < 固定资产分类 >
         <record id="machinery_equipment" model='asset.category'>
             <field name='name'>机器设备</field>
             <field name='account_accumulated_depreciation' ref='finance.small_business_chart1602'/>
@@ -148,6 +148,6 @@
             <field name='account_id' ref='small_business_chart571101'/>
             <field name='type'>other_pay</field>
             <field name='note'>由系统创建</field>
-        </record>
+        </record-->
     </data>
 </openerp>

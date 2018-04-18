@@ -14,6 +14,7 @@
         #'security/groups.xml',
         'views/nonprofit_money_order_view.xml',
         'data/mony_flow_data.xml',
+        #'data/account_data.xml',
     ],
     'demo': [
         'demo/money_demo.xml',
