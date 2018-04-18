@@ -14,9 +14,13 @@
             <field name='name'>净资产</field>
             <field name='costs_types'>equity</field>
         </record>
-        <record id="base_inout" model='finance.account.type'>
-            <field name='name'>收入费用</field>
-            <field name='costs_types'>inout</field>
+        <record id="base_in" model='finance.account.type'>
+            <field name='name'>收入</field>
+            <field name='costs_types'>in</field>
+        </record>
+        <record id="base_out" model='finance.account.type'>
+            <field name='name'>费用</field>
+            <field name='costs_types'>out</field>
         </record>
 
         <!-- 资产类 -->
@@ -25,7 +29,7 @@
             <field name='name'>库存现金</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1002" model='finance.account'>
@@ -33,7 +37,7 @@
             <field name='name'>银行存款</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1009" model='finance.account'>
@@ -41,7 +45,7 @@
             <field name='name'>其他货币资金</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1101" model='finance.account'>
@@ -49,7 +53,7 @@
             <field name='name'>短期投资</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1102" model='finance.account'>
@@ -57,7 +61,7 @@
             <field name='name'>短期投资跌价准备</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1111" model='finance.account'>
@@ -65,7 +69,7 @@
             <field name='name'>应收票据</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1121" model='finance.account'>
@@ -73,7 +77,7 @@
             <field name='name'>应收账款</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1122" model='finance.account'>
@@ -81,7 +85,7 @@
             <field name='name'>其他应收款</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1131" model='finance.account'>
@@ -89,7 +93,7 @@
             <field name='name'>坏账准备</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1141" model='finance.account'>
@@ -97,7 +101,7 @@
             <field name='name'>预付账款</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1201" model='finance.account'>
@@ -105,7 +109,7 @@
             <field name='name'>存货</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1202" model='finance.account'>
@@ -113,7 +117,7 @@
             <field name='name'>存货跌价准备</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1301" model='finance.account'>
@@ -121,7 +125,7 @@
             <field name='name'>待摊费用</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1401" model='finance.account'>
@@ -129,7 +133,7 @@
             <field name='name'>长期股权投资</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1402" model='finance.account'>
@@ -137,7 +141,7 @@
             <field name='name'>长期债权投资</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1421" model='finance.account'>
@@ -145,7 +149,7 @@
             <field name='name'>长期投资减值准备</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
         <record id="init_account_142101" model='finance.account'>
@@ -153,15 +157,17 @@
             <field name='name'>长期投资减值准备-股权投资</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
-            <field name='account_type'>view</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_1421'/>
+            <field name='account_type'>normal</field>
         </record>
         <record id="init_account_142102" model='finance.account'>
             <field name='code'>142102</field>
             <field name='name'>长期投资减值准备-债权投资</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_1421'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1501" model='finance.account'>
@@ -169,7 +175,7 @@
             <field name='name'>固定资产</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1502" model='finance.account'>
@@ -177,7 +183,7 @@
             <field name='name'>累计折旧</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1505" model='finance.account'>
@@ -185,7 +191,7 @@
             <field name='name'>在建工程</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1506" model='finance.account'>
@@ -193,7 +199,7 @@
             <field name='name'>文物文化资产</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1509" model='finance.account'>
@@ -201,7 +207,7 @@
             <field name='name'>固定资产清理</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1601" model='finance.account'>
@@ -209,7 +215,7 @@
             <field name='name'>无形资产</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_1701" model='finance.account'>
@@ -217,7 +223,7 @@
             <field name='name'>受托代理资产</field>
             <field name='user_type' ref='base_assest'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
 
@@ -227,7 +233,7 @@
             <field name='name'>短期借款</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_2201" model='finance.account'>
@@ -235,7 +241,7 @@
             <field name='name'>应付票据</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_2202" model='finance.account'>
@@ -243,7 +249,7 @@
             <field name='name'>应付账款</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_2202" model='finance.account'>
@@ -251,7 +257,7 @@
             <field name='name'>应付账款</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_2203" model='finance.account'>
@@ -259,7 +265,7 @@
             <field name='name'>预收账款</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_2204" model='finance.account'>
@@ -267,7 +273,7 @@
             <field name='name'>应付工资</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_2206" model='finance.account'>
@@ -275,7 +281,7 @@
             <field name='name'>应交税金</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_2209" model='finance.account'>
@@ -283,7 +289,7 @@
             <field name='name'>其他应付款</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_2301" model='finance.account'>
@@ -291,7 +297,7 @@
             <field name='name'>预提费用</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_2401" model='finance.account'>
@@ -299,7 +305,7 @@
             <field name='name'>预计负债</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_2501" model='finance.account'>
@@ -307,7 +313,7 @@
             <field name='name'>长期借款</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_2502" model='finance.account'>
@@ -315,7 +321,7 @@
             <field name='name'>长期应付款</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_2601" model='finance.account'>
@@ -323,7 +329,7 @@
             <field name='name'>受托代理负债</field>
             <field name='user_type' ref='base_debt'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
 
@@ -333,7 +339,7 @@
             <field name='name'>非限定性净资产</field>
             <field name='user_type' ref='base_equity'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_3102" model='finance.account'>
@@ -341,7 +347,7 @@
             <field name='name'>限定性净资产</field>
             <field name='user_type' ref='base_equity'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
 
@@ -349,209 +355,223 @@
         <record id="init_account_4101" model='finance.account'>
             <field name='code'>4101</field>
             <field name='name'>捐赠收入</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
         <record id="init_account_410101" model='finance.account'>
             <field name='code'>410101</field>
             <field name='name'>捐赠收入-非限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4101'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_410102" model='finance.account'>
             <field name='code'>410102</field>
             <field name='name'>捐赠收入-限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4101'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_4201" model='finance.account'>
             <field name='code'>4201</field>
             <field name='name'>会费收入</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
         <record id="init_account_420101" model='finance.account'>
             <field name='code'>420101</field>
             <field name='name'>会费收入-非限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4201'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_420102" model='finance.account'>
             <field name='code'>420102</field>
             <field name='name'>会费收入-限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4201'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_4301" model='finance.account'>
             <field name='code'>4301</field>
             <field name='name'>提供服务收入</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
         <record id="init_account_430101" model='finance.account'>
             <field name='code'>430101</field>
             <field name='name'>提供服务收入-非限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4301'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_430102" model='finance.account'>
             <field name='code'>430102</field>
             <field name='name'>提供服务收入-限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4301'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_4401" model='finance.account'>
             <field name='code'>4401</field>
             <field name='name'>政府补助收入</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
         <record id="init_account_440101" model='finance.account'>
             <field name='code'>440101</field>
             <field name='name'>政府补助收入-非限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4401'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_440102" model='finance.account'>
             <field name='code'>440102</field>
             <field name='name'>政府补助收入-限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4401'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_4501" model='finance.account'>
             <field name='code'>4501</field>
             <field name='name'>商品销售收入</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
         <record id="init_account_450101" model='finance.account'>
             <field name='code'>450101</field>
             <field name='name'>商品销售收入-非限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4501'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_450102" model='finance.account'>
             <field name='code'>450102</field>
             <field name='name'>商品销售收入-限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4501'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_4601" model='finance.account'>
             <field name='code'>4601</field>
             <field name='name'>投资收益</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
         <record id="init_account_460101" model='finance.account'>
             <field name='code'>460101</field>
             <field name='name'>投资收益-非限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4601'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_460102" model='finance.account'>
             <field name='code'>460102</field>
             <field name='name'>投资收益-限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4601'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_4901" model='finance.account'>
             <field name='code'>4901</field>
             <field name='name'>其他收入</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
         <record id="init_account_490101" model='finance.account'>
             <field name='code'>490101</field>
             <field name='name'>其他收入-非限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4901'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_490102" model='finance.account'>
             <field name='code'>490102</field>
             <field name='name'>其他收入-限定性</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_in'/>
             <field name='balance_directions'>in</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_4901'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_5101" model='finance.account'>
             <field name='code'>5101</field>
             <field name='name'>业务活动成本</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_out'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_5201" model='finance.account'>
             <field name='code'>5201</field>
             <field name='name'>管理费用</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_out'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_5301" model='finance.account'>
             <field name='code'>5301</field>
             <field name='name'>筹资费用</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_out'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
         <record id="init_account_530101" model='finance.account'>
             <field name='code'>530101</field>
             <field name='name'>筹资费用-汇兑损益</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_out'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_5401" model='finance.account'>
             <field name='code'>5401</field>
             <field name='name'>其他费用</field>
-            <field name='user_type' ref='base_inout'/>
+            <field name='user_type' ref='base_out'/>
             <field name='balance_directions'>out</field>
-            <field name='selection'>init</field>
+            <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
 
