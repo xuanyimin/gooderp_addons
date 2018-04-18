@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--非营利收入/支出tree-->
+    	<record id="nonprofit_money_order_tree" model="ir.ui.view">
+            <field name="name">nonprofit.money.order.tree</field>
+            <field name="model">other.money.order</field>
+            <field name="arch" type="xml">
+                <tree string="流水单" colors='blue:state == "draft";lightgray:state == "cancel"'>
+                    <field name="type"/>
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="partner_id"/>
+                    <field name="total_amount"/>
+                    <field name="state"/>
+                    <field name="_approve_state"/>
+                    <field name="note"/>
+                    <field name="is_init" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--非营利收入/支出form-->
+        <record id="nonprofit_money_order_form" model="ir.ui.view">
+            <field name="name">nonprofit.money.order.form</field>
+            <field name="model">other.money.order</field>
+            <field name="arch" type="xml">
+                <form string="非营利收支流水">
+                <header>
+					<button name="other_money_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+					<button name="other_money_draft" states="done" string="反审核" type="object"/>
+                    <button name="action_cancel" states="draft" string="作废" type="object"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" class="oe_inline" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+							<field name='type' required="1"/>
+							<field name="partner_id"
+								options="{'no_open': True, 'no_create': True}" />
+                            />
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="voucher_id"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" context="{'order_type': type}">
+                    	<tree string="流水单明细" editable="bottom">
+                    		<field name="mony_flow" string="现金流量表项目" options="{'no_open': True, 'no_create': True}"/>
+							<field name="category_id" required="1" domain="[('type', '=', parent.type)]"  />
+                    		<field name="auxiliary_id"/>
+                            <field name="amount" sum="合计"/>
+                            <field name="note"/>
+                       </tree>
+                    </field>
+                    <group>
+                    	<group>
+		                	<field name="bank_id"/>
+		                </group>
+		                <group>	
+		                	<field name="total_amount"/>
+		                </group>
+		            </group>
+                    <field name="note" placeholder="备注"/>
+                </sheet>
+                <div class="oe_chatter">
+	                    <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="_to_approver_ids" widget="goodprocess" readonly="1"/>
+	                    <field name="message_ids" widget="mail_thread"/>
+	            </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- 流水单 action -->
+        <record id="nonprofit_money_receipt_action" model="ir.actions.act_window">
+            <field name="name">流水单</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">other.money.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('nonprofit_money.nonprofit_money_order_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('nonprofit_money.nonprofit_money_order_form')})]"/>
+            <field name="domain">[]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建流水单
+              </p>
+            </field>
+        </record>
+
+		<!-- 非营利收入单menu、非营利支出单menu -->
+        <menuitem id="menu_nonprofit_money_receipt_action" action="nonprofit_money_receipt_action" parent="money.menu_money_manage"  sequence="5"/>
+	</data>
+</openerp>
+	
