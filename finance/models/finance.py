@@ -692,6 +692,7 @@ class WizardAccountAddChild(models.TransientModel):
                 'code': full_account_code,
                 'name': self.account_name,
                 'account_type': 'normal',
+                'source': 'manual',
                 'parent_id': new_account.id
             })
 
@@ -701,6 +702,7 @@ class WizardAccountAddChild(models.TransientModel):
                 'code': full_account_code,
                 'name': self.account_name,
                 'account_type': 'normal',
+                'source': 'manual',
                 'parent_id': self.parent_id.id
             })
 
