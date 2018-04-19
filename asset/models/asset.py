@@ -352,21 +352,29 @@ class CreateCleanWizard(models.TransientModel):
     _name = 'create.clean.wizard'
     _description = u'固定资产清理向导'
 
+    CHANGE_TYPE = [('guazhang', u'挂帐'),
+                   ('handle', u'直接处理')]
+
     @api.one
     @api.depends('date')
     def _compute_period_id(self):
         ''' 根据清理日期取得期间 '''
         self.period_id = self.env['finance.period'].get_period(self.date)
 
-    #字段
+    # 字段
+    clean_type = fields.Selection(CHANGE_TYPE, u'类型',
+                                  required=True,
+                                  default='guazhang')
     date = fields.Date(u'清理日期', required=True)
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
-    clean_cost = fields.Float(u'清理费用', required=True)
-    residual_income = fields.Float(u'残值收入', required=True)
-    sell_tax_amount = fields.Float(u'销项税额', required=True)
+    clean_cost = fields.Float(u'清理费用')
+    clean_account = fields.Many2one(
+        'finance.account', u'固定资产清理科目')
+    residual_income = fields.Float(u'残值收入')
+    sell_tax_amount = fields.Float(u'销项税额')
     bank_account = fields.Many2one('bank.account', u'结算账户')
     company_id = fields.Many2one(
         'res.company',
@@ -416,19 +424,30 @@ class CreateCleanWizard(models.TransientModel):
         vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         depreciation2 = sum(line.cost_depreciation for line in Asset.line_ids)
         depreciation = Asset.depreciation_previous + depreciation2
-        income = Asset.cost - depreciation
+        income = Asset.cost - depreciation - (self.residual_income - self.clean_cost) #收入还是支出：原值-累计折旧-(残值收入-残值支出)
         Asset.write({'voucher_id': vouch_obj.id})
-        '''借方行'''
-        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
-                                         'debit': income, 'account_id': Asset.category_id.clean_costs.id,
-                                         })
-        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+        #借方行,挂帐不存在income<0
+        if self.clean_type == 'guazhang':
+            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+                                                 'debit': income, 'account_id': self.clean_account.id,
+                                                 })
+        if depreciation:
+            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
                                          'debit': depreciation, 'account_id': Asset.account_accumulated_depreciation.id,
                                          })
-        '''贷方行'''
+        if income > 0 and self.clean_type == 'handle':
+            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+                                             'debit': income, 'account_id': Asset.category_id.clean_costs.id,
+                                             })
+        # 贷方行
+        if income < 0 and self.clean_type == 'handle':
+            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+                                             'credit': income, 'account_id': Asset.category_id.clean_income.id,
+                                             })
         self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
                                          'credit': Asset.cost, 'account_id': Asset.account_asset.id,
                                          })
+
         vouch_obj.voucher_done()
         return vouch_obj
 
@@ -437,17 +456,21 @@ class CreateCleanWizard(models.TransientModel):
         ''' 清理固定资产 '''
         if not self.env.context.get('active_id'):
             return
+        if self.clean_type == 'guazhang' and not self.clean_account.id:
+            raise UserError(u'挂帐处理必须要挂帐科目')
         Asset = self.env['asset'].browse(self.env.context.get('active_id'))
+        if self.clean_type == 'handle' and not (Asset.category_id.clean_income.id or Asset.category_id.clean_costs.id):
+            raise UserError(u'直接处理必须要清理收入科目及清理支出科目')
         Asset.no_depreciation = 1
         Asset.state = 'clean'
         # 按发票收入生成收入单
-        self._generate_other_get()
+        if self.residual_income:
+            self._generate_other_get()
         # 按费用生成支出单
         if self.clean_cost:
             self._clean_cost_generate_other_pay(self.clean_cost)
         # 生成凭证
         self._generate_voucher(Asset)
-
 
 class CreateChangWizard(models.TransientModel):
     '''固定资产变更'''
@@ -466,13 +489,13 @@ class CreateChangWizard(models.TransientModel):
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
-    chang_cost = fields.Float(u'增加金额', required=True,
+    chang_cost = fields.Float(u'增加金额',
                               digits=dp.get_precision('Amount'))
-    chang_depreciation_number = fields.Float(u'变更折旧期间', required=True)
+    chang_depreciation_number = fields.Float(u'变更折旧期间')
     chang_tax = fields.Float(
-        u'增加税额', digits=dp.get_precision('Amount'), required=True)
+        u'增加税额', digits=dp.get_precision('Amount'))
     chang_partner_id = fields.Many2one(
-        'partner', u'供应商', ondelete='restrict', required=True)
+        'partner', u'供应商', ondelete='restrict')
     change_reason = fields.Text(u'变更原因')
     company_id = fields.Many2one(
         'res.company',

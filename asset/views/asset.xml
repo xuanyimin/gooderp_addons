@@ -29,10 +29,12 @@
                         <group>
                             <field name="date"/>
                             <field name="period_id"/>
-                            <field name="clean_cost"/>
-                            <field name="residual_income"/>
-                            <field name="bank_account"/>
-                            <field name="sell_tax_amount"/>
+                            <field name="clean_type"/>
+                            <field name="clean_account" attrs="{'required':[('clean_type', '!=', 'handle')], 'invisible': [('clean_type', '=', 'handle')]}"/>
+                            <field name="clean_cost" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
+                            <field name="residual_income" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
+                            <field name="bank_account" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
+                            <field name="sell_tax_amount" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
                         </group>
                     </group>
                     <footer>
@@ -252,16 +254,26 @@
 			<field name='arch' type='xml'>
 				<form string="固定资产">
                     <group>
-                        <field name='name'/>
-                        <field name='is_depreciation'/>
-                        <field name='account_accumulated_depreciation' required="1"/>
-                        <field name='account_asset' required="1"/>
-                        <field name='account_depreciation' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}"/>
-                        <field name='depreciation_number' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}"/>
-                        <field name='depreciation_value' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}"/>
-                        <field name='clean_income' required="1"/>
-                        <field name='clean_costs' required="1"/>
-                        <field name='active'/>
+                        <group>
+                            <field name='name'/>
+                        </group>
+                        <group>
+                            <field name='is_depreciation'/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name='account_asset' required="1"/>
+                            <field name='clean_income' />
+                            <field name='clean_costs' />
+                            <field name='active'/>
+                        </group>
+                        <group>
+                            <field name='account_accumulated_depreciation' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}"/>
+                            <field name='account_depreciation' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}"/>
+                            <field name='depreciation_number' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}"/>
+                            <field name='depreciation_value' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}"/>
+                        </group>
                     </group>
                 </form>
 			</field>

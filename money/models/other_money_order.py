@@ -230,23 +230,30 @@ class OtherMoneyOrder(models.Model):
                 self.date, self.bank_id.currency_id.id)
             vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'note': line.note or '',
                          'credit_auxiliary_id': line.auxiliary_id.id,
-                         'amount': abs(line.amount + line.tax_amount),
                          'credit_account_id': line.category_id.account_id.id,
                          'debit_account_id': self.bank_id.account_id.id,
                          'partner_credit': self.partner_id.id, 'partner_debit': '',
                          'sell_tax_amount': line.tax_amount or 0,
                          'init_obj': init_obj,
+                         })
+            if self.bank_id.currency_id.id:
+                vals.update({
+                         'amount': (line.amount + line.tax_amount) * rate_silent,
                          'currency_id': self.bank_id.currency_id.id,
-                         'currency_amount': self.currency_amount,
+                         'currency_amount': abs(line.amount + line.tax_amount),
                          'rate_silent': rate_silent,
                          })
+            else:
+                vals.update({
+                    'amount': abs(line.amount + line.tax_amount),
+                })
             # 贷方行
             if not init_obj:
                 self.env['voucher.line'].create({
                     'name': u"%s %s" % (vals.get('name'), vals.get('note')),
                     'partner_id': vals.get('partner_credit', ''),
                     'account_id': vals.get('credit_account_id'),
-                    'credit': line.amount,
+                    'credit': line.amount * rate_silent,
                     'voucher_id': vals.get('vouch_obj_id'),
                     'auxiliary_id': vals.get('credit_auxiliary_id', False),
                 })
@@ -265,7 +272,7 @@ class OtherMoneyOrder(models.Model):
         self.env['voucher.line'].create({
             'name': u"%s" % (vals.get('name')),
             'account_id': vals.get('debit_account_id'),
-            'debit': self.total_amount,  # 借方和
+            'debit': vals.get('amount'),  # 借方和
             'voucher_id': vals.get('vouch_obj_id'),
             'partner_id': vals.get('partner_debit', ''),
             'auxiliary_id': vals.get('debit_auxiliary_id', False),
@@ -290,20 +297,27 @@ class OtherMoneyOrder(models.Model):
                 self.date, self.bank_id.currency_id.id)
             vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'note': line.note or '',
                          'debit_auxiliary_id': line.auxiliary_id.id,
-                         'amount': abs(line.amount + line.tax_amount),
                          'credit_account_id': self.bank_id.account_id.id,
                          'debit_account_id': line.category_id.account_id.id, 'partner_credit': '',
                          'partner_debit': self.partner_id.id,
                          'buy_tax_amount': line.tax_amount or 0,
-                         'currency_id': self.bank_id.currency_id.id,
-                         'currency_amount': self.currency_amount,
-                         'rate_silent': rate_silent,
                          })
+            if self.bank_id.currency_id.id:
+                vals.update({
+                             'amount': (line.amount + line.tax_amount) * rate_silent,
+                             'currency_id': self.bank_id.currency_id.id,
+                             'currency_amount': abs(line.amount + line.tax_amount),
+                             'rate_silent': rate_silent,
+                             })
+            else:
+                vals.update({
+                    'amount': abs(line.amount + line.tax_amount),
+                })
             # 借方行
             self.env['voucher.line'].create({
                 'name': u"%s %s " % (vals.get('name'), vals.get('note')),
                 'account_id': vals.get('debit_account_id'),
-                'debit': line.amount,
+                'debit': (line.amount) * rate_silent,
                 'voucher_id': vals.get('vouch_obj_id'),
                 'partner_id': vals.get('partner_debit', ''),
                 'auxiliary_id': vals.get('debit_auxiliary_id', False),
@@ -324,7 +338,7 @@ class OtherMoneyOrder(models.Model):
             'name': u"%s" % (vals.get('name')),
             'partner_id': vals.get('partner_credit', ''),
             'account_id': vals.get('credit_account_id'),
-            'credit': self.total_amount,  # 贷方和
+            'credit': vals.get('amount'),  # 贷方和
             'voucher_id': vals.get('vouch_obj_id'),
             'auxiliary_id': vals.get('credit_auxiliary_id', False),
             'init_obj': vals.get('init_obj', False),

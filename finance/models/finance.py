@@ -783,6 +783,8 @@ class BankAccount(models.Model):
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision('Amount'))
 
 
+
+
 class CoreCategory(models.Model):
     '''继承core cotegory，添加科目类型'''
     _inherit = 'core.category'
