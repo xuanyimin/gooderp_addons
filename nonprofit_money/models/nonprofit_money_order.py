@@ -23,34 +23,27 @@ import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api
 from odoo.tools import float_compare
 
+SELECTION = [
+        ('other_pay', u'支出'),
+        ('other_get', u'收入'),
+    ]
 class OtherMoneyOrderLine(models.Model):
     _inherit ='other.money.order.line'
     _description = u'流水单明细'
 
     mony_flow = fields.Many2one('mony.flow', u'现金流量表项目', ondelete='restrict',
                               help=u'该笔收支对应现金流量表的项目')
-
+    type = fields.Selection(SELECTION, string=u'类型', readonly=True,
+                            default=lambda self: self._context.get('type'),
+                            help=u'类型：收入 或者 支出')
 
 class mony_flow(models.Model):
     ''' 是对其他收支业务的更细分类 '''
     _name = 'mony.flow'
     _description = u'收支项'
 
-    SELECTION = [
-        ('other_pay', u'支出'),
-        ('other_get', u'收入'),
-    ]
-
-    type = fields.Selection(SELECTION, string=u'类型', readonly=True,
-                            default=lambda self: self._context.get('type'),
-                            states={'draft': [('readonly', False)]},
-                            help=u'类型：收入 或者 支出')
-    line_ids = fields.One2many('other.money.order.line', 'other_money_id',
-                               string=u'收支单行', readonly=True,
-                               copy=True,
-                               states={'draft': [('readonly', False)]},
-                               help=u'流水表明细行')
-
+    type = fields.Selection(SELECTION, u'类型',
+                            default=lambda self: self._context.get('type'))
     name = fields.Char(u'名称', required=True)
     active = fields.Boolean(u'启用', default=True )
     company_id = fields.Many2one(

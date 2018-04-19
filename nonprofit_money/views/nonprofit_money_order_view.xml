@@ -52,7 +52,7 @@
                     </group>
                     <field name="line_ids" context="{'order_type': type}">
                     	<tree string="流水单明细" editable="bottom">
-                    		<field name="mony_flow" string="现金流量表项目" options="{'no_open': True, 'no_create': True}"/>
+                    		<field name="mony_flow" domain="[('type', '=', parent.type)]" />
 							<field name="category_id" required="1" domain="[('type', '=', parent.type)]"  />
                     		<field name="auxiliary_id"/>
                             <field name="amount" sum="合计"/>

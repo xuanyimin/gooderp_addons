@@ -226,8 +226,11 @@ class OtherMoneyOrder(models.Model):
             if not line.category_id.account_id:
                 raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
 
-            rate_silent = self.env['res.currency'].get_rate_silent(
-                self.date, self.bank_id.currency_id.id)
+            if self.bank_id.currency_id.id:
+                rate_silent = self.env['res.currency'].get_rate_silent(
+                    self.date, self.bank_id.currency_id.id)
+            else:
+                rate_silent = 1
             vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'note': line.note or '',
                          'credit_auxiliary_id': line.auxiliary_id.id,
                          'credit_account_id': line.category_id.account_id.id,
@@ -292,9 +295,12 @@ class OtherMoneyOrder(models.Model):
         for line in self.line_ids:
             if not line.category_id.account_id:
                 raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
+            if self.bank_id.currency_id.id:
+                rate_silent = self.env['res.currency'].get_rate_silent(
+                    self.date, self.bank_id.currency_id.id)
+            else:
+                rate_silent = 1
 
-            rate_silent = self.env['res.currency'].get_rate_silent(
-                self.date, self.bank_id.currency_id.id)
             vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'note': line.note or '',
                          'debit_auxiliary_id': line.auxiliary_id.id,
                          'credit_account_id': self.bank_id.account_id.id,
