@@ -575,6 +575,15 @@
             <field name='account_type'>normal</field>
         </record>
 
+        <record id='account_init' model='finance.account'>
+            <field name='code'>9999</field>
+            <field name='name'>期初余额</field>
+            <field name='user_type' ref='base_equity'/>
+            <field name='costs_types'>equity</field>
+            <field name='balance_directions'>in</field>
+            <field name='account_type'>normal</field>
+        </record>
+
 
         <!-- 资产负债表-->
         <record id='bs_0' model='balance.sheet'>
