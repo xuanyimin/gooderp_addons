@@ -245,6 +245,85 @@ class CreateBalanceSheetWizard(models.TransientModel):
                         total_sum = sum(subject_vals_out)
             return total_sum
 
+    @api.multi
+    def compute_activity(self, formula, period_id, report_fields):
+        """ 根据传进来的 的科目的code 进行业务活动表的计算 """
+        if formula:
+            formula_list = formula.split('~')
+            subject_vals = []
+            if len(formula_list) == 1:
+                subject_ids = self.env['finance.account'].search(
+                    [('code', '=', formula_list[0])])
+            else:
+                subject_ids = self.env['finance.account'].search(
+                    [('code', '>=', formula_list[0]), ('code', '<=', formula_list[1])])
+            trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [
+                                                              subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
+            for trial_balance in trial_balances:
+                subject_vals.append(trial_balance[report_fields[0]], trial_balance[report_fields[1]])
+
+            return sum(subject_vals)
+
+        else:
+            return 0
+
+    def deal_with_activity_formula(self, report_fields_formula, period_id, report_fields):
+        if report_fields_formula:
+            return_vals = sum([self.compute_activity(formula, period_id, report_fields)
+                               for formula in report_fields_formula.split(';')])
+        else:
+            return_vals = 0
+        return return_vals
+
+    @api.multi
+    def create_activity_statement(self):
+        """生成业务活动表"""
+        balance_wizard = self.env['create.trial.balance.wizard'].create(
+            {'period_id': self.period_id.id})
+        balance_wizard.create_trial_balance()
+        view_id = self.env.ref('finance.view_business_activity_statement_tree').id
+        report_item_ids = self.env['business.activity.statement'].search([])
+
+        current_fields =['cumulative_occurrence_debit','cumulative_occurrence_credit']
+        cumulative_fields =['current_occurrence_debit','current_occurrence_credit']
+
+        for report_item in report_item_ids:
+            cumulative_restricted =  self.deal_with_activity_formula(report_item.formula_restricted, self.period_id, cumulative_fields)
+            cumulative_unrestricted =  self.deal_with_activity_formula(report_item.formula_unrestricted, self.period_id, cumulative_fields)
+            current_restricted =  self.deal_with_activity_formula(report_item.formula_restricted, self.period_id, current_fields)
+            current_unrestricted =  self.deal_with_activity_formula(report_item.formula_unrestricted, self.period_id, current_fields)
+
+            report_item.write({'cumulative_restricted': cumulative_restricted,
+                             'cumulative_unrestricted': cumulative_unrestricted,
+                             'cumulative_total': cumulative_restricted +cumulative_unrestricted , 
+                             'current_restricted': current_restricted ,
+                             'current_unrestricted': current_unrestricted ,
+                             'current_total':  current_restricted+  current_unrestricted ,
+
+                                     })
+        force_company = self._context.get('force_company')
+        if not force_company:
+            force_company = self.env.user.company_id.id
+        company_row = self.env['res.company'].browse(force_company)
+        days = calendar.monthrange(
+            int(self.period_id.year), int(self.period_id.month))[1]
+        attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year\
+                                 + u'年' + self.period_id.month + u'月' + \
+            str(days) + u'日' + u',' + u'单位：元'
+        return {      # 返回生成业务活动表的数据的列表
+            'type': 'ir.actions.act_window',
+            'name': u'业务活动表' + self.period_id.name,
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'business.activity.statement',
+            'target': 'current',
+            'view_id': False,
+            'views': [(view_id, 'tree')],
+            'context': {'period_id': self.period_id.id, 'attachment_information': attachment_information},
+            'domain': [('id', 'in', [report_item.id for report_item in report_item_ids])],
+            'limit': 65535,
+        }
+
 
 class ProfitStatement(models.Model):
     """利润表模板

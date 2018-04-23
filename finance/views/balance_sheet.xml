@@ -21,18 +21,15 @@
             <field name="priority" eval="16" />
             <field name="active" eval="True" />
             <field name="arch" type="xml">
-                <tree string="business_activity_statement_tree" create='false' edit='false'>
-                    <field name="sequence" />
+                <tree string="业务活动表" create='false' edit='false' duplicate="false" delete="false">
                     <field name="balance" />
                     <field name="line_num" />
-                    <field name="cumulative_total" />
-                    <field name="cumulative_restricted" />
-                    <field name="cumulative_unrestricted" />
-                    <field name="current_total" />
-                    <field name="current_restricted" />
-                    <field name="current_unrestricted" />
-                    <field name="formula_restricted" />
-                    <field name="formula_unrestricted" />
+                    <field name="cumulative_restricted" base_string='本年累计数' merge="False" child_name='限定性' colspan='2' widget="bgcolor" color="success"/>
+                    <field name="cumulative_unrestricted" base_string='本年累计数' merge="True" child_name='非限定性' widget="bgcolor" color="primary"/>
+                    <field name="cumulative_total" base_string='本年累计数' merge="True" child_name='合计' widget="bgcolor" color="primary" />
+                    <field name="current_restricted" base_string='本月数' merge="False" child_name='非限定性' colspan='2' widget="bgcolor" color="success"/>
+                    <field name="current_unrestricted" base_string='本月数' merge="True" child_name='限定性' widget="bgcolor" color="primary"/>
+                    <field name="current_total" base_string='本月数' merge="True" child_name='合计' widget="bgcolor" color="success"/>
                 </tree>
             </field>
         </record>
@@ -154,8 +151,9 @@
                         </group>
                     </group>
                     <footer>
-                        <button name="create_balance_sheet" invisible="context.get('profit_statement')"  string="资产负债表" type="object" class="oe_highlight"/>
-                        <button name="create_profit_statement" invisible="context.get('balance_sheet')"  string="利润表" type="object" class="oe_highlight"/>
+                        <button name="create_balance_sheet" invisible="context.get('profit_statement') or context.get('activity_statement')"  string="资产负债表" type="object" class="oe_highlight"/>
+                        <button name="create_profit_statement" invisible="context.get('balance_sheet') or context.get('activity_statement')"  string="利润表" type="object" class="oe_highlight"/>
+                        <button name="create_activity_statement" invisible="context.get('balance_sheet') or context.get('profit_statement')"  string="业务活动表" type="object" class="oe_highlight"/>
                         或者
                         <button string="取消" class="oe_link" special="cancel"/>
                     </footer>
