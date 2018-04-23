@@ -1,6 +1,73 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+        <!-- VIEWS: "业务活动表"
+                
+                    - Model·········: business.activity.statement
+                    - _rec_name·····: name
+                    - Domain········: []
+                    - Context·······: {}
+                    - Parent menu ··: base.menu_custom
+                    - View priority·: 16    
+                    - Sequence····..: 10
+                    - Action help···: Something about business.activity.statement
+                - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+        <!-- Tree view for "business.activity.statement" -->
+        <record id="view_business_activity_statement_tree" model="ir.ui.view">
+            <field name="name">view.business.activity.statement.tree</field>
+            <field name="model">business.activity.statement</field>
+            <field name="type">tree</field>
+            <field name="mode">primary</field>
+            <field name="priority" eval="16" />
+            <field name="active" eval="True" />
+            <field name="arch" type="xml">
+                <tree string="business_activity_statement_tree" create='false' edit='false'>
+                    <field name="sequence" />
+                    <field name="balance" />
+                    <field name="line_num" />
+                    <field name="cumulative_total" />
+                    <field name="cumulative_restricted" />
+                    <field name="cumulative_unrestricted" />
+                    <field name="current_total" />
+                    <field name="current_restricted" />
+                    <field name="current_unrestricted" />
+                    <field name="formula_restricted" />
+                    <field name="formula_unrestricted" />
+                </tree>
+            </field>
+        </record>
+        <record id="view_business_activity_statement_tree_template" model="ir.ui.view">
+            <field name="name">view.business.activity.statement.tree</field>
+            <field name="model">business.activity.statement</field>
+            <field name="type">tree</field>
+            <field name="mode">primary</field>
+            <field name="priority" eval="16" />
+            <field name="active" eval="True" />
+            <field name="arch" type="xml">
+                <tree string="业务活动表模板" editable="bottom" >
+                    <field name="sequence" widget="handle"/>
+                    <field name="balance" />
+                    <field name="line_num" />
+                    <field name="formula_restricted" />
+                    <field name="formula_unrestricted" />
+                </tree>
+            </field>
+        </record>
+        <!-- Main window action for "business.activity.statement" -->
+        <record id="action_business_activity_statement_act_window" model="ir.actions.act_window">
+            <field name="type">ir.actions.act_window</field>
+            <field name="name">业务活动表模板</field>
+            <field name="res_model">business.activity.statement</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_business_activity_statement_tree_template" />
+            <field name="target">current</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+        </record>
+        <!-- Main menu for "business.activity.statement" -->
+        <menuitem id='menu_business_activity_statement' action='action_business_activity_statement_act_window' groups="base.group_no_one" parent='finance_setting_menu' sequence='80' />
+
         <record id="profit_statement_tree" model="ir.ui.view">
             <field name="name">profit_statement_tree</field>
             <field name="model">profit.statement</field>
@@ -113,6 +180,16 @@
             target="new" 
             context="{'profit_statement':True}"
             />
+        <act_window id="activity_statement_tree_wizard_action"
+            name='业务活动表'
+            res_model="create.balance.sheet.wizard"
+            multi="True"
+            view_type="form"
+            view_mode="form"
+            target="new" 
+            context="{'activity_statement':True}"
+            />
+         <menuitem id='activity_statement_tree_wizard_action_menu' action='activity_statement_tree_wizard_action' parent='voucher_books_menu' sequence='35'/>
          <menuitem id='profit_statement_tree_wizard_action_menu' action='profit_statement_tree_wizard_action' parent='voucher_books_menu' sequence='30'/>
          <menuitem id='create_balance_sheet_wizard_menu' action='create_balance_sheet_wizard_action' parent='voucher_books_menu' sequence='25'/>
          <menuitem id='balance_sheet_menu' action='balance_sheet_action' parent='finance_setting_menu' groups="base.group_no_one" sequence='70'/>
