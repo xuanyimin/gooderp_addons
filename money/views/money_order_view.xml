@@ -279,12 +279,12 @@
         </record>
 
 		<!-- 收款单menu、付款单menu -->
-        <menuitem id="menu_money_receipt_action" action="money_receipt_action" parent="menu_money_manage" sequence="1"/>
-        <menuitem id="menu_money_payment_action" action="money_payment_action" parent="menu_money_manage" sequence="2"/>
+        <menuitem id="menu_money_receipt_action" action="money_receipt_action" parent="menu_money_manage" sequence="1" groups='base.group_no_one'/>
+        <menuitem id="menu_money_payment_action" action="money_payment_action" parent="menu_money_manage" sequence="2" groups='base.group_no_one'/>
 		<!-- 结算单menu -->
 		<menuitem id="menu_money_invoice_action" action="money_invoice_action"
 			name="结算单" parent="menu_money_manage" sequence="3"
-			groups='money.reconcile_groups'/>
+			groups='base.group_no_one'/>
 	</data>
 </openerp>
 	

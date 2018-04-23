@@ -544,7 +544,7 @@ class MoneyOrderLine(models.Model):
         """
         self.currency_id = self.bank_id.account_id.currency_id.id or self.env.user.company_id.currency_id.id
         if self.bank_id and self.currency_id != self.money_id.currency_id:
-            raise ValidationError(u'结算帐户与业务伙伴币别不一致。\n 结算账户币别:%s 业务伙伴币别:%s'
+            raise ValidationError(u'结算账户与业务伙伴币别不一致。\n 结算账户币别:%s 业务伙伴币别:%s'
                                   % (self.currency_id.name, self.money_id.currency_id.name))
 
     money_id = fields.Many2one('money.order', string=u'收付款单',

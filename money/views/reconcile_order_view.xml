@@ -122,7 +122,7 @@
 		<!-- 核销单menu -->
 		<menuitem id="menu_reconcile_action" action="reconcile_action"
 		parent="menu_money_manage" sequence="4"
-		groups='money.reconcile_groups'/>
+		groups='base.group_no_one'/>
 	</data>
 </openerp>
 	

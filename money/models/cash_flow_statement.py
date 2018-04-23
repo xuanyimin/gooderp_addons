@@ -43,5 +43,5 @@ class CashFlowStatement(models.Model):
 
 class CoreCategory(models.Model):
     _inherit = 'core.category'
-    cash_flow_template_ids = fields.Many2many(
+    cash_flow_template_ids = fields.Many2one(
         'cash.flow.template', string=u'现金流量表行')

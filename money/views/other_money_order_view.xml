@@ -135,8 +135,8 @@
             </field>
         </record>
 		<!-- 其他收入单menu、其他支出单menu -->
-        <menuitem id="menu_other_money_receipt_action" action="other_money_receipt_action" parent="menu_money_manage" groups='money.other_get_pay_groups' sequence="5"/>
-        <menuitem id="menu_other_money_payment_action" action="other_money_payment_action" parent="menu_money_manage" groups='money.other_get_pay_groups' sequence="6"/>
+        <menuitem id="menu_other_money_receipt_action" action="other_money_receipt_action" parent="menu_money_manage" groups='base.group_no_one' sequence="5"/>
+        <menuitem id="menu_other_money_payment_action" action="other_money_payment_action" parent="menu_money_manage" groups='base.group_no_one' sequence="6"/>
 	</data>
 </openerp>
 	
