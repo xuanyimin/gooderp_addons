@@ -70,7 +70,7 @@ class hr_expense(models.Model):
             self.state = 'done'
         if self.other_money_order and self.other_money_order.state == 'draft':
             self.state = 'confirm'
-        '''付给公司走公司对帐了，跟报销人已经没有关系，所以不DONE了吧'''
+        '''付给公司走公司对账了，跟报销人已经没有关系，所以不DONE了吧'''
 
     @api.depends('line_ids')
     def _compute_invoice_all_total(self):

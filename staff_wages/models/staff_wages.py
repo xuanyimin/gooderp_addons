@@ -22,7 +22,7 @@ class StaffWages(models.Model):
     def _compute_period_id(self):
         self.name = self.env['finance.period'].get_period(self.date)
 
-    date = fields.Date(u'记帐日期', required=True, states=READONLY_STATES)
+    date = fields.Date(u'记账日期', required=True, states=READONLY_STATES)
     name = fields.Many2one(
         'finance.period',
         u'会计期间',
