@@ -826,7 +826,7 @@
         </record>
         <record id='bs_28' model='balance.sheet'>
             <field name="line">30</field>
-            <field name='balance'>3102~3102999999</field>
+            <field name='balance'>受托代理资产</field>
             <field name='line_num'>51</field>
             <field name='balance_formula'>1701~1701999999</field>
             <field name='balance_two'>净资产合计</field>
