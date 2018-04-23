@@ -19,7 +19,7 @@
 			</field>
 		</record>
 
-        <!--固定资产清理-->
+        <!--固定资产处置/清查-->
         <record id="create_clean_wizard_form" model="ir.ui.view">
             <field name="name">create.clean.wizard</field>
             <field name="model">create.clean.wizard</field>
@@ -31,17 +31,17 @@
                         <field name="clean_type"/>
                         <field name="clean_account" attrs="{'required':[('clean_type', '!=', 'handle')], 'invisible': [('clean_type', '=', 'handle')]}"/>
                         <group>
-                            <field name="cost_select" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
                             <field name="clean_cost" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
+                            <field name="cost_select" attrs="{'required':['&amp;',('clean_type', '=', 'handle'),('clean_cost', '&gt;', 0)], 'invisible': ['|',('clean_type', '!=', 'handle'),('clean_cost', '&lt;=', 0)]}"/>
                             <field name="cost_bank" attrs="{'required':['&amp;','&amp;',('clean_type', '=', 'handle'),('clean_cost', '&gt;', 0),('cost_select', '=', 'bank')], 'invisible': ['|','|',('clean_type', '!=', 'handle'),('clean_cost', '&lt;=', 0),('cost_select', '!=', 'bank')]}"/>
                             <field name="cost_account" attrs="{'required':['&amp;','&amp;',('clean_type', '=', 'handle'),('clean_cost', '&gt;', 0),('cost_select', '=', 'account')], 'invisible': ['|','|',('clean_type', '!=', 'handle'),('clean_cost', '&lt;=', 0),('cost_select', '!=', 'account')]}"/>
                         </group>
                         <group>
-                            <field name="income_select" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
                             <field name="residual_income" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
-                            <field name="sell_tax_amount" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
+                            <field name="income_select" attrs="{'required':['&amp;',('clean_type', '=', 'handle'),('residual_income', '&gt;', 0)], 'invisible': ['|',('clean_type', '!=', 'handle'),('residual_income', '&lt;=', 0)]}"/>
                             <field name="income_bank" attrs="{'required':['&amp;','&amp;',('clean_type', '=', 'handle'),('residual_income', '&gt;', 0),('income_select', '=', 'bank')], 'invisible': ['|','|',('clean_type', '!=', 'handle'),('residual_income', '&lt;=', 0),('income_select', '!=', 'bank')]}"/>
                             <field name="income_account" attrs="{'required':['&amp;','&amp;',('clean_type', '=', 'handle'),('residual_income', '&gt;', 0),('income_select', '=', 'account')], 'invisible': ['|','|',('clean_type', '!=', 'handle'),('residual_income', '&lt;=', 0),('income_select', '!=', 'account')]}"/>
+                            <field name="sell_tax_amount" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
                         </group>
                     </group>
                     <footer>
@@ -111,9 +111,9 @@
         </record>
         
         <!-- form view在此前定义，后面的form view引用了这两个action，所以不能把它们放在action文件里 -->
-        <!-- 固定资产清理 action -->
+        <!-- 固定资产处置/清查 action -->
         <record id="create_clean_action" model="ir.actions.act_window">
-            <field name="name">固定资产清理</field>
+            <field name="name">固定资产处置/清查</field>
             <field name="res_model">create.clean.wizard</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="create_clean_wizard_form"/>

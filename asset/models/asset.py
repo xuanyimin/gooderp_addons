@@ -127,7 +127,7 @@ class Asset(models.Model):
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
-    date = fields.Date(u'记帐日期', required=True, states=READONLY_STATES)
+    date = fields.Date(u'记账日期', required=True, states=READONLY_STATES)
     tax = fields.Float(u'税额', digits=dp.get_precision(
         'Amount'), required=True, states=READONLY_STATES)
     amount = fields.Float(u'价税合计', digits=dp.get_precision(
@@ -334,8 +334,8 @@ class CreateCleanWizard(models.TransientModel):
     _name = 'create.clean.wizard'
     _description = u'固定资产清理向导'
 
-    CLEAN_TYPE = [('guazhang', u'挂帐（盘亏，待处理，转资产等）'),
-                   ('handle', u'直接处理')]
+    CLEAN_TYPE = [('guazhang', u'盘亏'),
+                   ('handle', u'处置')]
 
     SELECT = [('bank', u'现金/银行'),
               ('account', '科目')]
@@ -350,7 +350,7 @@ class CreateCleanWizard(models.TransientModel):
     clean_type = fields.Selection(CLEAN_TYPE, u'操作类型',
                                   required=True,
                                   default='guazhang')
-    date = fields.Date(u'清理日期', required=True)
+    date = fields.Date(u'日期', required=True)
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
@@ -359,17 +359,17 @@ class CreateCleanWizard(models.TransientModel):
     clean_account = fields.Many2one(
         'finance.account', u'固定资产清理科目')
     #清理支出
-    cost_select = fields.Selection(SELECT, u'清理支出类型',
+    cost_select = fields.Selection(SELECT, u'清理费用类型',
                                    required=True,
                                    default='bank')
-    clean_cost = fields.Float(u'清理支出')
-    cost_bank = fields.Many2one('bank.account', u'清理支出结算账户')
-    cost_account = fields.Many2one('finance.account', u'清理支出结算科目')
+    clean_cost = fields.Float(u'清理费用金额')
+    cost_bank = fields.Many2one('bank.account', u'清理费用结算账户')
+    cost_account = fields.Many2one('finance.account', u'清理费用结算科目')
     #清理收入
     income_select = fields.Selection(SELECT, u'残值收入类型',
                                    required=True,
                                    default='bank')
-    residual_income = fields.Float(u'残值收入')
+    residual_income = fields.Float(u'残值收入金额')
     sell_tax_amount = fields.Float(u'销项税额')
     income_bank = fields.Many2one('bank.account', u'残值收入结算账户')
     income_account = fields.Many2one('finance.account', u'残值收入结算科目')
@@ -539,7 +539,7 @@ class CreateCleanWizard(models.TransientModel):
         if not Asset.account_accumulated_depreciation:
             raise UserError(u'请到固定资产分类:%s累计折旧科目'%Asset.account_accumulated_depreciation.name)
         if self.clean_type == 'guazhang' and not self.clean_account.id:
-            raise UserError(u'盘亏处理必须要挂帐科目')
+            raise UserError(u'盘亏处理必须要挂账科目')
         depreciation2 = sum(line.cost_depreciation for line in Asset.line_ids)
         depreciation = Asset.depreciation_previous + depreciation2
         residual = Asset.cost - depreciation  # 残值=原值-累计折旧
@@ -683,7 +683,7 @@ class CreateAssetWizard(models.TransientModel):
                                  domain="[('s_category_id', '!=', False)]",
                                  help=u'固定资产入账时：如应付，此处为选供应商')
     bank_account = fields.Many2one('bank.account', u'结算账户', ondelete='restrict',
-                                   help=u'固定资产入账时：如现金，此处为选帐户')
+                                   help=u'固定资产入账时：如现金，此处为选账户')
 
     account_ids = fields.Char( u'可使用贷方科目id',help=u'技术字段，用于过滤')
 
@@ -824,7 +824,7 @@ class AssetLine(models.Model):
     no_depreciation = fields.Float(u'未提折旧额')
     code = fields.Char(u'编码')
     name = fields.Char(u'名称')
-    date = fields.Date(u'记帐日期', required=True)
+    date = fields.Date(u'记账日期', required=True)
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
@@ -851,7 +851,7 @@ class CreateDepreciationWizard(models.TransientModel):
         ''' 取本月的最后一天作为默认折旧日  '''
         return self.env['finance.period'].get_period_month_date_range(self.env['finance.period'].get_date_now_period_id())[1]
 
-    date = fields.Date(u'记帐日期', required=True, default=_get_last_date)
+    date = fields.Date(u'记账日期', required=True, default=_get_last_date)
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
@@ -981,7 +981,7 @@ class ChangLine(models.Model):
     order_id = fields.Many2one('asset', u'订单编号', index=True,
                                required=True, ondelete='cascade')
     chang_name = fields.Char(u'变更内容', required=True)
-    date = fields.Date(u'记帐日期', required=True)
+    date = fields.Date(u'记账日期', required=True)
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
