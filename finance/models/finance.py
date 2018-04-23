@@ -300,6 +300,31 @@ class VoucherLine(models.Model):
             if record.account_id.account_type == 'view':
                 raise UserError('只能往下级科目记账!')
 
+    def check_restricted_account(self):
+        prohibit_account_debit_ids = self.env['finance.account'].search([('restricted_debit', '=', True)])
+        prohibit_account_credit_ids = self.env['finance.account'].search([('restricted_credit', '=', True)])
+
+        account_ids =[]
+
+        account = self.account_id
+        account_ids.append(account)
+        while account.parent_id:
+            account_ids.append(account.parent_id)
+            account = account.parent_id
+
+        inner_account_debit = [ acc for acc in account_ids if acc in prohibit_account_debit_ids]
+
+        inner_account_credit = [ acc for acc in account_ids if acc in prohibit_account_credit_ids]
+
+        if self.debit and self.credit:
+            raise UserError( u'不可以同时录入 贷方和借方')
+
+        if self.debit and not self.credit and inner_account_debit:
+            raise UserError(u'借方禁止科目: %s-%s \n\n 提示：%s '% (self.account_id.code, self.account_id.name,inner_account_debit[0].restricted_debit_msg))
+
+        if not self.debit and self.credit and inner_account_credit:
+            raise UserError(u'贷方禁止科目: %s-%s \n\n 提示：%s '% (self.account_id.code, self.account_id.name, inner_account_credit[0].restricted_credit_msg))
+
     @api.model
     def create(self, values):
         """
@@ -314,29 +339,7 @@ class VoucherLine(models.Model):
         if not self.env.context.get('entry_manual', False):
             return result
 
-        prohibit_account_debit_ids = result.company_id.prohibit_manual_debit_account_ids
-        prohibit_account_credit_ids = result.company_id.prohibit_manual_credit_account_ids
-
-        account_ids =[]
-
-        account = result.account_id
-        account_ids.append(account)
-        while account.parent_id:
-            account_ids.append(account.parent_id)
-            account = account.parent_id
-
-        inner_account_debit = [ acc for acc in account_ids if acc in prohibit_account_debit_ids]
-
-        inner_account_credit = [ acc for acc in account_ids if acc in prohibit_account_credit_ids]
-
-        if result.debit and result.credit:
-            raise UserError( u'不可以同时录入 贷方和借方')
-
-        if result.debit and not result.credit and inner_account_debit:
-            raise UserError(u'借方禁止手工记账科目: %s-%s'% (result.account_id.code, result.account_id.name))
-
-        if not result.debit and result.credit and inner_account_credit:
-            raise UserError(u'贷方禁止手工记账科目: %s-%s'% (result.account_id.code, result.account_id.name))
+        result.check_restricted_account()
     
         return result
 
@@ -357,29 +360,7 @@ class VoucherLine(models.Model):
             return result
 
         for record in self:
-            prohibit_account_debit_ids = record.company_id.prohibit_manual_debit_account_ids
-            prohibit_account_credit_ids = record.company_id.prohibit_manual_credit_account_ids
-
-            account_ids =[]
-
-            account = record.account_id
-            account_ids.append(account)
-            while account.parent_id:
-                account_ids.append(account.parent_id)
-                account = account.parent_id
-
-            inner_account_debit = [ acc for acc in account_ids if acc in prohibit_account_debit_ids]
-
-            inner_account_credit = [ acc for acc in account_ids if acc in prohibit_account_credit_ids]
-
-            if record.debit and record.credit:
-                raise UserError( u'不可以同时录入 贷方和借方')
-
-            if record.debit and not record.credit and inner_account_debit:
-                raise UserError(u'借方禁止手工记账科目: %s-%s'% (record.account_id.code, record.account_id.name))
-
-            if not record.debit and record.credit and inner_account_credit:
-                raise UserError(u'贷方禁止手工记账科目: %s-%s'% (record.account_id.code, record.account_id.name))
+            record.check_restricted_account()
     
         return result
 
@@ -636,6 +617,20 @@ class FinanceAccount(models.Model):
                            digits=dp.get_precision('Amount'),
                            help=u'科目的当前余额',
                            )
+    restricted_debit = fields.Boolean(
+        string=u'借方限制使用',
+        help='手工凭证时， 借方限制使用'
+    )
+    restricted_debit_msg = fields.Char(
+        string=u'提示消息',
+    )
+    restricted_credit = fields.Boolean(
+        string=u'贷方限制使用',
+        help='手工凭证时， 贷方限制使用'
+    )
+    restrict_credit_msg = fields.Char(
+        string=u'提示消息',
+    )
     source = fields.Selection(
         string=u'创建来源',
         selection=[('init', '初始化'), ('manual', '手工创建')], default='manual'
