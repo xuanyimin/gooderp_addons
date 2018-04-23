@@ -31,11 +31,24 @@ class OtherMoneyOrderLine(models.Model):
     _inherit ='other.money.order.line'
     _description = u'流水单明细'
 
-    mony_flow = fields.Many2one('mony.flow', u'现金流量表项目', ondelete='restrict',
-                              help=u'该笔收支对应现金流量表的项目')
-    type = fields.Selection(SELECTION, string=u'类型', readonly=True,
-                            default=lambda self: self._context.get('type'),
-                            help=u'类型：收入 或者 支出')
+    cash_flow_template_ids = fields.Many2one(
+        'cash.flow.template', string=u'现金流量表行')
+
+    @api.onchange('category_id')
+    def onchange_category_id(self):
+        '''当类别发生变化时，带出现金流量表项'''
+        if self.category_id:
+            self.cash_flow_template_ids = self.category_id.cash_flow_template_ids
+
+    @api.multi
+    def write(self, vals):
+        res = super(OtherMoneyOrderLine, self).write(vals)
+        # 如果没有现金流量表项则报错
+        if self.other_money_id.is_init:
+            pass
+        if not self.category_id.cash_flow_template_ids:
+            raise UserError(u'请到类型%s设置现金流量表项'%self.category_id.name)
+        return res
 
 class mony_flow(models.Model):
     ''' 是对其他收支业务的更细分类 '''

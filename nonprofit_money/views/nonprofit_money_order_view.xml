@@ -52,7 +52,7 @@
                     </group>
                     <field name="line_ids" context="{'order_type': type}">
                     	<tree string="流水单明细" editable="bottom">
-                    		<field name="mony_flow" domain="[('type', '=', parent.type)]" />
+                    		<field name="cash_flow_template_ids" domain="[('type', '=', parent.type)]" readonly="1"/>
 							<field name="category_id" required="1" domain="[('type', '=', parent.type)]"  />
                     		<field name="auxiliary_id"/>
                             <field name="amount" sum="合计"/>
@@ -96,7 +96,8 @@
         </record>
 
 		<!-- 非营利收入单menu、非营利支出单menu -->
-        <menuitem id="menu_nonprofit_money_receipt_action" action="nonprofit_money_receipt_action" parent="money.menu_money_manage"  sequence="5"/>
+        <menuitem id="menu_nonprofit_money_receipt_action" action="nonprofit_money_receipt_action" parent="money.menu_money_manage"  sequence="5"
+        web_icon="nonprofit_money,static/description/icon.png"/>
 	</data>
 </openerp>
 	
