@@ -300,6 +300,89 @@ class VoucherLine(models.Model):
             if record.account_id.account_type == 'view':
                 raise UserError('只能往下级科目记账!')
 
+    @api.model
+    def create(self, values):
+        """
+            Create a new record for a model VoucherLine
+            @param values: provides a data for new record
+    
+            @return: returns a id of new record
+        """
+    
+        result = super(VoucherLine, self).create(values)
+
+        if not self.env.context.get('entry_manual', False):
+            return result
+
+        prohibit_account_debit_ids = result.company_id.prohibit_manual_debit_account_ids
+        prohibit_account_credit_ids = result.company_id.prohibit_manual_credit_account_ids
+
+        account_ids =[]
+
+        account = result.account_id
+        account_ids.append(account)
+        while account.parent_id:
+            account_ids.append(account.parent_id)
+            account = account.parent_id
+
+        inner_account_debit = [ acc for acc in account_ids if acc in prohibit_account_debit_ids]
+
+        inner_account_credit = [ acc for acc in account_ids if acc in prohibit_account_credit_ids]
+
+        if result.debit and result.credit:
+            raise UserError( u'不可以同时录入 贷方和借方')
+
+        if result.debit and not result.credit and inner_account_debit:
+            raise UserError(u'借方禁止手工记账科目: %s-%s'% (result.account_id.code, result.account_id.name))
+
+        if not result.debit and result.credit and inner_account_credit:
+            raise UserError(u'贷方禁止手工记账科目: %s-%s'% (result.account_id.code, result.account_id.name))
+    
+        return result
+
+    @api.multi
+    def write(self, values):
+        """
+            Update all record(s) in recordset, with new value comes as {values}
+            return True on success, False otherwise
+    
+            @param values: dict of new values to be set
+    
+            @return: True on success, False otherwise
+        """
+
+        result = super(VoucherLine, self).write(values)
+        
+        if not self.env.context.get('entry_manual', False):
+            return result
+
+        for record in self:
+            prohibit_account_debit_ids = record.company_id.prohibit_manual_debit_account_ids
+            prohibit_account_credit_ids = record.company_id.prohibit_manual_credit_account_ids
+
+            account_ids =[]
+
+            account = record.account_id
+            account_ids.append(account)
+            while account.parent_id:
+                account_ids.append(account.parent_id)
+                account = account.parent_id
+
+            inner_account_debit = [ acc for acc in account_ids if acc in prohibit_account_debit_ids]
+
+            inner_account_credit = [ acc for acc in account_ids if acc in prohibit_account_credit_ids]
+
+            if record.debit and record.credit:
+                raise UserError( u'不可以同时录入 贷方和借方')
+
+            if record.debit and not record.credit and inner_account_debit:
+                raise UserError(u'借方禁止手工记账科目: %s-%s'% (record.account_id.code, record.account_id.name))
+
+            if not record.debit and record.credit and inner_account_credit:
+                raise UserError(u'贷方禁止手工记账科目: %s-%s'% (record.account_id.code, record.account_id.name))
+    
+        return result
+
 class FinancePeriod(models.Model):
     '''会计期间'''
     _name = 'finance.period'

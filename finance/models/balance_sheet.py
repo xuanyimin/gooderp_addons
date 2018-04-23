@@ -269,3 +269,39 @@ class ProfitStatement(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+
+
+class BusinessActivityStatement(models.Model):
+    """ 业务活动表模板
+
+    """
+
+    _name = 'business.activity.statement'
+    _order = "sequence,id"
+    _description = u'业务活动表'
+
+    sequence = fields.Integer(u'序号')
+
+    balance = fields.Char(u'项目', help=u'报表的行次的总一个名称')
+    line_num = fields.Char(u'行次', help=u'生成报表的行次')
+    cumulative_total = fields.Float(u'本年累计数', help=u'本年累计数合计', compute='_compute_total' )
+    cumulative_restricted = fields.Float(u'本年累计数限定性', help=u'本年累计数限定性')
+    cumulative_unrestricted = fields.Float(u'本年累计数非限定性', help=u'本年累计数非限定性')
+    current_total = fields.Float(u'本月数合计', help=u'本月的利润的金额合计', compute='_compute_total')
+    current_restricted = fields.Float(u'本月数限定性', help=u'本月数限定性')
+    current_unrestricted = fields.Float(u'本月数非限定性', help=u'本月数非限定性')
+    formula_restricted = fields.Text(
+        u'限定性科目范围', help=u'设定本行的限定性业务的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
+    formula_unrestricted = fields.Text(
+        u'非限定性科目范围', help=u'设定本行的非限定性业务的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
+
+    @api.depends('cumulative_restricted', 'cumulative_unrestricted', 'current_restricted', 'current_unrestricted')
+    def _compute_total(self):
+        for record in self:
+            record.cumulative_total = record.cumulative_restricted +  record.cumulative_unrestricted
+            record.current_total = record.current_restricted +  record.current_unrestricted
