@@ -27,5 +27,23 @@
             <field name="res_model">asset.category</field>
             <field name="view_mode">tree,form</field>
         </record>
+
+		<!--固定资产凭证action-->
+        <record id="asset_account_action" model="ir.actions.act_window">
+            <field name="name">固定资产贷方科目</field>
+            <field name="res_model">asset.account</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!--固定资产设置action-->
+        <record id="view_asset_config_setting_action" model="ir.actions.act_window">
+            <field name="name">固定设置</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">asset.config.settings</field>
+            <field name="view_id" ref="view_asset_config"/>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+
     </data>
 </openerp>

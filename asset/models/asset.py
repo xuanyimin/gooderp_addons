@@ -12,7 +12,6 @@ READONLY_STATES = {
     'clean': [('readonly', True)],     # 已清理
 }
 
-
 class AssetCategory(models.Model):
     '''固定资产分类'''
     _name = 'asset.category'
@@ -42,7 +41,6 @@ class AssetCategory(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-
 
 class Asset(models.Model):
     _name = 'asset'
@@ -111,14 +109,15 @@ class Asset(models.Model):
 
     net_value = fields.Float(u'净值',digits=dp.get_precision(
         'Amount'), store=True, compute='_get_net_value')
-    no_depreciation = fields.Boolean(u'不折旧')
+    no_depreciation = fields.Boolean(u'暂停折旧')
     depreciation_number = fields.Integer(
-        u'折旧期间数', required=True, states=READONLY_STATES)
+        u'折旧期间数',  states=READONLY_STATES)
     depreciation_value = fields.Float(u'最终残值', digits=dp.get_precision(
-        'Amount'), required=True, states=READONLY_STATES)
+        'Amount'),  states=READONLY_STATES)
     cost_depreciation = fields.Float(u'每月折旧额', digits=dp.get_precision(
         'Amount'), store=True, compute='_get_cost_depreciation')
-    
+    forever_no_depreciation = fields.Boolean(u'永不折旧')
+
     state = fields.Selection([('draft', u'草稿'),
                               ('done', u'已确认'),
                               ('clean', u'已清理')], u'状态', default='draft',
@@ -133,25 +132,16 @@ class Asset(models.Model):
         'Amount'), required=True, states=READONLY_STATES)
     amount = fields.Float(u'价税合计', digits=dp.get_precision(
         'Amount'), store=True, compute='_get_amount')
-    partner_id = fields.Many2one('partner', u'供应商', ondelete='restrict', states=READONLY_STATES,
-                                 domain="[('s_category_id', '!=', False)]",
-                                 help=u'用于记录采购固定资产时的应付账款，据此生成结算单')
-    bank_account = fields.Many2one('bank.account', u'结算账户', ondelete='restrict', states=READONLY_STATES,
-                                   help=u'用于记录现金采购固定资产时的付款，据此生成其他支出单')
     is_init = fields.Boolean(u'初始化资产', states=READONLY_STATES,
                              help=u'此固定资产在ERP系统启用前就已经有折旧了')
     depreciation_previous = fields.Float(u'以前折旧', digits=dp.get_precision(
         'Amount'), required=True, states=READONLY_STATES)
-    
-    account_credit = fields.Many2one(
-        'finance.account', u'资产贷方科目', required=True, states=READONLY_STATES,
-        help=u'固定资产入账时：\n 如赊购，此处为应付科目；\n 如现购，此处为资金科目；\n 如自建，此处为在建工程')
     account_asset = fields.Many2one(
         'finance.account', u'固定资产科目', required=True, states=READONLY_STATES)
     account_depreciation = fields.Many2one(
-        'finance.account', u'折旧费用科目', required=True, states=READONLY_STATES)
+        'finance.account', u'折旧费用科目', states=READONLY_STATES)
     account_accumulated_depreciation = fields.Many2one(
-        'finance.account', u'累计折旧科目', required=True, states=READONLY_STATES)
+        'finance.account', u'累计折旧科目', states=READONLY_STATES)
 
     line_ids = fields.One2many('asset.line', 'order_id', u'折旧明细行',
                                states=READONLY_STATES, copy=False)
@@ -181,6 +171,12 @@ class Asset(models.Model):
             self.account_accumulated_depreciation = self.category_id.account_accumulated_depreciation
             self.account_depreciation = self.category_id.account_depreciation
             self.depreciation_value = self.category_id.depreciation_value * self.cost / 100
+            self.forever_no_depreciation = self.category_id.is_depreciation
+
+    @api.onchange('forever_no_depreciation')
+    def onchange_no_depreciation(self):
+        # 当选择了收支项后，则自动填充上类别和金额
+        self.no_depreciation = self.forever_no_depreciation
 
     @api.onchange('cost')
     def onchange_cost(self):
@@ -265,7 +261,7 @@ class Asset(models.Model):
             'tax_amount': self.tax,
             'category_id': category and category.id
         })
-
+        other_money_order.other_money_done()
         return other_money_order
 
     @api.one
@@ -288,19 +284,6 @@ class Asset(models.Model):
     def asset_done(self):
         ''' 确认固定资产 '''
         self._wrong_asset_done()
-        # 非初始化固定资产生成入账凭证
-        if not self.is_init:
-            if self.partner_id and self.partner_id.s_category_id.account_id == self.account_credit:
-                # 赊购
-                self._partner_generate_invoice()
-            elif self.bank_account and self.account_credit == self.bank_account.account_id:
-                # 现金购入
-                self._bank_account_generate_other_pay()
-            else:
-                # 在建工程转入
-                self._construction_generate_voucher()
-        # 初始化的固定资产需要在初始化会计凭证上点击【导入固定资产】按钮
-
         self.state = 'done'
         return True
 
@@ -346,14 +329,16 @@ class Asset(models.Model):
 
         return super(Asset, self).unlink()
 
-
 class CreateCleanWizard(models.TransientModel):
     '''固定资产清理'''
     _name = 'create.clean.wizard'
     _description = u'固定资产清理向导'
 
-    CHANGE_TYPE = [('guazhang', u'挂帐'),
+    CLEAN_TYPE = [('guazhang', u'挂帐（盘亏，待处理，转资产等）'),
                    ('handle', u'直接处理')]
+
+    SELECT = [('bank', u'现金/银行'),
+              ('account', '科目')]
 
     @api.one
     @api.depends('date')
@@ -362,7 +347,7 @@ class CreateCleanWizard(models.TransientModel):
         self.period_id = self.env['finance.period'].get_period(self.date)
 
     # 字段
-    clean_type = fields.Selection(CHANGE_TYPE, u'类型',
+    clean_type = fields.Selection(CLEAN_TYPE, u'操作类型',
                                   required=True,
                                   default='guazhang')
     date = fields.Date(u'清理日期', required=True)
@@ -370,12 +355,24 @@ class CreateCleanWizard(models.TransientModel):
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
-    clean_cost = fields.Float(u'清理费用')
+    #挂帐科目
     clean_account = fields.Many2one(
         'finance.account', u'固定资产清理科目')
+    #清理支出
+    cost_select = fields.Selection(SELECT, u'清理支出类型',
+                                   required=True,
+                                   default='bank')
+    clean_cost = fields.Float(u'清理支出')
+    cost_bank = fields.Many2one('bank.account', u'清理支出结算账户')
+    cost_account = fields.Many2one('finance.account', u'清理支出结算科目')
+    #清理收入
+    income_select = fields.Selection(SELECT, u'残值收入类型',
+                                   required=True,
+                                   default='bank')
     residual_income = fields.Float(u'残值收入')
     sell_tax_amount = fields.Float(u'销项税额')
-    bank_account = fields.Many2one('bank.account', u'结算账户')
+    income_bank = fields.Many2one('bank.account', u'残值收入结算账户')
+    income_account = fields.Many2one('finance.account', u'残值收入结算科目')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -403,47 +400,93 @@ class CreateCleanWizard(models.TransientModel):
         return other_money_order
 
     @api.one
-    def _clean_cost_generate_other_pay(self, clean_cost):
-        '''按费用生成支出单'''
-        pay_category = self.env.ref('asset.asset_clean_pay')
+    # 按费用生成支出单
+    # 借：费用（固定资产清理）
+    # 贷：银行/现金
+    def _clean_cost_generate_other_pay(self):
+        pay_category = self.env.ref('asset.asset_clean_pay')#
         other_money_order = self.with_context(type='other_pay').env['other.money.order'].create({
             'state': 'draft',
             'partner_id': None,
             'date': self.date,
-            'bank_id': self.bank_account.id,
+            'bank_id': self.cost_bank.id,
         })
         self.env['other.money.order.line'].create({
             'other_money_id': other_money_order.id,
-            'amount': clean_cost,
+            'amount': self.clean_cost,
             'category_id': pay_category and pay_category.id
         })
 
     @api.one
-    def _generate_voucher(self, Asset):
+    # 按收入生成清理收入单
+    # 借：银行/现金
+    # 贷：收入（固定资产清理）
+    def _clean_income_other_get(self):
+        pay_category = self.env.ref('asset.asset_clean_get')#
+        other_money_order = self.with_context(type='other_get').env['other.money.order'].create({
+            'state': 'draft',
+            'partner_id': None,
+            'date': self.date,
+            'bank_id': self.income_bank.id,
+        })
+        self.env['other.money.order.line'].create({
+            'other_money_id': other_money_order.id,
+            'amount': self.residual_income,
+            'category_id': pay_category and pay_category.id
+        })
+
+    @api.one
+    # 按收入生成凭证
+    # 借：科目
+    # 贷：固定资产清理
+    def _clean_income_voucher(self,clear_account_id):
+        vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
+        # 借方行
+        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+                                             'debit': self.residual_income, 'account_id': self.income_account.id,
+                                             })
+        # 贷方行
+        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+                                         'credit': self.residual_income, 'account_id': clear_account_id.id,
+                                         })
+        vouch_obj.voucher_done()
+        return vouch_obj
+
+    @api.one
+    # 按费用生成凭证
+    # 借：固定资产清理
+    # 贷：科目
+    def _clean_cost_generate_voucher(self,clear_account_id):
+        vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
+        # 借方行
+        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+                                             'debit': self.clean_cost, 'account_id': clear_account_id.id,
+                                             })
+        # 贷方行
+        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+                                         'credit': self.clean_cost, 'account_id': self.clean_account.id,
+                                         })
+        vouch_obj.voucher_done()
+        return vouch_obj
+
+    @api.one
+    # 直接生成凭证
+    # 借：累计折旧
+    # 借：清理科目/其他科目
+    # 贷：固定资产
+    def _generate_voucher(self, Asset,income,depreciation,account_id):
         ''' 生成凭证，并确认 '''
         vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
-        depreciation2 = sum(line.cost_depreciation for line in Asset.line_ids)
-        depreciation = Asset.depreciation_previous + depreciation2
-        income = Asset.cost - depreciation - (self.residual_income - self.clean_cost) #收入还是支出：原值-累计折旧-(残值收入-残值支出)
         Asset.write({'voucher_id': vouch_obj.id})
         #借方行,挂帐不存在income<0
-        if self.clean_type == 'guazhang':
-            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
-                                                 'debit': income, 'account_id': self.clean_account.id,
+        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+                                                 'debit': income, 'account_id': account_id,
                                                  })
         if depreciation:
             self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
                                          'debit': depreciation, 'account_id': Asset.account_accumulated_depreciation.id,
                                          })
-        if income > 0 and self.clean_type == 'handle':
-            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
-                                             'debit': income, 'account_id': Asset.category_id.clean_costs.id,
-                                             })
         # 贷方行
-        if income < 0 and self.clean_type == 'handle':
-            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
-                                             'credit': income, 'account_id': Asset.category_id.clean_income.id,
-                                             })
         self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
                                          'credit': Asset.cost, 'account_id': Asset.account_asset.id,
                                          })
@@ -452,25 +495,81 @@ class CreateCleanWizard(models.TransientModel):
         return vouch_obj
 
     @api.one
+    # 挂帐直接生成凭证
+    # 借：其他收入 OR  固定资产清理
+    # 贷：固定资产清理   or  其他支出
+    def _generate_handle_voucher(self, Asset, income, clear_account_id):
+        ''' 生成凭证，并确认 '''
+        if income == 0 :
+            pass
+        vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
+        Asset.write({'voucher_id': vouch_obj.id})
+        #借方行,挂帐不存在income<0
+        if income <0:
+            # 借方行
+            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+                                             'debit': -income, 'account_id': Asset.category_id.clean_costs.id,
+                                             })
+            # 贷方行
+            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+                                             'credit': -income, 'account_id': clear_account_id,
+                                             })
+        if income >0:
+            # 借方行
+            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+                                                     'debit': income, 'account_id': clear_account_id,
+                                                     })
+            # 贷方行
+            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+                                             'credit': income, 'account_id': Asset.category_id.clean_income.id,
+                                             })
+        vouch_obj.voucher_done()
+        return vouch_obj
+
+    @api.one
+    #清理固定资产
     def create_clean_account(self):
-        ''' 清理固定资产 '''
+        clear_account_id = self.env['ir.values'].get_default(
+            'asset.config.settings', 'clear_account_id')
         if not self.env.context.get('active_id'):
             return
-        if self.clean_type == 'guazhang' and not self.clean_account.id:
-            raise UserError(u'挂帐处理必须要挂帐科目')
         Asset = self.env['asset'].browse(self.env.context.get('active_id'))
         if self.clean_type == 'handle' and not (Asset.category_id.clean_income.id or Asset.category_id.clean_costs.id):
             raise UserError(u'直接处理必须要清理收入科目及清理支出科目')
+        if not Asset.account_accumulated_depreciation:
+            raise UserError(u'请到固定资产分类:%s累计折旧科目'%Asset.account_accumulated_depreciation.name)
+        if self.clean_type == 'guazhang' and not self.clean_account.id:
+            raise UserError(u'盘亏处理必须要挂帐科目')
+        depreciation2 = sum(line.cost_depreciation for line in Asset.line_ids)
+        depreciation = Asset.depreciation_previous + depreciation2
+        residual = Asset.cost - depreciation  # 残值=原值-累计折旧
+        income = self.residual_income - self.clean_cost - residual#收入/支出=收入-支出-残值 大于0则为收入，小于0为支出
+        #挂帐（盘亏）处理直接生成凭证
+        if self.clean_type == 'guazhang':
+            self._generate_voucher(Asset, residual, depreciation, self.clean_account.id)
+        # 按发票收入生成收入单
+        else:
+            if not clear_account_id:
+                raise UserError(u'请到固定设置-固定资产清理科目维护')
+            # 先清理到清理科目
+            self._generate_voucher(Asset, residual, depreciation, clear_account_id)
+            # 直接处理：费用>0且为生成其他付款单（流水）
+            if self.clean_cost >0 and self.cost_bank:
+                self._clean_cost_generate_other_pay()
+            # 直接处理：费用>0且为生成凭证
+            if self.clean_cost > 0 and self.cost_account:
+                self._clean_cost_generate_voucher(clear_account_id)
+            # 直接处理：收入>0且为生成其他收款单（流水）
+            if self.residual_income > 0 and self.income_bank:
+                self._clean_income_other_get()
+            # 直接处理：收入>0且为生成凭证
+            if self.residual_income > 0 and self.income_account:
+                self._clean_income_voucher(clear_account_id)
+            # 生成清理收入/支出凭证
+            self._generate_handle_voucher(Asset, income,clear_account_id)
+
         Asset.no_depreciation = 1
         Asset.state = 'clean'
-        # 按发票收入生成收入单
-        if self.residual_income:
-            self._generate_other_get()
-        # 按费用生成支出单
-        if self.clean_cost:
-            self._clean_cost_generate_other_pay(self.clean_cost)
-        # 生成凭证
-        self._generate_voucher(Asset)
 
 class CreateChangWizard(models.TransientModel):
     '''固定资产变更'''
@@ -560,6 +659,153 @@ class CreateChangWizard(models.TransientModel):
 
         return True
 
+class CreateAssetWizard(models.TransientModel):
+    '''固定资产确认'''
+    _name = 'create.asset.wizard'
+    _description = u'固定资产清理向导'
+
+    '''
+    SELECT = [('partner', u'应付管理'),
+               ('bank', u'现金/银行'),
+              ('account','科目')]
+    '''
+    SELECT = [('bank', u'现金/银行'),
+              ('account', '科目')]
+
+    # 字段
+    create_type = fields.Selection(SELECT, u'类型',
+                                  required=True,
+                                  default='bank')
+    account_credit = fields.Many2one(
+        'finance.account', u'资产贷方科目',
+        help=u'固定资产入账时：如自建，此处为在建工程')
+    partner_id = fields.Many2one('partner', u'供应商', ondelete='restrict',
+                                 domain="[('s_category_id', '!=', False)]",
+                                 help=u'固定资产入账时：如应付，此处为选供应商')
+    bank_account = fields.Many2one('bank.account', u'结算账户', ondelete='restrict',
+                                   help=u'固定资产入账时：如现金，此处为选帐户')
+
+    account_ids = fields.Char( u'可使用贷方科目id',help=u'技术字段，用于过滤')
+
+    @api.model
+    def default_get(self,fields):
+        ''' 取默认值科目'''
+        res = super(CreateAssetWizard, self).default_get(fields)
+        account_ids=[]
+        for account in self.env['asset.account'].search([]):
+            account_ids.append(account.name.id)
+        res.update({'account_ids': account_ids})
+        return res
+
+    @api.one
+    def _wrong_asset_done(self,Asset):
+        ''' 固定资产确认入账前的验证 '''
+        # todo 外币购固定资产
+        if Asset.state == 'done':
+            raise UserError(u'请不要重复确认！')
+        if Asset.period_id.is_closed:
+            raise UserError(u'该会计期间(%s)已结账！不能确认' % Asset.period_id.name)
+        if Asset.cost <= 0:
+            raise UserError(u'金额必须大于0！\n金额:%s' % Asset.cost)
+        if Asset.tax < 0:
+            raise UserError(u'税额必须大于0！\n税额:%s' % Asset.tax)
+        if Asset.depreciation_previous < 0:
+            raise UserError(u'以前折旧必须大于0！\n折旧金额:%s' %
+                            Asset.depreciation_previous)
+        if self.partner_id and self.partner_id.s_category_id.account_id.currency_id:
+            raise UserError(u'系统占不支持外币结算固定资产')
+        if self.bank_account and self.bank_account.account_id.currency_id:
+            raise UserError(u'系统占不支持外币结算固定资产')
+        if self.account_credit and self.account_credit.currency_id:
+            raise UserError(u'系统占不支持外币结算固定资产')
+
+    @api.one
+    def _partner_generate_invoice(self,Asset):
+        ''' 赊购的方式，选择往来单位时，生成结算单'''
+        categ = self.env.ref('asset.asset_expense')  # 固定资产采购
+        # 创建结算单
+        money_invoice = self.env['money.invoice'].create({
+            'name': u'固定资产' + Asset.code,
+            'partner_id': self.partner_id.id,
+            'category_id': categ and categ.id,
+            'date': Asset.date,
+            'amount': Asset.amount,
+            'reconciled': 0,
+            'to_reconcile': Asset.amount,
+            'date_due': fields.Date.context_today(Asset),
+            'state': 'draft',
+            'tax_amount': Asset.tax
+        })
+        Asset.write({'money_invoice': money_invoice.id})
+
+        ''' 因分类上只能设置一个固定资产科目，这里要用当前固定资产的对应科目替换凭证 '''
+
+        # 如未自动确认，则确认一下结算单
+        if money_invoice.state != 'done':
+            money_invoice.money_invoice_done()
+        # 找到结算单对应的凭证行并修改科目
+        chang_account = self.env['voucher.line'].search(
+            [('voucher_id', '=', money_invoice.voucher_id.id),
+             ('account_id', '=', categ.account_id.id)])
+        chang_account.write({'account_id': Asset.account_asset.id})
+
+        return money_invoice
+
+    @api.one
+    def _bank_account_generate_other_pay(self,Asset):
+        ''' 现金和银行支付的方式，选择结算账户，生成其他支出单 '''
+        category = Asset.env.ref('asset.asset')  # 借：固定资产
+        other_money_order = Asset.with_context(type='other_pay').env['other.money.order'].create({
+            'state': 'draft',
+            'date': Asset.date,
+            'bank_id': self.bank_account.id,
+        })
+        Asset.write({'other_money_order': other_money_order.id})
+        Asset.env['other.money.order.line'].create({
+            'other_money_id': other_money_order.id,
+            'amount': Asset.cost,
+            'tax_rate': Asset.cost and Asset.tax / Asset.cost * 100 or 0,
+            'tax_amount': Asset.tax,
+            'category_id': category and category.id
+        })
+
+        return other_money_order
+
+    @api.one
+    def _construction_generate_voucher(self,Asset):
+        ''' 贷方科目选择在建工程，直接生成凭证 '''
+        vals = {}
+        vouch_obj = self.env['voucher'].create({'date': Asset.date, 'ref': '%s,%s' % (Asset._name, Asset.id)})
+        Asset.write({'voucher_id': vouch_obj.id})
+        vals.update({'vouch_obj_id': vouch_obj.id, 'string': Asset.name, 'name': u'固定资产',
+                     'amount': Asset.amount, 'credit_account_id': self.account_credit.id,
+                     'debit_account_id': Asset.account_asset.id,
+                     'buy_tax_amount': Asset.tax or 0
+                     })
+        self.env['money.invoice'].create_voucher_line(vals)
+        vouch_obj.voucher_done()
+
+        return vouch_obj
+
+    @api.one
+    def create_asset(self):
+        # 确认固定资产
+        Asset = self.env['asset'].browse(self.env.context.get('active_id'))
+        # 报错
+        self._wrong_asset_done(Asset)
+        # 非初始化固定资产生成入账凭证
+        Asset.state = 'done'
+        if not Asset.is_init:
+            if self.create_type == 'partner' and self.partner_id:
+                # 赊购
+                self._partner_generate_invoice(Asset)
+            if self.create_type == 'bank' and self.bank_account :
+                # 现金购入
+                self._bank_account_generate_other_pay(Asset)
+            if self.create_type == 'account' and self.account_credit:
+                # 在建工程转入
+                self._construction_generate_voucher(Asset)
+        return True
 
 class AssetLine(models.Model):
     _name = 'asset.line'
@@ -588,7 +834,6 @@ class AssetLine(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-
 
 class CreateDepreciationWizard(models.TransientModel):
     """生成每月折旧的向导 根据输入的期间"""
@@ -722,7 +967,6 @@ class CreateDepreciationWizard(models.TransientModel):
             'domain': [('id', 'in', asset_line_id_list)]
         }
 
-
 class ChangLine(models.Model):
     _name = 'chang.line'
     _description = u'资产变更明细'
@@ -753,7 +997,6 @@ class ChangLine(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-
 
 class Voucher(models.Model):
     ''' 在凭证上增加 引入固定资产 按钮逻辑 '''
@@ -802,3 +1045,26 @@ class Voucher(models.Model):
         for account_id, val in res.iteritems():
             self.env['voucher.line'].create(dict(val, account_id=account_id),
                                             )
+
+class AssetAccount(models.Model):
+    '''固定资产科目维护'''
+    _name = 'asset.account'
+    _description = u'固定资产监控科目'
+
+    name = fields.Many2one(
+        'finance.account', u'固定资产货方科目维护')
+
+class AssetConfigSettings(models.TransientModel):
+    _name = 'asset.config.settings'
+    _inherit = 'res.config.settings'
+    _description = u'会计默认设置'
+
+    clear_account_id = fields.Many2one(
+        'finance.account', u'固定资产清理科目维护')
+
+    @api.multi
+    def set_default_clear_account_id(self):
+        voucher_date = self.clear_account_id
+        res = self.env['ir.values'].set_default(
+            'asset.config.settings', 'clear_account_id', voucher_date.id)
+        return res
