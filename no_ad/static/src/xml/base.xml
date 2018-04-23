@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<template>
+	 <t t-extend="ListView">
+       <t t-jquery="#GoodERP_AD" t-operation="replace">
+        </t>
+    </t>
+ </template>
