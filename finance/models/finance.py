@@ -569,16 +569,27 @@ class FinanceAccount(models.Model):
 
             record.level = level
 
-    @api.one
+    @api.depends('child_ids', 'voucher_line_ids','account_type')
     def compute_balance(self):
         """
         计算会计科目的当前余额
         :return:
         """
-        lines = self.env['voucher.line'].search(
-            [('account_id', '=', self.id),
-             ('voucher_id.state', '=', 'done')])
-        self.balance = sum((line.debit - line.credit) for line in lines)
+        for record in self:
+            # 上级科目按下级科目汇总 
+            if record.account_type == 'view':
+                lines = self.env['voucher.line'].search(
+                    [('account_id', 'child_of', record.id),
+                     ('voucher_id.state', '=', 'done')])
+                record.debit = sum((line.debit ) for line in lines)
+                record.credit = sum((line.credit ) for line in lines)
+                record.balance = record.debit - record.credit
+
+            # 下级科目按记账凭证计算
+            else:
+                record.debit = sum(record.voucher_line_ids.mapped('debit'))
+                record.credit = sum(record.voucher_line_ids.mapped('credit'))
+                record.balance = record.debit - record.credit
 
     name = fields.Char(u'名称', required="1")
     code = fields.Char(u'编码', required="1")
@@ -616,9 +627,12 @@ class FinanceAccount(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    voucher_line_ids = fields.One2many(string=u'Voucher Lines', comodel_name='voucher.line', inverse_name='account_id', )
+    debit = fields.Float(string=u'借方', compute='compute_balance', store=False )
+    credit = fields.Float(string=u'贷方', compute='compute_balance', store=False )
     balance = fields.Float(u'当前余额',
                            compute='compute_balance',
-                           store=True,
+                           store=False,
                            digits=dp.get_precision('Amount'),
                            help=u'科目的当前余额',
                            )
