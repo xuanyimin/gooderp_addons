@@ -23,4 +23,5 @@
     'qweb': [
         "static/src/xml/*.xml",
     ],
+    'auto_install': True
 }
