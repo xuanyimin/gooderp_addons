@@ -587,6 +587,7 @@
             <field name='user_type' ref='base_out'/>
             <field name='balance_directions'>out</field>
             <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_5301'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_5401" model='finance.account'>

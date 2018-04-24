@@ -14,5 +14,13 @@
             <field name="blank_rows">1</field>
             <field name="active">True</field>
         </record>
+
+        <record id="template_activity_statement" model="report.template">
+            <field name="model_id"  ref="finance.model_business_activity_statement"/>
+            <field name="file_address">finance/xls/activity.xls</field>
+            <field name="blank_rows">2</field>
+            <field name="active">True</field>
+        </record>
+
     </data>
 </openerp>
