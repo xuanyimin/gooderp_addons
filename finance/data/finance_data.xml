@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
-    <data  noupdate="0">
+    <data  noupdate="1">
 
         <record id="account_code_default_account_hierarchy_level" model="ir.values">
             <field name="name">default_account_hierarchy_level</field>
@@ -83,7 +83,7 @@
             <field name='code'>1102</field>
             <field name='name'>短期投资跌价准备</field>
             <field name='user_type' ref='base_assest'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
@@ -171,7 +171,7 @@
             <field name='code'>1421</field>
             <field name='name'>长期投资减值准备</field>
             <field name='user_type' ref='base_assest'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
@@ -179,7 +179,7 @@
             <field name='code'>142101</field>
             <field name='name'>长期投资减值准备-股权投资</field>
             <field name='user_type' ref='base_assest'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_1421'/>
             <field name='account_type'>normal</field>
@@ -188,7 +188,7 @@
             <field name='code'>142102</field>
             <field name='name'>长期投资减值准备-债权投资</field>
             <field name='user_type' ref='base_assest'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_1421'/>
             <field name='account_type'>normal</field>
@@ -205,7 +205,7 @@
             <field name='code'>1502</field>
             <field name='name'>累计折旧</field>
             <field name='user_type' ref='base_assest'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
@@ -587,7 +587,7 @@
             <field name='user_type' ref='base_out'/>
             <field name='balance_directions'>in</field>
             <field name='source'>init</field>
-            <field name='parent_id' ref='init_account_530101'/>
+            <field name='parent_id' ref='init_account_5301'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_5401" model='finance.account'>
