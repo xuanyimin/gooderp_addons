@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
-    <data  noupdate="1">
+    <data  noupdate="0">
 
         <record id="account_code_default_account_hierarchy_level" model="ir.values">
             <field name="name">default_account_hierarchy_level</field>
@@ -379,7 +379,7 @@
             <field name='code'>4101</field>
             <field name='name'>捐赠收入</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
@@ -387,7 +387,7 @@
             <field name='code'>410101</field>
             <field name='name'>捐赠收入-非限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4101'/>
             <field name='account_type'>normal</field>
@@ -396,7 +396,7 @@
             <field name='code'>410102</field>
             <field name='name'>捐赠收入-限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4101'/>
             <field name='account_type'>normal</field>
@@ -405,7 +405,7 @@
             <field name='code'>4201</field>
             <field name='name'>会费收入</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
@@ -413,7 +413,7 @@
             <field name='code'>420101</field>
             <field name='name'>会费收入-非限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4201'/>
             <field name='account_type'>normal</field>
@@ -422,7 +422,7 @@
             <field name='code'>420102</field>
             <field name='name'>会费收入-限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4201'/>
             <field name='account_type'>normal</field>
@@ -431,7 +431,7 @@
             <field name='code'>4301</field>
             <field name='name'>提供服务收入</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
@@ -439,7 +439,7 @@
             <field name='code'>430101</field>
             <field name='name'>提供服务收入-非限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4301'/>
             <field name='account_type'>normal</field>
@@ -448,7 +448,7 @@
             <field name='code'>430102</field>
             <field name='name'>提供服务收入-限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4301'/>
             <field name='account_type'>normal</field>
@@ -457,7 +457,7 @@
             <field name='code'>4401</field>
             <field name='name'>政府补助收入</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
@@ -465,7 +465,7 @@
             <field name='code'>440101</field>
             <field name='name'>政府补助收入-非限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4401'/>
             <field name='account_type'>normal</field>
@@ -474,7 +474,7 @@
             <field name='code'>440102</field>
             <field name='name'>政府补助收入-限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4401'/>
             <field name='account_type'>normal</field>
@@ -483,7 +483,7 @@
             <field name='code'>4501</field>
             <field name='name'>商品销售收入</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
@@ -491,7 +491,7 @@
             <field name='code'>450101</field>
             <field name='name'>商品销售收入-非限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4501'/>
             <field name='account_type'>normal</field>
@@ -500,7 +500,7 @@
             <field name='code'>450102</field>
             <field name='name'>商品销售收入-限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4501'/>
             <field name='account_type'>normal</field>
@@ -509,7 +509,7 @@
             <field name='code'>4601</field>
             <field name='name'>投资收益</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
@@ -517,7 +517,7 @@
             <field name='code'>460101</field>
             <field name='name'>投资收益-非限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4601'/>
             <field name='account_type'>normal</field>
@@ -526,7 +526,7 @@
             <field name='code'>460102</field>
             <field name='name'>投资收益-限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4601'/>
             <field name='account_type'>normal</field>
@@ -535,7 +535,7 @@
             <field name='code'>4901</field>
             <field name='name'>其他收入</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
@@ -543,7 +543,7 @@
             <field name='code'>490101</field>
             <field name='name'>其他收入-非限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4901'/>
             <field name='account_type'>normal</field>
@@ -552,7 +552,7 @@
             <field name='code'>490102</field>
             <field name='name'>其他收入-限定性</field>
             <field name='user_type' ref='base_in'/>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='source'>init</field>
             <field name='parent_id' ref='init_account_4901'/>
             <field name='account_type'>normal</field>
@@ -561,7 +561,7 @@
             <field name='code'>5101</field>
             <field name='name'>业务活动成本</field>
             <field name='user_type' ref='base_out'/>
-            <field name='balance_directions'>out</field>
+            <field name='balance_directions'>in</field>
             <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
@@ -569,7 +569,7 @@
             <field name='code'>5201</field>
             <field name='name'>管理费用</field>
             <field name='user_type' ref='base_out'/>
-            <field name='balance_directions'>out</field>
+            <field name='balance_directions'>in</field>
             <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
@@ -577,7 +577,7 @@
             <field name='code'>5301</field>
             <field name='name'>筹资费用</field>
             <field name='user_type' ref='base_out'/>
-            <field name='balance_directions'>out</field>
+            <field name='balance_directions'>in</field>
             <field name='source'>init</field>
             <field name='account_type'>view</field>
         </record>
@@ -585,15 +585,16 @@
             <field name='code'>530101</field>
             <field name='name'>筹资费用-汇兑损益</field>
             <field name='user_type' ref='base_out'/>
-            <field name='balance_directions'>out</field>
+            <field name='balance_directions'>in</field>
             <field name='source'>init</field>
+            <field name='parent_id' ref='init_account_530101'/>
             <field name='account_type'>normal</field>
         </record>
         <record id="init_account_5401" model='finance.account'>
             <field name='code'>5401</field>
             <field name='name'>其他费用</field>
             <field name='user_type' ref='base_out'/>
-            <field name='balance_directions'>out</field>
+            <field name='balance_directions'>in</field>
             <field name='source'>init</field>
             <field name='account_type'>normal</field>
         </record>
@@ -603,7 +604,7 @@
             <field name='name'>期初余额</field>
             <field name='user_type' ref='base_equity'/>
             <field name='costs_types'>equity</field>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
             <field name='account_type'>normal</field>
         </record>
 
@@ -972,44 +973,44 @@
         <record id='as_1' model='business.activity.statement'>
             <field name='balance'>其中：捐赠收入</field>
             <field name='line_num'>2</field>
-            <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_restricted'>410102~410102999999</field>
+            <field name='formula_unrestricted'>410101~410101999999</field>
         </record>
         <record id='as_2' model='business.activity.statement'>
             <field name='balance'>会费收入</field>
             <field name='line_num'>2</field>
-            <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_restricted'>420102~420102999999</field>
+            <field name='formula_unrestricted'>420101~420101999999</field>
         </record>
         <record id='as_3' model='business.activity.statement'>
             <field name='balance'>提供服务收入</field>
             <field name='line_num'>3</field>
-            <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_restricted'>430102~430102999999</field>
+            <field name='formula_unrestricted'>430101~430101999999</field>
         </record>
         <record id='as_4' model='business.activity.statement'>
             <field name='balance'>商品销售收入</field>
             <field name='line_num'>4</field>
-            <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_restricted'>450102~450102999999</field>
+            <field name='formula_unrestricted'>450101~450101999999</field>
         </record>
         <record id='as_5' model='business.activity.statement'>
             <field name='balance'>政府补助收入</field>
             <field name='line_num'>5</field>
-            <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_restricted'>440102~440102999999</field>
+            <field name='formula_unrestricted'>440101~440101999999</field>
         </record>
         <record id='as_6' model='business.activity.statement'>
             <field name='balance'>投资收益</field>
             <field name='line_num'>6</field>
-            <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_restricted'>460102~460102999999</field>
+            <field name='formula_unrestricted'>460101~460101999999</field>
         </record>
         <record id='as_7' model='business.activity.statement'>
             <field name='balance'>其他收入</field>
             <field name='line_num'>9</field>
-            <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_restricted'>490102~490102999999</field>
+            <field name='formula_unrestricted'>490101~490101999999</field>
         </record>
         <record id='as_8' model='business.activity.statement'>
             <field name='balance'>收入合计</field>
@@ -1027,7 +1028,7 @@
             <field name='balance'>（一）业务活动成本</field>
             <field name='line_num'>12</field>
             <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_unrestricted'>5101~510199999999</field>
         </record>
         <record id='as_11' model='business.activity.statement'>
             <field name='balance'>其中：</field>
@@ -1057,13 +1058,13 @@
             <field name='balance'>（二）管理费用</field>
             <field name='line_num'>21</field>
             <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_unrestricted'>5201~520199999999</field>
         </record>
         <record id='as_16' model='business.activity.statement'>
             <field name='balance'>（三）筹资费用</field>
             <field name='line_num'>24</field>
             <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_unrestricted'>5301~530199999999</field>
         </record>
         <record id='as_17' model='business.activity.statement'>
             <field name='balance'>（四）其他费用</field>
@@ -1075,7 +1076,7 @@
             <field name='balance'>费用合计</field>
             <field name='line_num'>35</field>
             <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_unrestricted'>5401~540199999999</field>
         </record>
         <record id='as_19' model='business.activity.statement'>
             <field name='balance'>三、限定性净资产转为非限定性净资产</field>

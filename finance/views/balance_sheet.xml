@@ -25,8 +25,8 @@
                     <field name="balance" />
                     <field name="line_num" />
                     <field name="cumulative_restricted" base_string='本年累计数' merge="False" child_name='限定性' colspan='2' widget="bgcolor" color="success"/>
-                    <field name="cumulative_unrestricted" base_string='本年累计数' merge="True" child_name='非限定性' widget="bgcolor" color="primary"/>
-                    <field name="cumulative_total" base_string='本年累计数' merge="True" child_name='合计' widget="bgcolor" color="primary" />
+                    <field name="cumulative_unrestricted"  merge="True" child_name='非限定性' widget="bgcolor" color="primary"/>
+                    <field name="cumulative_total"  merge="True" child_name='合计' widget="bgcolor" color="primary" />
                     <field name="current_restricted" base_string='本月数' merge="False" child_name='非限定性' colspan='2' widget="bgcolor" color="success"/>
                     <field name="current_unrestricted" base_string='本月数' merge="True" child_name='限定性' widget="bgcolor" color="primary"/>
                     <field name="current_total" base_string='本月数' merge="True" child_name='合计' widget="bgcolor" color="success"/>
