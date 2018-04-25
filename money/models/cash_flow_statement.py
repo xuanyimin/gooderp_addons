@@ -10,7 +10,6 @@ LINE_TYPES = [('get', u'销售收款'),
               ('end', u'科目期末'),
               ('lines', u'表行计算')]
 
-
 class CashFlowTemplate(models.Model):
     _name = 'cash.flow.template'
     _order = 'sequence'
@@ -20,8 +19,8 @@ class CashFlowTemplate(models.Model):
     line_num = fields.Char(u'行次')
     line_type = fields.Selection(LINE_TYPES, u'行类型')
     # for type sum
-    category_ids = fields.Many2many(
-        'core.category', string=u'收支类别', domain="[('type','in',['other_get','other_pay'])]")
+    category_ids = fields.One2many('core.category', 'cash_flow_template_id', string=u'收支类别',
+                                copy=False, )
     # for type begin
     begin_ids = fields.Many2many('finance.account', string=u'会计科目期初')
     # for type end
@@ -43,5 +42,5 @@ class CashFlowStatement(models.Model):
 
 class CoreCategory(models.Model):
     _inherit = 'core.category'
-    cash_flow_template_ids = fields.Many2one(
+    cash_flow_template_id = fields.Many2one(
         'cash.flow.template', string=u'现金流量表行')

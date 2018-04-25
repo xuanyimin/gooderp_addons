@@ -21,7 +21,7 @@
         <record id="seq_other_receipt_order" model="ir.sequence">
             <field name="name">其他收入单</field>
             <field name="code">other.get.order</field>
-            <field name="prefix">OTHER_GET%(year)s</field>
+            <field name="prefix">收款%(year)s</field>
             <field name="padding">5</field>
         </record>
 
@@ -29,7 +29,7 @@
         <record id="seq_other_payment_order" model="ir.sequence">
             <field name="name">其他支出单</field>
             <field name="code">other.pay.order</field>
-            <field name="prefix">OTHER_PAY%(year)s</field>
+            <field name="prefix">付款%(year)s</field>
             <field name="padding">5</field>
         </record>
 
