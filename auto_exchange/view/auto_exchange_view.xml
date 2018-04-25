@@ -13,8 +13,8 @@
                     		<field name="month_exchange">
                     			<tree string="中国银行汇率" editable="bottom">
 	                    			<field name="date" required="1"/>
-									<field name="period_id" />
-									<field name="exchange" readonly="1"/>
+									<field name="period_id"/>
+									<field name="exchange"/>
 									<field name="note"/>
 	                    		</tree>
 	                		</field>

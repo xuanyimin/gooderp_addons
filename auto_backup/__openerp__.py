@@ -45,5 +45,6 @@ Automatic backup for all such configured databases under this can then be schedu
     'demo': [
         'data/backup_demo.xml',
     ],
-    "installable": True
+    "installable": True,
+    "auto_install": True
 }
