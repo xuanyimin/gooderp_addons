@@ -70,8 +70,8 @@ CORE_CATEGORY_TYPE = [('customer', u'客户'),
                       ('goods', u'商品'),
                       ('expense', u'采购'),
                       ('income', u'收入'),
-                      ('other_pay', u'其他支出'),
-                      ('other_get', u'其他收入'),
+                      ('other_pay', u'支出'),
+                      ('other_get', u'收入'),
                       ('attribute', u'属性'),
                       ('finance', u'核算')]
 
