@@ -52,7 +52,7 @@
                     </group>
                     <field name="line_ids" context="{'order_type': type}">
                     	<tree string="流水单明细" editable="bottom">
-                    		<field name="cash_flow_template_ids" domain="[('type', '=', parent.type)]" readonly="1"/>
+                    		<field name="cash_flow_template_id" domain="[('type', '=', parent.type)]" readonly="1"/>
 							<field name="category_id" required="1" domain="[('type', '=', parent.type)]"  />
                     		<field name="auxiliary_id"/>
                             <field name="amount" sum="合计"/>
