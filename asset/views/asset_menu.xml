@@ -6,13 +6,9 @@
         	parent='finance.voucher_books_menu' sequence='110'/>
         <menuitem id='create_depreciation_menu_finance' name="固定资产折旧" action='create_depreciation_action'
         	parent='finance.checkout_menu' sequence='11'/>
-        <menuitem id='menu_asset_config' name="固定资产设置"
-        	parent='finance.finance_setting_menu' sequence='2'/>
         <menuitem id='asset_category_finance' name="固定资产分类" action='asset_category_action'
-        	parent='menu_asset_config' sequence='31'/>
+        	parent='finance.finance_setting_menu' sequence='31'/>
         <!--menuitem id="asset_account" name="固定资产贷方科目" parent="menu_asset_config"
                   action="asset_account_action" sequence="32"/-->
-        <menuitem id="menu_asset_config_settings" name="固定资产设置" parent="menu_asset_config"
-                  action="view_asset_config_setting_action" sequence="32"/>
     </data>
 </openerp>

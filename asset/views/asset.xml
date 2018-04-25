@@ -45,7 +45,7 @@
                         </group>
                     </group>
                     <footer>
-                        <button name="create_clean_account"  string="生成清理凭证" type="object" class="oe_highlight"/>
+                        <button name="create_clean_account"  string="生成处置凭证" type="object" class="oe_highlight"/>
                         或者
                         <button string="取消" class="oe_link" special="cancel"/>
                     </footer>
@@ -146,9 +146,10 @@
 			<field name='arch' type='xml'>
                 <form string="固定资产">
 	                <header>
-	                	<button name="%(create_asset_action)d" states="draft" string="确认" type="action" class="oe_highlight"/>
+	                	<button name="%(create_asset_action)d" string="确认" type="action" class="oe_highlight" attrs="{'invisible': ['|',('is_init', '!=', False),('state', '!=', 'draft')]}"/>
+                        <button name="asset_done" string="确认" type="object" class="oe_highlight" attrs="{'invisible': ['|',('is_init', '!=', True),('state', '!=', 'draft')]}"/>
 	                	<button name='asset_draft' states="done" string="撤销确认" type="object" />
-                        <button name="%(create_clean_action)d" string="清理固定资产" type="action" class="btn-primary"
+                        <button name="%(create_clean_action)d" string="处置固定资产" type="action" class="btn-primary"
                         attrs="{'invisible': [('state', '!=', 'done')]}"/>
                         <button name="%(create_chang_action)d" string="变更固定资产" type="action" class="btn-primary"
                         attrs="{'invisible': [('state', '!=', 'done')]}"/>
@@ -283,6 +284,7 @@
 					<field name='account_accumulated_depreciation'/>
 					<field name='account_asset'/>
 					<field name='account_depreciation'/>
+                    <field name="clear_account_id" />
                     <field name='depreciation_number'/>
 					<field name='depreciation_value'/>
 					<field name='clean_income'/>
@@ -311,6 +313,7 @@
                             <field name='account_asset' required="1"/>
                             <field name='clean_income' />
                             <field name='clean_costs' />
+                            <field name="clear_account_id" />
                             <field name='active'/>
                         </group>
                         <group>
@@ -358,27 +361,6 @@
 			</field>
 		</record>
 
-        <!--固定资产设置-->
-        <record id="view_asset_config" model="ir.ui.view">
-            <field name="name">asset_config_settings</field>
-            <field name="model">asset.config.settings</field>
-            <field name="arch" type="xml">
-                <form string="Configure finance" class="oe_form_configuration">
-                    <header>
-                        <button string="应用" type="object" name="execute" class="oe_highlight"/>
-                        或
-                        <button string="取消" type="object" name="cancel" class="oe_link"/>
-                    </header>
-                    <div id="main" position="inside">
-                        <group string="固定资产设置">
-                            <group>
-                                <field name="clear_account_id" />
-                            </group>
-                        </group>
-                    </div>
-                </form>
-            </field>
-        </record>
 
 	</data>
 </openerp>
