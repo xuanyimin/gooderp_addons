@@ -389,6 +389,8 @@ class CreateCleanWizard(models.TransientModel):
     @api.one
     def _generate_other_get(self,Asset):
         '''按发票收入生成收入单'''
+        if self.bank_account and self.bank_account.account_id.currency_id:
+            raise UserError(u'系统占不支持外币结算固定资产')
         get_category = self.env.ref('asset.asset_clean_get')
         other_money_order = self.with_context(type='other_get').env['other.money.order'].create({
             'state': 'draft',
@@ -420,6 +422,8 @@ class CreateCleanWizard(models.TransientModel):
     # 贷：银行/现金
     def _clean_cost_generate_other_pay(self,Asset):
         pay_category = self.env.ref('asset.asset_clean_pay')#
+        if self.cost_bank and self.cost_bank.account_id.currency_id:
+            raise UserError(u'系统占不支持外币结算固定资产')
         other_money_order = self.with_context(type='other_pay').env['other.money.order'].create({
             'state': 'draft',
             'partner_id': None,
@@ -447,6 +451,8 @@ class CreateCleanWizard(models.TransientModel):
     # 贷：收入（固定资产处置）
     def _clean_income_other_get(self,Asset):
         get_category = self.env.ref('asset.asset_clean_get')#
+        if self.income_bank and self.income_bank.account_id.currency_id:
+            raise UserError(u'系统占不支持外币结算固定资产')
         other_money_order = self.with_context(type='other_get').env['other.money.order'].create({
             'state': 'draft',
             'partner_id': None,
@@ -815,6 +821,7 @@ class CreateAssetWizard(models.TransientModel):
         category = Asset.category_id.asset_other_money_pay_category  # 固定资产采购
         if not category:
             raise UserError(u'请在固定资产中设置固定资产直采类别')
+
         other_money_order = Asset.with_context(type='other_pay').env['other.money.order'].create({
             'state': 'draft',
             'date': Asset.date,

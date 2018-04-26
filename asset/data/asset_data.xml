@@ -1,116 +1,24 @@
 <?xml version="1.0"?>
 <openerp>
     <data noupdate="0">
-        <!--增加科目-->
-
-        <!-- 固定资产分类 -->
-        <record id="machinery_equipment" model='asset.category'>
-            <field name='name'>机器设备</field>
-            <field name='is_depreciation'>False</field>
-            <field name='depreciation_number'>120</field>
-            <field name='depreciation_value'>5</field>
-            <field name="clear_account_id" ref="finance.init_account_1509"/>
-            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
-            <field name='account_asset' ref='finance.init_account_1501'/>
-            <field name='clean_income' ref='finance.init_account_490101'/>
-            <field name='account_depreciation' ref='finance.init_account_5201'/>
-            <field name='clean_costs' ref='finance.init_account_5401'/>
-        </record>
-        <record id="transport_tool" model='asset.category'>
-            <field name='name'>运输工具</field>
-            <field name='is_depreciation'>False</field>
-            <field name='depreciation_number'>48</field>
-            <field name='depreciation_value'>5</field>
-            <field name="clear_account_id" ref="finance.init_account_1509"/>
-            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
-            <field name='account_asset' ref='finance.init_account_1501'/>
-            <field name='clean_income' ref='finance.init_account_490101'/>
-            <field name='clean_costs' ref='finance.init_account_5401'/>
-            <field name='account_depreciation' ref='finance.init_account_5201'/>
-        </record>
-        <record id="electronic_equipment" model='asset.category'>
-            <field name='name'>电子设备</field>
-            <field name='is_depreciation'>False</field>
-            <field name='depreciation_number'>48</field>
-            <field name='depreciation_value'>5</field>
-            <field name="clear_account_id" ref="finance.init_account_1509"/>
-            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
-            <field name='account_asset' ref='finance.init_account_1501'/>
-            <field name='clean_income' ref='finance.init_account_490101'/>
-            <field name='clean_costs' ref='finance.init_account_5401'/>
-            <field name='account_depreciation' ref='finance.init_account_5201'/>
-        </record>
-        <record id="production_tool" model='asset.category'>
-            <field name='name'>生产工具</field>
-            <field name='is_depreciation'>False</field>
-            <field name='depreciation_number'>60</field>
-            <field name='depreciation_value'>5</field>
-            <field name="clear_account_id" ref="finance.init_account_1509"/>
-            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
-            <field name='account_asset' ref='finance.init_account_1501'/>
-            <field name='clean_income' ref='finance.init_account_490101'/>
-            <field name='clean_costs' ref='finance.init_account_5401'/>
-            <field name='account_depreciation' ref='finance.init_account_5201'/>
-        </record>
-        <record id="office_furniture" model='asset.category'>
-            <field name='name'>办公家具</field>
-            <field name='is_depreciation'>False</field>
-            <field name='depreciation_number'>60</field>
-            <field name='depreciation_value'>5</field>
-            <field name="clear_account_id" ref="finance.init_account_1509"/>
-            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
-            <field name='account_asset' ref='finance.init_account_1501'/>
-            <field name='clean_income' ref='finance.init_account_490101'/>
-            <field name='clean_costs' ref='finance.init_account_5401'/>
-            <field name='account_depreciation' ref='finance.init_account_5201'/>
-        </record>
-        <record id="house" model='asset.category'>
-            <field name='name'>房屋</field>
-            <field name='is_depreciation'>False</field>
-            <field name='depreciation_number'>240</field>
-            <field name='depreciation_value'>5</field>
-            <field name="clear_account_id" ref="finance.init_account_1509"/>
-            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
-            <field name='account_asset' ref='finance.init_account_1501'/>
-            <field name='clean_income' ref='finance.init_account_490101'/>
-            <field name='clean_costs' ref='finance.init_account_5401'/>
-            <field name='account_depreciation' ref='finance.init_account_5201'/>
-        </record>
-        <record id="no_tax_house" model='asset.category'>
-            <field name='name'>非房产税房产</field>
-            <field name='is_depreciation'>False</field>
-            <field name='depreciation_number'>240</field>
-            <field name='depreciation_value'>5</field>
-            <field name="clear_account_id" ref="finance.init_account_1509"/>
-            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
-            <field name='account_asset' ref='finance.init_account_1501'/>
-            <field name='clean_income' ref='finance.init_account_490101'/>
-            <field name='clean_costs' ref='finance.init_account_5401'/>
-            <field name='account_depreciation' ref='finance.init_account_5201'/>
-        </record>
-        <record id="land" model='asset.category'>
-            <field name='name'>土地</field>
-            <field name='is_depreciation'>False</field>
-            <field name='depreciation_number'>600</field>
-            <field name='depreciation_value'>0</field>
-            <field name="clear_account_id" ref="finance.init_account_1509"/>
-            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
-            <field name='account_asset' ref='finance.init_account_1501'/>
-            <field name='clean_income' ref='finance.init_account_490101'/>
-            <field name='clean_costs' ref='finance.init_account_5401'/>
-            <field name='account_depreciation' ref='finance.init_account_5201'/>
-        </record>
-        <record id="cultural_relics" model='asset.category'>
-            <field name='name'>文物文化资产</field>
-            <field name='is_depreciation'>True</field>
-            <field name="clear_account_id" ref="finance.init_account_1509"/>
-            <field name='account_asset' ref='finance.init_account_1506'/>
-            <field name='clean_income' ref='finance.init_account_490101'/>
-            <field name='clean_costs' ref='finance.init_account_5401'/>
-        </record>
+        <!--增加类别-->
         <record id="asset" model='core.category'>
             <field name='name'>固定资产</field>
             <field name='account_id' ref='finance.init_account_1501'/>
+            <field name='type'>other_pay</field>
+            <field name='cash_flow_template_id' ref="money.cft_35"/>
+            <field name='note'>由系统创建</field>
+        </record>
+        <record id="cultural" model='core.category'>
+            <field name='name'>文物文化资产</field>
+            <field name='account_id' ref='finance.init_account_1506'/>
+            <field name='type'>other_pay</field>
+            <field name='cash_flow_template_id' ref="money.cft_35"/>
+            <field name='note'>由系统创建</field>
+        </record>
+        <record id="land" model='core.category'>
+            <field name='name'>土地</field>
+            <field name='account_id' ref='finance.init_account_1601'/>
             <field name='type'>other_pay</field>
             <field name='cash_flow_template_id' ref="money.cft_35"/>
             <field name='note'>由系统创建</field>
@@ -135,6 +43,123 @@
             <field name='type'>other_pay</field>
             <field name='cash_flow_template_id' ref="money.cft_27"/>
             <field name='note'>由系统创建</field>
+        </record>
+        <!--增加科目-->
+
+        <!-- 固定资产分类 -->
+        <record id="machinery_equipment" model='asset.category'>
+            <field name='name'>机器设备</field>
+            <field name='is_depreciation'>False</field>
+            <field name='depreciation_number'>120</field>
+            <field name='depreciation_value'>5</field>
+            <field name="clear_account_id" ref="finance.init_account_1509"/>
+            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
+            <field name='account_asset' ref='finance.init_account_1501'/>
+            <field name='clean_income' ref='finance.init_account_490101'/>
+            <field name='account_depreciation' ref='finance.init_account_5201'/>
+            <field name='clean_costs' ref='finance.init_account_5401'/>
+            <field name='clean_costs' ref='finance.init_account_5401'/>
+            <field name='asset_other_money_pay_category' ref='asset'/>
+        </record>
+        <record id="transport_tool" model='asset.category'>
+            <field name='name'>运输工具</field>
+            <field name='is_depreciation'>False</field>
+            <field name='depreciation_number'>48</field>
+            <field name='depreciation_value'>5</field>
+            <field name="clear_account_id" ref="finance.init_account_1509"/>
+            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
+            <field name='account_asset' ref='finance.init_account_1501'/>
+            <field name='clean_income' ref='finance.init_account_490101'/>
+            <field name='clean_costs' ref='finance.init_account_5401'/>
+            <field name='account_depreciation' ref='finance.init_account_5201'/>
+            <field name='asset_other_money_pay_category' ref='asset'/>
+        </record>
+        <record id="electronic_equipment" model='asset.category'>
+            <field name='name'>电子设备</field>
+            <field name='is_depreciation'>False</field>
+            <field name='depreciation_number'>48</field>
+            <field name='depreciation_value'>5</field>
+            <field name="clear_account_id" ref="finance.init_account_1509"/>
+            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
+            <field name='account_asset' ref='finance.init_account_1501'/>
+            <field name='clean_income' ref='finance.init_account_490101'/>
+            <field name='clean_costs' ref='finance.init_account_5401'/>
+            <field name='account_depreciation' ref='finance.init_account_5201'/>
+            <field name='asset_other_money_pay_category' ref='asset'/>
+        </record>
+        <record id="production_tool" model='asset.category'>
+            <field name='name'>生产工具</field>
+            <field name='is_depreciation'>False</field>
+            <field name='depreciation_number'>60</field>
+            <field name='depreciation_value'>5</field>
+            <field name="clear_account_id" ref="finance.init_account_1509"/>
+            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
+            <field name='account_asset' ref='finance.init_account_1501'/>
+            <field name='clean_income' ref='finance.init_account_490101'/>
+            <field name='clean_costs' ref='finance.init_account_5401'/>
+            <field name='account_depreciation' ref='finance.init_account_5201'/>
+            <field name='asset_other_money_pay_category' ref='asset'/>
+        </record>
+        <record id="office_furniture" model='asset.category'>
+            <field name='name'>办公家具</field>
+            <field name='is_depreciation'>False</field>
+            <field name='depreciation_number'>60</field>
+            <field name='depreciation_value'>5</field>
+            <field name="clear_account_id" ref="finance.init_account_1509"/>
+            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
+            <field name='account_asset' ref='finance.init_account_1501'/>
+            <field name='clean_income' ref='finance.init_account_490101'/>
+            <field name='clean_costs' ref='finance.init_account_5401'/>
+            <field name='account_depreciation' ref='finance.init_account_5201'/>
+            <field name='asset_other_money_pay_category' ref='asset'/>
+        </record>
+        <record id="house" model='asset.category'>
+            <field name='name'>房屋</field>
+            <field name='is_depreciation'>False</field>
+            <field name='depreciation_number'>240</field>
+            <field name='depreciation_value'>5</field>
+            <field name="clear_account_id" ref="finance.init_account_1509"/>
+            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
+            <field name='account_asset' ref='finance.init_account_1501'/>
+            <field name='clean_income' ref='finance.init_account_490101'/>
+            <field name='clean_costs' ref='finance.init_account_5401'/>
+            <field name='account_depreciation' ref='finance.init_account_5201'/>
+            <field name='asset_other_money_pay_category' ref='asset'/>
+        </record>
+        <record id="no_tax_house" model='asset.category'>
+            <field name='name'>非房产税房产</field>
+            <field name='is_depreciation'>False</field>
+            <field name='depreciation_number'>240</field>
+            <field name='depreciation_value'>5</field>
+            <field name="clear_account_id" ref="finance.init_account_1509"/>
+            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
+            <field name='account_asset' ref='finance.init_account_1501'/>
+            <field name='clean_income' ref='finance.init_account_490101'/>
+            <field name='clean_costs' ref='finance.init_account_5401'/>
+            <field name='account_depreciation' ref='finance.init_account_5201'/>
+            <field name='asset_other_money_pay_category' ref='asset'/>
+        </record>
+        <record id="asset_land" model='asset.category'>
+            <field name='name'>土地</field>
+            <field name='is_depreciation'>False</field>
+            <field name='depreciation_number'>600</field>
+            <field name='depreciation_value'>0</field>
+            <field name="clear_account_id" ref="finance.init_account_1509"/>
+            <field name='account_accumulated_depreciation' ref='finance.init_account_1502'/>
+            <field name='account_asset' ref='finance.init_account_1601'/>
+            <field name='clean_income' ref='finance.init_account_490101'/>
+            <field name='clean_costs' ref='finance.init_account_5401'/>
+            <field name='account_depreciation' ref='finance.init_account_5201'/>
+            <field name='asset_other_money_pay_category' ref='land'/>
+        </record>
+        <record id="cultural_relics" model='asset.category'>
+            <field name='name'>文物文化资产</field>
+            <field name='is_depreciation'>True</field>
+            <field name="clear_account_id" ref="finance.init_account_1509"/>
+            <field name='account_asset' ref='finance.init_account_1506'/>
+            <field name='clean_income' ref='finance.init_account_490101'/>
+            <field name='clean_costs' ref='finance.init_account_5401'/>
+            <field name='asset_other_money_pay_category' ref='cultural'/>
         </record>
     </data>
 </openerp>
