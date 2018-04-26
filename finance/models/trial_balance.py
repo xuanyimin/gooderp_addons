@@ -78,7 +78,6 @@ class TrialBalance(models.Model):
             ),
         }
 
-        return self.env.ref('finance.create_vouchers_summary_wizard_form')
 
 class ChangeCumulativeOccurrenceWizard(models.TransientModel):
     """ The summary line for a class docstring should fit on one line.
