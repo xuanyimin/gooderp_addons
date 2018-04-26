@@ -572,6 +572,44 @@ class FinanceAccount(models.Model):
                 record.credit = sum(record.voucher_line_ids.mapped('credit'))
                 record.balance = record.debit - record.credit
 
+    @api.multi
+    def get_balance(self, period_id=False):
+        self.ensure_one()
+        domain =[]
+        data = {}
+        period = self.env['finance.period']
+        if period_id :
+            domain.append( ('period_id', '=', period_id))
+
+
+        if self.account_type == 'view':
+            domain.extend([('account_id', 'child_of', self.id), ('voucher_id.state', '=', 'done')])
+            lines = self.env['voucher.line'].search(domain) 
+
+            debit = sum((line.debit ) for line in lines)
+            credit = sum((line.credit ) for line in lines)
+            balance = self.debit - self.credit
+
+            data.update( {'debit': debit, 'credit':credit , 'balance':balance})
+
+        # 下级科目按记账凭证计算
+        else:
+            if period_id:
+                period = self.env['finance.period'].browse(period_id)
+
+            if period:
+                debit = sum(self.voucher_line_ids.filtered(lambda self: self.period_id==period).mapped('debit'))
+                credit = sum(self.voucher_line_ids.filtered(lambda self: self.period_id==period).mapped('credit'))
+                balance = self.debit - self.credit
+            else:
+                debit = sum(self.voucher_line_ids.mapped('debit'))
+                credit = sum(self.voucher_line_ids.mapped('credit'))
+                balance = self.debit - self.credit
+
+            data.update( {'debit': debit, 'credit':credit , 'balance':balance})
+
+        return data
+
     name = fields.Char(u'名称', required="1")
     code = fields.Char(u'编码', required="1")
     balance_directions = fields.Selection(
