@@ -493,6 +493,22 @@ class FinancePeriod(models.Model):
                 raise UserError(u'%s 对应的会计期间不存在' % date)
             return period_id
 
+    @api.multi
+    def search_period(self, date):
+        """
+        根据参数date 得出对应的期间
+        :param date: 需要取得期间的时间
+        :return: 对应的期间
+        """
+        if date:
+            period_id = self.search([
+                ('year', '=', date[0:4]),
+                ('month', '=', int(date[5:7]))
+            ])
+            if not period_id:
+                raise UserError(u'%s 对应的会计期间不存在' % date)
+            return period_id
+
     _sql_constraints = [
         ('period_uniq', 'unique (year,month)', u'会计期间不能重复'),
     ]
