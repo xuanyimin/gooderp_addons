@@ -37,7 +37,7 @@ class AssetCategory(models.Model):
     # 用于软删除归档
     active = fields.Boolean(u'启用', default=True)
     clear_account_id = fields.Many2one(
-        'finance.account', u'固定资产处置科目维护')
+        'finance.account', u'固定资产处置科目')
     # 未来支持多公司
     company_id = fields.Many2one(
         'res.company',
@@ -383,8 +383,9 @@ class CreateCleanWizard(models.TransientModel):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
+
     @api.one
-    def _generate_other_get(self):
+    def _generate_other_get(self,Asset):
         '''按发票收入生成收入单'''
         get_category = self.env.ref('asset.asset_clean_get')
         other_money_order = self.with_context(type='other_get').env['other.money.order'].create({
@@ -407,6 +408,13 @@ class CreateCleanWizard(models.TransientModel):
             [('voucher_id', '=', other_money_order.voucher_id.id),
              ('account_id', '=', get_category.account_id.id)])
         chang_account.write({'account_id': Asset.account_asset.id})
+        #增加变更行，以后需要可以跟据此行做反向处理
+        self.env['chang.line'].create({'date': self.date,
+                                       'period_id': self.period_id.id,
+                                       'chang_name': u'清理固定资产',
+                                       'order_id': Asset.id,
+                                       'change_vourch': chang_account.id
+                                       })
         return other_money_order
 
     @api.one
@@ -433,6 +441,13 @@ class CreateCleanWizard(models.TransientModel):
             [('voucher_id', '=', other_money_order.voucher_id.id),
              ('account_id', '=', pay_category.account_id.id)])
         chang_account.write({'account_id': Asset.account_asset.id})
+
+        self.env['chang.line'].create({'date': self.date,
+                                       'period_id': self.period_id.id,
+                                       'chang_name': u'清理固定资产',
+                                       'order_id': Asset.id,
+                                       'change_other_money': other_money_order.id
+                                       })
         return other_money_order
 
     @api.one
@@ -459,6 +474,13 @@ class CreateCleanWizard(models.TransientModel):
             [('voucher_id', '=', other_money_order.voucher_id.id),
              ('account_id', '=', get_category.account_id.id)])
         chang_account.write({'account_id': Asset.account_asset.id})
+
+        self.env['chang.line'].create({'date': self.date,
+                                       'period_id': self.period_id.id,
+                                       'chang_name': u'清理固定资产',
+                                       'order_id': Asset.id,
+                                       'change_other_many': other_money_order.id
+                                       })
         return other_money_order
 
     @api.one
@@ -476,6 +498,12 @@ class CreateCleanWizard(models.TransientModel):
                                          'credit': self.residual_income, 'account_id': clear_account_id.id,
                                          })
         vouch_obj.voucher_done()
+        self.env['chang.line'].create({'date': self.date,
+                                       'period_id': self.period_id.id,
+                                       'chang_name': u'清理固定资产',
+                                       'order_id': Asset.id,
+                                       'change_vourch': vouch_obj.id
+                                       })
         return vouch_obj
 
     @api.one
@@ -493,6 +521,12 @@ class CreateCleanWizard(models.TransientModel):
                                          'credit': self.clean_cost, 'account_id': self.clean_account.id,
                                          })
         vouch_obj.voucher_done()
+        self.env['chang.line'].create({'date': self.date,
+                                       'period_id': self.period_id.id,
+                                       'chang_name': u'清理固定资产',
+                                       'order_id': Asset.id,
+                                       'change_vourch': vouch_obj.id
+                                       })
         return vouch_obj
 
     @api.one
@@ -500,7 +534,7 @@ class CreateCleanWizard(models.TransientModel):
     # 借：累计折旧
     # 借：处置科目/其他科目
     # 贷：固定资产
-    def _generate_voucher(self, Asset,income,depreciation,account_id):
+    def _generate_voucher(self, Asset, income, depreciation, account_id):
         ''' 生成凭证，并确认 '''
         vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         Asset.write({'voucher_id': vouch_obj.id})
@@ -518,6 +552,13 @@ class CreateCleanWizard(models.TransientModel):
                                          })
 
         vouch_obj.voucher_done()
+        self.env['chang.line'].create({'date': self.date,
+                                       'period_id': self.period_id.id,
+                                       'chang_name': u'清理固定资产',
+                                       'order_id': Asset.id,
+                                       'change_vourch': vouch_obj.id
+                                       })
+
         return vouch_obj
 
     @api.one
@@ -550,6 +591,12 @@ class CreateCleanWizard(models.TransientModel):
                                              'credit': income, 'account_id': Asset.category_id.clean_income.id,
                                              })
         vouch_obj.voucher_done()
+        self.env['chang.line'].create({'date': self.date,
+                                       'period_id': self.period_id.id,
+                                       'chang_name': u'清理固定资产',
+                                       'order_id': Asset.id,
+                                       'change_vourch': vouch_obj.id
+                                       })
         return vouch_obj
 
     @api.one
@@ -575,7 +622,7 @@ class CreateCleanWizard(models.TransientModel):
         # 按发票收入生成收入单
         else:
             if not clear_account_id:
-                raise UserError(u'请到固定设置-固定资产处置科目维护')
+                raise UserError(u'请到固定分类处置科目维护')
             # 先处置到处置科目
             self._generate_voucher(Asset, residual, depreciation, clear_account_id)
             # 直接处理：费用>0且为生成其他付款单（流水）
@@ -583,15 +630,15 @@ class CreateCleanWizard(models.TransientModel):
                 self._clean_cost_generate_other_pay(Asset)
             # 直接处理：费用>0且为生成凭证
             if self.clean_cost > 0 and self.cost_account:
-                self._clean_cost_generate_voucher(clear_account_id)
+                self._clean_cost_generate_voucher(Asset,clear_account_id)
             # 直接处理：收入>0且为生成其他收款单（流水）
             if self.residual_income > 0 and self.income_bank:
                 self._clean_income_other_get(Asset)
             # 直接处理：收入>0且为生成凭证
             if self.residual_income > 0 and self.income_account:
-                self._clean_income_voucher(clear_account_id)
+                self._clean_income_voucher(Asset, clear_account_id)
             # 生成处置收入/支出凭证
-            self._generate_handle_voucher(Asset, income,clear_account_id)
+            self._generate_handle_voucher(Asset, income, clear_account_id)
 
         Asset.no_depreciation = 1
         Asset.state = 'clean'
@@ -1028,6 +1075,10 @@ class ChangLine(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    change_vourch = fields.Many2one(
+        'voucher', u'会计凭证', readonly=True, ondelete='restrict')
+    chang_other_money = fields.Many2one(
+        'other.money.order', u'对应收支单', readonly=True, ondelete='restrict')
 
 class Voucher(models.Model):
     ''' 在凭证上增加 引入固定资产 按钮逻辑 '''
