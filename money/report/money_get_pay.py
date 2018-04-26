@@ -6,8 +6,8 @@ from odoo import fields, models, api, tools
 MONEY_TYPE = [
     ('pay', u'采购'),
     ('get', u'销售'),
-    ('other_pay', u'其他支出'),
-    ('other_get', u'其他收入'),
+    ('other_pay', u'支出'),
+    ('other_get', u'收入'),
 ]
 
 

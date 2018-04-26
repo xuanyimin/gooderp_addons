@@ -65,10 +65,10 @@ class BankStatementsReport(models.Model):
                         omo.date,
                         omo.name,
                         (CASE WHEN omo.type = 'other_get' THEN
-                         (CASE WHEN ba.currency_id IS NULL THEN omo.total_amount ELSE omo.currency_amount END)
+                         (CASE WHEN ba.currency_id IS NULL THEN omo.total_amount  END)
                          ELSE 0 END) AS get,
                         (CASE WHEN omo.type = 'other_pay' THEN
-                         (CASE WHEN ba.currency_id IS NULL THEN omo.total_amount ELSE omo.currency_amount END)
+                         (CASE WHEN ba.currency_id IS NULL THEN omo.total_amount  END)
                          ELSE 0 END) AS pay,
                         0 AS balance,
                         omo.partner_id,
@@ -82,7 +82,7 @@ class BankStatementsReport(models.Model):
                         mto.date,
                         mto.name,
                         0 AS get,
-                        (CASE WHEN ba.currency_id IS NULL THEN mtol.amount ELSE mtol.currency_amount END) AS pay,
+                        (CASE WHEN ba.currency_id IS NULL THEN mtol.amount END) AS pay,
                         0 AS balance,
                         NULL AS partner_id,
                         mto.note
