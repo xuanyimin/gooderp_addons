@@ -22,6 +22,8 @@ class AssetCategory(models.Model):
     name = fields.Char(u'名称', required=True)
     # 一些带到固定资产上的默认值
     is_depreciation = fields.Boolean(u'永不折旧', default=False)
+    asset_other_money_pay_category = fields.Many2one(
+        'core.category', u'资产直采类别', domain="[('type','=','other_pay')]")
     account_accumulated_depreciation = fields.Many2one(
         'finance.account', u'累计折旧科目')
     account_asset = fields.Many2one(
@@ -403,11 +405,6 @@ class CreateCleanWizard(models.TransientModel):
         })
         other_money_order_line.onchange_category_id()
         other_money_order.other_money_done()
-        # 找到结算单对应的凭证行并修改科目
-        chang_account = self.env['voucher.line'].search(
-            [('voucher_id', '=', other_money_order.voucher_id.id),
-             ('account_id', '=', get_category.account_id.id)])
-        chang_account.write({'account_id': Asset.account_asset.id})
         #增加变更行，以后需要可以跟据此行做反向处理
         self.env['chang.line'].create({'date': self.date,
                                        'period_id': self.period_id.id,
@@ -436,12 +433,6 @@ class CreateCleanWizard(models.TransientModel):
         })
         other_money_order_line.onchange_category_id()
         other_money_order.other_money_done()
-        # 找到结算单对应的凭证行并修改科目
-        chang_account = self.env['voucher.line'].search(
-            [('voucher_id', '=', other_money_order.voucher_id.id),
-             ('account_id', '=', pay_category.account_id.id)])
-        chang_account.write({'account_id': Asset.account_asset.id})
-
         self.env['chang.line'].create({'date': self.date,
                                        'period_id': self.period_id.id,
                                        'chang_name': u'清理固定资产',
@@ -470,11 +461,6 @@ class CreateCleanWizard(models.TransientModel):
         other_money_order_line.onchange_category_id()
         other_money_order.other_money_done()
         # 找到结算单对应的凭证行并修改科目
-        chang_account = self.env['voucher.line'].search(
-            [('voucher_id', '=', other_money_order.voucher_id.id),
-             ('account_id', '=', get_category.account_id.id)])
-        chang_account.write({'account_id': Asset.account_asset.id})
-
         self.env['chang.line'].create({'date': self.date,
                                        'period_id': self.period_id.id,
                                        'chang_name': u'清理固定资产',
@@ -826,7 +812,9 @@ class CreateAssetWizard(models.TransientModel):
     @api.one
     def _bank_account_generate_other_pay(self,Asset):
         ''' 现金和银行支付的方式，选择结算账户，生成其他支出单 '''
-        category = Asset.env.ref('asset.asset')  # 借：固定资产
+        category = Asset.category_id.asset_other_money_pay_category  # 固定资产采购
+        if not category:
+            raise UserError(u'请在固定资产中设置固定资产直采类别')
         other_money_order = Asset.with_context(type='other_pay').env['other.money.order'].create({
             'state': 'draft',
             'date': Asset.date,
@@ -842,11 +830,6 @@ class CreateAssetWizard(models.TransientModel):
         })
         other_money_order_line.onchange_category_id()
         other_money_order.other_money_done()
-        # 找到结算单对应的凭证行并修改科目
-        chang_account = self.env['voucher.line'].search(
-            [('voucher_id', '=', other_money_order.voucher_id.id),
-             ('account_id', '=', category.account_id.id)])
-        chang_account.write({'account_id': Asset.account_asset.id})
         return other_money_order
 
     @api.one
