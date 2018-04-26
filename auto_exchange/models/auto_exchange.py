@@ -116,6 +116,18 @@ class Currency(models.Model):
                 if period_id == line.period_id.id:
                     currency.rate = line.exchange or 1.0
 
+    @api.multi
+    def get_rate_silent(self, date, currency_id):
+        currency = self.env['res.currency'].search([('id', '=', currency_id)])
+        period_id = self.env['finance.period'].get_period(date)
+        rate = 0
+        for line in currency.month_exchange:
+            if period_id == line.period_id:
+                rate = line.exchange
+        if not rate:
+            raise UserError(u'没有设置会计期间内的外币%s汇率' % currency.name)
+
+        return rate
 
 class AutoExchangeLine(models.Model):
     _name = 'auto.exchange.line'
@@ -149,7 +161,6 @@ class AutoExchangeLine(models.Model):
         ('unique_start_date', 'unique (currency_id,period_id)', u'同币别期间不能重合!'),
     ]
 
-
 class CurrencyMoneyOrder(models.Model):
     _inherit = 'money.order'
 
@@ -162,5 +173,4 @@ class CurrencyMoneyOrder(models.Model):
                 rate = line.exchange
         if not rate:
             raise UserError(u'没有设置会计期间内的外币%s汇率' % currency.name)
-
         return rate
