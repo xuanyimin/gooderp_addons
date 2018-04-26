@@ -53,6 +53,16 @@ class OtherMoneyOrder(models.Model):
         self.total_amount = sum((line.amount + line.tax_amount)
                                 for line in self.line_ids)
 
+    @api.one
+    @api.depends('date','bank_id')
+    def _compute_rate_silent(self):
+        ''' 根据入账日期获取期间，用于生成凭证 '''
+        if self.bank_id and self.bank_id.currency_id:
+            self.rate_silent = self.env['res.currency'].get_rate_silent(
+                        self.date, self.bank_id.currency_id.id)
+        if not self.rate_silent:
+            self.rate_silent = 1
+
     state = fields.Selection([
         ('draft', u'草稿'),
         ('done', u'已确认'),
@@ -108,8 +118,9 @@ class OtherMoneyOrder(models.Model):
                                  ondelete='restrict',
                                  copy=False,
                                  help=u'其他收支单确认时生成的对应凭证')
-    currency_amount = fields.Float(u'外币金额',
-                                   digits=dp.get_precision('Amount'))
+    rate_silent = fields.Float(u'外币汇率',
+                               compute='_compute_rate_silent',
+                               ondelete='restrict', store=True)
 
     @api.onchange('date')
     def onchange_date(self):
@@ -226,11 +237,6 @@ class OtherMoneyOrder(models.Model):
             if not line.category_id.account_id:
                 raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
 
-            if self.bank_id.currency_id.id:
-                rate_silent = self.env['res.currency'].get_rate_silent(
-                    self.date, self.bank_id.currency_id.id)
-            else:
-                rate_silent = 1
             vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'note': line.note or '',
                          'credit_auxiliary_id': line.auxiliary_id.id,
                          'credit_account_id': line.category_id.account_id.id,
@@ -241,10 +247,10 @@ class OtherMoneyOrder(models.Model):
                          })
             if self.bank_id.currency_id.id:
                 vals.update({
-                         'amount': (line.amount + line.tax_amount) * rate_silent,
+                         'amount': (line.amount + line.tax_amount) * self.rate_silent,
                          'currency_id': self.bank_id.currency_id.id,
                          'currency_amount': abs(line.amount + line.tax_amount),
-                         'rate_silent': rate_silent,
+                         'rate_silent': self.rate_silent,
                          })
             else:
                 vals.update({
@@ -256,7 +262,7 @@ class OtherMoneyOrder(models.Model):
                     'name': u"%s %s" % (vals.get('name'), vals.get('note')),
                     'partner_id': vals.get('partner_credit', ''),
                     'account_id': vals.get('credit_account_id'),
-                    'credit': line.amount * rate_silent,
+                    'credit': line.amount * self.rate_silent,
                     'voucher_id': vals.get('vouch_obj_id'),
                     'auxiliary_id': vals.get('credit_auxiliary_id', False),
                 })
@@ -295,11 +301,6 @@ class OtherMoneyOrder(models.Model):
         for line in self.line_ids:
             if not line.category_id.account_id:
                 raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
-            if self.bank_id.currency_id.id:
-                rate_silent = self.env['res.currency'].get_rate_silent(
-                    self.date, self.bank_id.currency_id.id)
-            else:
-                rate_silent = 1
 
             vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'note': line.note or '',
                          'debit_auxiliary_id': line.auxiliary_id.id,
@@ -310,10 +311,10 @@ class OtherMoneyOrder(models.Model):
                          })
             if self.bank_id.currency_id.id:
                 vals.update({
-                             'amount': (line.amount + line.tax_amount) * rate_silent,
+                             'amount': (line.amount + line.tax_amount) * self.rate_silent,
                              'currency_id': self.bank_id.currency_id.id,
                              'currency_amount': abs(line.amount + line.tax_amount),
-                             'rate_silent': rate_silent,
+                             'rate_silent': self.rate_silent,
                              })
             else:
                 vals.update({
@@ -323,7 +324,7 @@ class OtherMoneyOrder(models.Model):
             self.env['voucher.line'].create({
                 'name': u"%s %s " % (vals.get('name'), vals.get('note')),
                 'account_id': vals.get('debit_account_id'),
-                'debit': (line.amount) * rate_silent,
+                'debit': (line.amount) * self.rate_silent,
                 'voucher_id': vals.get('vouch_obj_id'),
                 'partner_id': vals.get('partner_debit', ''),
                 'auxiliary_id': vals.get('debit_auxiliary_id', False),

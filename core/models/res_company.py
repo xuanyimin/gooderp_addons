@@ -3,6 +3,8 @@ from odoo import api, fields, models, tools
 from odoo.exceptions import UserError
 import os
 from odoo.tools import misc
+import datetime
+
 # 成本计算方法，已实现 先入先出
 
 CORE_COST_METHOD = [('average', u'全月一次加权平均法'),
@@ -13,9 +15,9 @@ CORE_COST_METHOD = [('average', u'全月一次加权平均法'),
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
-    start_date = fields.Date(u'启用日期',
+    start_date = fields.Date(u'期初日期',
                              required=True,
-                             default=lambda self: fields.Date.context_today(self))
+                             default=lambda self: self.env['res.company']._getMonthFirstDay()- datetime.timedelta(days=1))
     cost_method = fields.Selection(CORE_COST_METHOD, u'存货计价方法',
                                    help=u'''GoodERP仓库模块使用先进先出规则匹配
                                    每次出库对应的入库成本和数量，但不实时记账。
@@ -40,3 +42,12 @@ class ResCompany(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+
+    def _getMonthFirstDay(self):
+        year = datetime.date.today().year
+        month = datetime.date.today().month
+
+        # 获取当月的第一天
+        firstDay = datetime.date(year=year, month=month, day=1)
+
+        return firstDay

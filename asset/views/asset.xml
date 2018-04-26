@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data>
-		<!--固定资产-->
+		<!--固定资产tree-->
 		<record id='asset_tree' model='ir.ui.view'>
 			<field name='name'>asset.tree</field>
 			<field name='model'>asset</field>
@@ -29,18 +29,19 @@
                         <field name="date"/>
                         <field name="period_id"/>
                         <field name="clean_type"/>
-                        <field name="clean_account" attrs="{'required':[('clean_type', '!=', 'handle')], 'invisible': [('clean_type', '=', 'handle')]}"/>
+                        <field name="clean_account" attrs="{'required':[('clean_type', '!=', 'handle')], 'invisible': [('clean_type', '=', 'handle')]}" options="{'no_open': True, 'no_create': True}"/>
                         <group>
                             <field name="clean_cost" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
                             <field name="cost_select" attrs="{'required':['&amp;',('clean_type', '=', 'handle'),('clean_cost', '&gt;', 0)], 'invisible': ['|',('clean_type', '!=', 'handle'),('clean_cost', '&lt;=', 0)]}"/>
                             <field name="cost_bank" attrs="{'required':['&amp;','&amp;',('clean_type', '=', 'handle'),('clean_cost', '&gt;', 0),('cost_select', '=', 'bank')], 'invisible': ['|','|',('clean_type', '!=', 'handle'),('clean_cost', '&lt;=', 0),('cost_select', '!=', 'bank')]}"/>
-                            <field name="cost_account" attrs="{'required':['&amp;','&amp;',('clean_type', '=', 'handle'),('clean_cost', '&gt;', 0),('cost_select', '=', 'account')], 'invisible': ['|','|',('clean_type', '!=', 'handle'),('clean_cost', '&lt;=', 0),('cost_select', '!=', 'account')]}"/>
+                            <field name="cost_account" attrs="{'required':['&amp;','&amp;',('clean_type', '=', 'handle'),('clean_cost', '&gt;', 0),('cost_select', '=', 'account')], 'invisible': ['|','|',('clean_type', '!=', 'handle'),('clean_cost', '&lt;=', 0),('cost_select', '!=', 'account')]}"
+                            options="{'no_open': True, 'no_create': True}"/>
                         </group>
                         <group>
                             <field name="residual_income" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
                             <field name="income_select" attrs="{'required':['&amp;',('clean_type', '=', 'handle'),('residual_income', '&gt;', 0)], 'invisible': ['|',('clean_type', '!=', 'handle'),('residual_income', '&lt;=', 0)]}"/>
                             <field name="income_bank" attrs="{'required':['&amp;','&amp;',('clean_type', '=', 'handle'),('residual_income', '&gt;', 0),('income_select', '=', 'bank')], 'invisible': ['|','|',('clean_type', '!=', 'handle'),('residual_income', '&lt;=', 0),('income_select', '!=', 'bank')]}"/>
-                            <field name="income_account" attrs="{'required':['&amp;','&amp;',('clean_type', '=', 'handle'),('residual_income', '&gt;', 0),('income_select', '=', 'account')], 'invisible': ['|','|',('clean_type', '!=', 'handle'),('residual_income', '&lt;=', 0),('income_select', '!=', 'account')]}"/>
+                            <field name="income_account" attrs="{'required':['&amp;','&amp;',('clean_type', '=', 'handle'),('residual_income', '&gt;', 0),('income_select', '=', 'account')], 'invisible': ['|','|',('clean_type', '!=', 'handle'),('residual_income', '&lt;=', 0),('income_select', '!=', 'account')]}" options="{'no_open': True, 'no_create': True}"/>
                             <field name="sell_tax_amount" attrs="{'required':[('clean_type', '=', 'handle')], 'invisible': [('clean_type', '!=', 'handle')]}"/>
                         </group>
                     </group>
@@ -93,7 +94,7 @@
                             <field name="account_ids" invisible="1"/>
                             <!--过滤科目，客户后来不想要的，所以使用了NOT IN如需要使用则改为in-->
                             <field name="account_credit" domain="[('id', 'not in', account_ids)]"
-                                    attrs="{'required':[('create_type', '=', 'account')], 'invisible': [('create_type', '!=', 'account')]}"/>/>
+                                    attrs="{'required':[('create_type', '=', 'account')], 'invisible': [('create_type', '!=', 'account')]}"                                               options="{'no_open': True, 'no_create': True}"/>/>
                             <field name="partner_id"
                                    domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"
                                    attrs="{'required':[('create_type', '=', 'partner')], 'invisible': [('create_type', '!=', 'partner')]}"/>
@@ -149,7 +150,7 @@
 	                	<button name="%(create_asset_action)d" string="确认" type="action" class="oe_highlight" attrs="{'invisible': ['|',('is_init', '!=', False),('state', '!=', 'draft')]}"/>
                         <button name="asset_done" string="确认" type="object" class="oe_highlight" attrs="{'invisible': ['|',('is_init', '!=', True),('state', '!=', 'draft')]}"/>
 	                	<button name='asset_draft' states="done" string="撤销确认" type="object" />
-                        <button name="%(create_clean_action)d" string="处置固定资产" type="action" class="btn-primary"
+                        <button name="%(create_clean_action)d" string="处置/清查固定资产" type="action" class="btn-primary"
                         attrs="{'invisible': [('state', '!=', 'done')]}"/>
                         <button name="%(create_chang_action)d" string="变更固定资产" type="action" class="btn-primary"
                         attrs="{'invisible': [('state', '!=', 'done')]}"/>
@@ -187,9 +188,9 @@
                               </group>
                               <group>
 
-                                <field name="account_asset"/>
-                                <field name="account_depreciation" attrs="{'required':[('forever_no_depreciation', '=', False)], 'invisible': [('forever_no_depreciation', '!=', False)]}"/>
-                                <field name="account_accumulated_depreciation" attrs="{'required':[('forever_no_depreciation', '=', False)], 'invisible': [('forever_no_depreciation', '!=', False)]}"/>
+                                <field name="account_asset" options="{'no_open': True, 'no_create': True}"/>
+                                <field name="account_depreciation" attrs="{'required':[('forever_no_depreciation', '=', False)], 'invisible': [('forever_no_depreciation', '!=', False)]}" options="{'no_open': True, 'no_create': True}"/>
+                                <field name="account_accumulated_depreciation" attrs="{'required':[('forever_no_depreciation', '=', False)], 'invisible': [('forever_no_depreciation', '!=', False)]}" options="{'no_open': True, 'no_create': True}"/>
                               </group>
                               </group>
                             </page>
@@ -310,15 +311,16 @@
                     </group>
                     <group>
                         <group>
-                            <field name='account_asset' required="1"/>
-                            <field name='clean_income' />
-                            <field name='clean_costs' />
-                            <field name="clear_account_id" />
+                            <field name='account_asset' required="1" options="{'no_open': True, 'no_create': True}"/>
+                            <field name='asset_other_money_pay_category' options="{'no_open': True, 'no_create': True}"/>
+                            <field name='clean_income' options="{'no_open': True, 'no_create': True}"/>
+                            <field name='clean_costs' options="{'no_open': True, 'no_create': True}"/>
+                            <field name="clear_account_id" options="{'no_open': True, 'no_create': True}"/>
                             <field name='active'/>
                         </group>
                         <group>
-                            <field name='account_accumulated_depreciation' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}"/>
-                            <field name='account_depreciation' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}"/>
+                            <field name='account_accumulated_depreciation' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}" options="{'no_open': True, 'no_create': True}"/>
+                            <field name='account_depreciation' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}" options="{'no_open': True, 'no_create': True}"/>
                             <field name='depreciation_number' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}"/>
                             <field name='depreciation_value' attrs="{'required':[('is_depreciation', '=', False)], 'invisible': [('is_depreciation', '!=', False)]}"/>
                         </group>
