@@ -5,6 +5,10 @@ import odoo.addons.decimal_precision as dp
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
+import xmltodict
+import os
+import time
+
 BALANCE_DIRECTIONS_TYPE = [
     ('in', u'借'),
     ('out', u'贷')]
@@ -928,7 +932,39 @@ class BankAccount(models.Model):
         'res.currency', u'外币币别', compute='_compute_currency_id', store=True)
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision('Amount'))
 
+    @api.model
+    def report_xml(self):
+        TIMEFORMAT = "%Y%m%d"
+        time_now= time.localtime(time.time())
 
+        report_model = self.env['report.template'].search([('model_id.model', '=', 'balance.sheet')], limit=1)
+        path = report_model and report_model[0].path or False
+
+        database_name = self.pool._db.dbname
+
+        bank_account_ids = self.search([])
+        data = []
+        for bank_account in bank_account_ids:
+            data.append(
+                {
+                    'database': database_name,
+                    'account_name': bank_account.name,
+                    'account_number': bank_account.num,
+                    'date': fields.Date.context_today(self),
+                    'amount': bank_account.balance
+                }
+            )
+
+        if path:
+            path = '%s/%s/%s' % (path, database_name, fields.Date.context_today(self))
+        else:
+            path = '%s/%s' % (database_name, fields.Date.context_today(self))
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        xml_file = open('%s/%s.xml' % (path, u'银行账户%s' % str(time.strftime(TIMEFORMAT, time_now))), 'wb')
+        xml_string = xmltodict.unparse({'data': data})
+        xml_file.write(xml_string)
 
 
 class CoreCategory(models.Model):
