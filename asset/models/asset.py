@@ -444,7 +444,7 @@ class CreateCleanWizard(models.TransientModel):
                                        'period_id': self.period_id.id,
                                        'chang_name': u'清理固定资产',
                                        'order_id': Asset.id,
-                                       'change_other_money': other_money_order.id
+                                       'chang_other_money': other_money_order.id
                                        })
         return other_money_order
 
@@ -482,7 +482,7 @@ class CreateCleanWizard(models.TransientModel):
     # 按收入生成凭证
     # 借：科目
     # 贷：固定资产处置
-    def _clean_income_voucher(self,clear_account_id):
+    def _clean_income_voucher(self, Asset, clear_account_id):
         vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         # 借方行
         self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'处置固定资产',
@@ -513,7 +513,7 @@ class CreateCleanWizard(models.TransientModel):
                                              })
         # 贷方行
         self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'处置固定资产',
-                                         'credit': self.clean_cost, 'account_id': self.clean_account.id,
+                                         'credit': self.clean_cost, 'account_id': self.cost_account.id,
                                          })
         vouch_obj.voucher_done()
         self.env['chang.line'].create({'date': self.date,
@@ -535,7 +535,7 @@ class CreateCleanWizard(models.TransientModel):
         Asset.write({'voucher_id': vouch_obj.id})
         #借方行,挂帐不存在income<0
         self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'处置固定资产',
-                                                 'debit': income, 'account_id': account_id,
+                                                 'debit': income, 'account_id': account_id.id,
                                                  })
         if depreciation:
             self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'处置固定资产',
@@ -574,12 +574,12 @@ class CreateCleanWizard(models.TransientModel):
                                              })
             # 贷方行
             self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'处置固定资产',
-                                             'credit': -income, 'account_id': clear_account_id,
+                                             'credit': -income, 'account_id': clear_account_id.id,
                                              })
         if income >0:
             # 借方行
             self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'处置固定资产',
-                                                     'debit': income, 'account_id': clear_account_id,
+                                                     'debit': income, 'account_id': clear_account_id.id,
                                                      })
             # 贷方行
             self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'处置固定资产',
@@ -600,7 +600,7 @@ class CreateCleanWizard(models.TransientModel):
         if not self.env.context.get('active_id'):
             return
         Asset = self.env['asset'].browse(self.env.context.get('active_id'))
-        clear_account_id = Asset.category_id.clear_account_id.id
+        clear_account_id = Asset.category_id.clear_account_id
         if self.clean_type == 'handle' and not (Asset.category_id.clean_income.id or Asset.category_id.clean_costs.id):
             raise UserError(u'直接处理必须要处置收入科目及处置支出科目')
         if not Asset.account_accumulated_depreciation and not Asset.forever_no_depreciation:
@@ -630,21 +630,25 @@ class CreateCleanWizard(models.TransientModel):
             if self.clean_cost >0 and self.cost_bank:
                 self._clean_cost_generate_other_pay(Asset)
             # 直接处理：费用>0且为生成凭证
+            print '1'
             if self.clean_cost > 0 and self.cost_account:
                 code = self.cost_account.code
                 if code[:3] in error_code:
                     raise UserError(u'您选择的类型和科目不匹配，请重新选择。')
                 self._clean_cost_generate_voucher(Asset,clear_account_id)
             # 直接处理：收入>0且为生成其他收款单（流水）
+            print '2'
             if self.residual_income > 0 and self.income_bank:
                 self._clean_income_other_get(Asset)
             # 直接处理：收入>0且为生成凭证
+            print '3'
             if self.residual_income > 0 and self.income_account:
                 code = self.income_account.code
                 if code[:3] in error_code:
                     raise UserError(u'您选择的类型和科目不匹配，请重新选择。')
                 self._clean_income_voucher(Asset, clear_account_id)
             # 生成处置收入/支出凭证
+            print '4'
             self._generate_handle_voucher(Asset, income, clear_account_id)
             Asset.state = 'clean'
 
