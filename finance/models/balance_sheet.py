@@ -324,7 +324,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [
                                                               subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
             for trial_balance in trial_balances:
-                subject_vals.append(trial_balance[report_fields[0]], trial_balance[report_fields[1]])
+                subject_vals.append(trial_balance[report_fields[0]])
+                subject_vals.append(trial_balance[report_fields[1]])
 
             return sum(subject_vals)
 

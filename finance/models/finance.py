@@ -509,8 +509,6 @@ class FinancePeriod(models.Model):
                 ('year', '=', date[0:4]),
                 ('month', '=', int(date[5:7]))
             ])
-            if not period_id:
-                raise UserError(u'%s 对应的会计期间不存在' % date)
             return period_id
 
     _sql_constraints = [
@@ -927,7 +925,7 @@ class BankAccount(models.Model):
     def _compute_currency_id(self):
         self.currency_id = self.account_id.currency_id.id
 
-    account_id = fields.Many2one('finance.account', u'科目')
+    account_id = fields.Many2one('finance.account', u'科目', domain="[('account_type','=','normal')]")
     currency_id = fields.Many2one(
         'res.currency', u'外币币别', compute='_compute_currency_id', store=True)
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision('Amount'))
