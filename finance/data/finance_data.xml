@@ -972,7 +972,7 @@
         </record>
         <record id='as_1' model='business.activity.statement'>
             <field name='balance'>其中：捐赠收入</field>
-            <field name='line_num'>2</field>
+            <field name='line_num'>1</field>
             <field name='formula_restricted'>410102~410102999999</field>
             <field name='formula_unrestricted'>410101~410101999999</field>
         </record>
@@ -1015,8 +1015,8 @@
         <record id='as_8' model='business.activity.statement'>
             <field name='balance'>收入合计</field>
             <field name='line_num'>11</field>
-            <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_restricted'>410102~410102999999;420102~420102999999;430102~430102999999;450102~450102999999;440102~440102999999;460102~460102999999;490102~490102999999</field>
+            <field name='formula_unrestricted'>410101~410101999999;420101~420101999999;430101~430101999999;440101~440101999999;450101~450101999999;460101~460101999999;490101~490101999999</field>
         </record>
         <record id='as_9' model='business.activity.statement'>
             <field name='balance'>二、费用</field>
@@ -1070,13 +1070,13 @@
             <field name='balance'>（四）其他费用</field>
             <field name='line_num'>28</field>
             <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'></field>
+            <field name='formula_unrestricted'>5401~540199999999</field>
         </record>
         <record id='as_18' model='business.activity.statement'>
             <field name='balance'>费用合计</field>
             <field name='line_num'>35</field>
             <field name='formula_restricted'></field>
-            <field name='formula_unrestricted'>5401~540199999999</field>
+            <field name='formula_unrestricted'>5101~540199999999</field>
         </record>
         <record id='as_19' model='business.activity.statement'>
             <field name='balance'>三、限定性净资产转为非限定性净资产</field>
