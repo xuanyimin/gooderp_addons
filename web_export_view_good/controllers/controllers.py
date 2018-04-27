@@ -50,7 +50,7 @@ class ReportTemplate(models.Model):
     file_address = fields.Char(u'模板文件路径',required=True)
     active = fields.Boolean(u'可用', default=True)
     blank_rows = fields.Integer(u'空白行数',required=True)
-    header_rows = fields.Integer(u'表头行数',required=True)
+    header_rows = fields.Integer(u'表头额外行数',required=False)
     save = fields.Boolean(string=u'保存副本', )
     path = fields.Char(string=u'副本保存路径', )
 
