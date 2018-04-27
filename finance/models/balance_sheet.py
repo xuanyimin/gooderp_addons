@@ -363,12 +363,12 @@ class BusinessActivityStatement(models.Model):
 
     balance = fields.Char(u'项目', help=u'报表的行次的总一个名称')
     line_num = fields.Char(u'行次', help=u'生成报表的行次')
-    cumulative_total = fields.Float(u'本年累计数', help=u'本年累计数合计', compute='_compute_total' )
-    cumulative_restricted = fields.Float(u'本年累计数限定性', help=u'本年累计数限定性')
-    cumulative_unrestricted = fields.Float(u'本年累计数非限定性', help=u'本年累计数非限定性')
-    current_total = fields.Float(u'本月数合计', help=u'本月的利润的金额合计', compute='_compute_total')
-    current_restricted = fields.Float(u'本月数限定性', help=u'本月数限定性')
-    current_unrestricted = fields.Float(u'本月数非限定性', help=u'本月数非限定性')
+    cumulative_total = fields.Float(u'合计', help=u'本年累计数合计', compute='_compute_total' )
+    cumulative_restricted = fields.Float(u'限定性', help=u'本年累计数限定性')
+    cumulative_unrestricted = fields.Float(u'非限定性', help=u'本年累计数非限定性')
+    current_total = fields.Float(u'合计', help=u'本月数合计', compute='_compute_total')
+    current_restricted = fields.Float(u'限定性', help=u'本月数限定性')
+    current_unrestricted = fields.Float(u'非限定性', help=u'本月数非限定性')
     formula_restricted = fields.Text(
         u'限定性科目范围', help=u'设定本行的限定性业务的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
     formula_unrestricted = fields.Text(
