@@ -109,7 +109,7 @@ class Currency(models.Model):
     @api.multi
     def _compute_current_rate(self):
         date = self._context.get('date') or fields.Datetime.now()
-        period_id = self.env['finance.period'].get_period(date).id
+        period_id = self.env['finance.period'].search_period(date).id
         for currency in self:
             currency.rate = 1.0
             for line in currency.month_exchange:
@@ -119,7 +119,7 @@ class Currency(models.Model):
     @api.multi
     def get_rate_silent(self, date, currency_id):
         currency = self.env['res.currency'].search([('id', '=', currency_id)])
-        period_id = self.env['finance.period'].get_period(date)
+        period_id = self.env['finance.period'].search_period(date)
         rate = 0
         for line in currency.month_exchange:
             if period_id == line.period_id:
@@ -136,9 +136,9 @@ class AutoExchangeLine(models.Model):
     @api.one
     @api.depends('date')
     def _compute_period_id(self):
-        self.period_id = self.env['finance.period'].get_period(self.date)
+        self.period_id = self.env['finance.period'].search_period(self.date)
 
-    date = fields.Date(u'抓取日期',
+    date = fields.Date(u'日期',
                        index=True, copy=False, help=u"应为每个月的第一个工作日")
     period_id = fields.Many2one(
         'finance.period',
@@ -167,7 +167,7 @@ class CurrencyMoneyOrder(models.Model):
     @api.multi
     def get_rate_silent(self, date, currency_id):
         currency = self.env['res.currency'].search([('id', '=', currency_id)])
-        period_id = self.env['finance.period'].get_period(date)
+        period_id = self.env['finance.period'].search_period(date)
         for line in currency.month_exchange:
             if period_id == line.period_id:
                 rate = line.exchange
