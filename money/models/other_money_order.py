@@ -37,14 +37,15 @@ class OtherMoneyOrder(models.Model):
     @api.model
     def create(self, values):
         # 创建单据时，更新订单类型的不同，生成不同的单据编号
-        if self.env.context.get('type') == 'other_get':
+        if values.get('type') == 'other_get':
             values.update(
                 {'name': self.env['ir.sequence'].next_by_code('other.get.order')})
-        if self.env.context.get('type') == 'other_pay' or values.get('name', '/') == '/':
+        elif values.get('type') == 'other_pay' or values.get('name', '/') == '/':
             values.update(
                 {'name': self.env['ir.sequence'].next_by_code('other.pay.order')})
 
         return super(OtherMoneyOrder, self).create(values)
+
 
     @api.one
     @api.depends('line_ids.amount', 'line_ids.tax_amount')
@@ -94,7 +95,7 @@ class OtherMoneyOrder(models.Model):
                                string=u'收支单行', readonly=True,
                                copy=True,
                                states={'draft': [('readonly', False)]},
-                               help=u'其他收支单明细行')
+                               help=u'日记帐明细行')
     type = fields.Selection(TYPE_SELECTION, string=u'类型', readonly=True,
                             default=lambda self: self._context.get('type'),
                             states={'draft': [('readonly', False)]},

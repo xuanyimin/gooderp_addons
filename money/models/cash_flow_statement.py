@@ -8,7 +8,9 @@ LINE_TYPES = [('get', u'销售收款'),
               ('category', u'其他收支'),
               ('begin', u'科目期初'),
               ('end', u'科目期末'),
-              ('lines', u'表行计算')]
+              ('lines', u'表行计算'),
+              ('inopen_account', u'本期收入发生额'),
+              ('outopen_account', u'本期支出发生额')]
 
 class CashFlowTemplate(models.Model):
     _name = 'cash.flow.template'
@@ -43,4 +45,4 @@ class CashFlowStatement(models.Model):
 class CoreCategory(models.Model):
     _inherit = 'core.category'
     cash_flow_template_id = fields.Many2one(
-        'cash.flow.template', string=u'现金流量表行')
+        'cash.flow.template', string=u'现金流量表项目')

@@ -241,7 +241,8 @@
         <record id="money.cft_60" model="cash.flow.template">
             <field name="name">四、汇率变动对现金的影响额</field>
             <field name="line_num" eval="60"/>
-            <field name="line_type">category</field>
+            <field name="line_type">inopen_account</field>
+            <field name="account_ids">inopen_account</field>
         </record>
 
         <record id="money.total_10" model="cash.flow.template">
