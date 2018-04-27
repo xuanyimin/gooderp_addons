@@ -505,8 +505,6 @@ class FinancePeriod(models.Model):
                 ('year', '=', date[0:4]),
                 ('month', '=', int(date[5:7]))
             ])
-            if not period_id:
-                raise UserError(u'%s 对应的会计期间不存在' % date)
             return period_id
 
     _sql_constraints = [

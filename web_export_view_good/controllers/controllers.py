@@ -48,8 +48,8 @@ class ReportTemplate(models.Model):
     model_id = fields.Many2one('ir.model', u'模型',required=True)
     file_address = fields.Char(u'模板文件路径',required=True)
     active = fields.Boolean(u'可用', default=True)
-    blank_rows = fields.Integer(u'空白行数',required=True)
-    header_rows = fields.Integer(u'表头行数',required=True)
+    blank_rows = fields.Integer(u'空白行数',required=True, default= 0)
+    header_rows = fields.Integer(u'表头行数',required=True, default= 0)
 
     @api.model
     def get_time(self, model):
