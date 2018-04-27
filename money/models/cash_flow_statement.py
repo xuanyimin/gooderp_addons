@@ -32,6 +32,10 @@ class CashFlowTemplate(models.Model):
         'cash.flow.template', 'c_p', 'c_id', 'p_id', string=u'+表行')
     nega_ids = fields.Many2many(
         'cash.flow.template', 'c_n', 'c_id', 'n_id', string=u'-表行')
+    # for type
+    d_account_ids = fields.Many2many('finance.account', string=u'借方累计会计科目')
+    # for type begin
+    c_account_ids = fields.Many2many('finance.account', string=u'贷方累计会计科目')
 
 
 class CashFlowStatement(models.Model):

@@ -25,31 +25,41 @@
                           <field name="line_type"/>
                         </group>
                         <group>
-                        <field name="category_ids" attrs="{'invisible': [('line_type','!=','category')]}" >
-                           <tree string="收支类别" editable="bottom">
-                              <field name="name"/>
-                           </tree>
-                        </field>
-                        <field name="begin_ids" attrs="{'invisible': [('line_type','!=','begin')]}">
-                           <tree string="期初科目" editable="bottom">
-                              <field name="name"/>
-                           </tree>
-                        </field>
-                        <field name="end_ids" attrs="{'invisible': [('line_type','!=','end')]}">
-                           <tree string="期末科目" editable="bottom">
-                              <field name="name"/>
-                           </tree>
-                        </field>
-                        <field name="plus_ids" attrs="{'invisible': [('line_type','!=','lines')]}">
-                           <tree string="+表行" editable="bottom">
-                              <field name="name"/>
-                           </tree>
-                        </field>
-                        <field name="nega_ids" attrs="{'invisible': [('line_type','!=','lines')]}">
-                           <tree string="-表行" editable="bottom">
-                              <field name="name"/>
-                           </tree>
-                        </field>
+                            <field name="category_ids" attrs="{'invisible': [('line_type','!=','category')]}" >
+                               <tree string="收支类别" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                            <field name="begin_ids" attrs="{'invisible': [('line_type','!=','begin')]}">
+                               <tree string="期初科目" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                            <field name="end_ids" attrs="{'invisible': [('line_type','!=','end')]}">
+                               <tree string="期末科目" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                            <field name="plus_ids" attrs="{'invisible': [('line_type','!=','lines')]}">
+                               <tree string="+表行" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                            <field name="nega_ids" attrs="{'invisible': [('line_type','!=','lines')]}">
+                               <tree string="-表行" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                            <field name="c_account_ids" attrs="{'invisible': [('line_type','!=','outopen_account')]}">
+                               <tree string="贷方累计会计科目" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                            <field name="d_account_ids" attrs="{'invisible': [('line_type','!=','inopen_account')]}">
+                               <tree string="借方累计会计科目" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
                         </group>
                     </form>
                </field>

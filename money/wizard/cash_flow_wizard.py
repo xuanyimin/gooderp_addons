@@ -70,11 +70,17 @@ class CashFlowWizard(models.TransientModel):
                     if l.line_num == line.line_num:
                         ret -= line.amount
         if tem.line_type == 'inopen_account':
-            # 科目期末金额合计
+            # 科目本期借方合计
             ret = sum([acc.current_occurrence_debit
                        for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
                                                                     ('subject_name_id', 'in',
-                                                                     [o.id for o in tem.in_account_ids])])])
+                                                                     [o.id for o in tem.d_account_ids])])])
+        if tem.line_type == 'outopen_account':
+            # 科目本期贷方合计
+            ret = sum([acc.current_occurrence_credit
+                       for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
+                                                                    ('subject_name_id', 'in',
+                                                                     [o.id for o in tem.c_account_ids])])])
 
         return ret
 
@@ -127,6 +133,20 @@ class CashFlowWizard(models.TransientModel):
                 for l in tem.nega_ids:
                     if l.line_num == line.line_num:
                         ret -= line.year_amount
+
+        if tem.line_type == 'inopen_account':
+            # 科目本期借方合计
+            ret = sum([acc.cumulative_occurrence_debit
+                       for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
+                                                                    ('subject_name_id', 'in',
+                                                                     [o.id for o in tem.d_account_ids])])])
+        if tem.line_type == 'outopen_account':
+            # 科目本期贷方合计
+            ret = sum([acc.cumulative_occurrence_credit
+                       for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
+                                                                    ('subject_name_id', 'in',
+                                                                     [o.id for o in tem.c_account_ids])])])
+
         return ret
 
     @api.multi
