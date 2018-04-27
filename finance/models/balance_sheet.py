@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.addons.web_export_view_good.controllers.controllers import ExcelExportView, ReportTemplate
 from math import fabs
 import calendar
+import os
+import xmltodict
 
 
 class BalanceSheet(models.Model):
@@ -144,6 +147,38 @@ class CreateBalanceSheetWizard(models.TransientModel):
         attachment_information = u'编制单位：' + company_row.name + u',,,,' + self.period_id.year\
                                  + u'年' + self.period_id.month + u'月' + \
             str(days) + u'日' + u',,,' + u'单位：元'
+
+        # 第一行 为字段名
+        #  从第二行开始 为数据
+
+        field_list = [
+            'balance', 'line_num', 'beginning_balance', 'ending_balance', 'balance_two', 'line_num_two',
+            'beginning_balance_two', 'ending_balance_two'
+        ]
+        domain = [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])]
+        export_data = {
+            "database": self.pool._db.dbname,
+            "date": fields.Date.context_today(self),
+            "report_name": u"资产负债表",
+            "report_code": u"会民非01表",
+            "rows": self.env['balance.sheet'].search_count(domain),
+            "cols": len(field_list),
+            "report_items": []
+        }
+
+        _data_dict = self.env['balance.sheet'].search_read(domain, field_list)
+
+        for _data in _data_dict:
+            row = {}
+            idx = 1
+            for field in field_list:
+                row.update({'col%s' % idx: _data.get(field, False) or ''})
+                idx += 1
+
+            export_data['report_items'].append(row)
+
+        self.export_xml('balance.sheet', {'data': export_data}, u'资产负债表%s' % self.period_id.name)
+
         return {     # 返回生成资产负债表的数据的列表
             'type': 'ir.actions.act_window',
             'name': u'资产负债表：' + self.period_id.name,
@@ -154,7 +189,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
             'view_id': False,
             'views': [(view_id, 'tree')],
             'context': {'period_id': self.period_id.id, 'attachment_information': attachment_information},
-            'domain': [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])],
+            'domain': domain,
             'limit': 65535,
         }
 
@@ -191,6 +226,35 @@ class CreateBalanceSheetWizard(models.TransientModel):
         attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year\
                                  + u'年' + self.period_id.month + u'月' + \
             str(days) + u'日' + u',' + u'单位：元'
+
+        # 第一行 为字段名
+        #  从第二行开始 为数据
+
+        field_list = ['balance', 'line_num', 'cumulative_occurrence_balance', 'current_occurrence_balance']
+        domain = [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])]
+        export_data = {
+            "database": self.pool._db.dbname,
+            "date": fields.Date.context_today(self),
+            "report_name": u"利润表",
+            "report_code": u"会企02表",
+            "rows": self.env['profit.statement'].search_count(domain),
+            "cols": len(field_list),
+            "report_items": []
+        }
+
+        _data_dict = self.env['profit.statement'].search_read(domain, field_list)
+
+        for _data in _data_dict:
+            row = {}
+            idx = 1
+            for field in field_list:
+                row.update({'col%s' % idx: _data.get(field, False) or ''})
+                idx += 1
+
+            export_data['report_items'].append(row)
+
+        self.export_xml('profit.statement', {'data': export_data}, u'利润表%s' % self.period_id.name)
+
         return {      # 返回生成利润表的数据的列表
             'type': 'ir.actions.act_window',
             'name': u'利润表：' + self.period_id.name,
@@ -201,7 +265,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
             'view_id': False,
             'views': [(view_id, 'tree')],
             'context': {'period_id': self.period_id.id, 'attachment_information': attachment_information},
-            'domain': [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])],
+            'domain': domain,
             'limit': 65535,
         }
 
@@ -310,6 +374,38 @@ class CreateBalanceSheetWizard(models.TransientModel):
         attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year\
                                  + u'年' + self.period_id.month + u'月' + \
             str(days) + u'日' + u',' + u'单位：元'
+
+        # 第一行 为字段名
+        #  从第二行开始 为数据
+
+        field_list = [
+            'balance', 'line_num', 'current_unrestricted', 'current_restricted', 'current_total', 'cumulative_unrestricted',
+            'cumulative_restricted', 'cumulative_total'
+        ]
+        domain = [('id', 'in', [report_item.id for report_item in report_item_ids])]
+        export_data = {
+            "database": self.pool._db.dbname,
+            "date": fields.Date.context_today(self),
+            "report_name": u"业务活动表",
+            "report_code": u"会民非02表",
+            "rows": self.env['business.activity.statement'].search_count(domain),
+            "cols": len(field_list),
+            "report_items": []
+        }
+
+        _data_dict = self.env['business.activity.statement'].search_read(domain, field_list)
+
+        for _data in _data_dict:
+            row = {}
+            idx = 1
+            for field in field_list:
+                row.update({'col%s' % idx: _data.get(field, False) or ''})
+                idx += 1
+
+            export_data['report_items'].append(row)
+
+        self.export_xml('business.activity.statement', {'data': export_data}, u'业务活动表%s'% self.period_id.name)
+
         return {      # 返回生成业务活动表的数据的列表
             'type': 'ir.actions.act_window',
             'name': u'业务活动表' + self.period_id.name,
@@ -320,9 +416,30 @@ class CreateBalanceSheetWizard(models.TransientModel):
             'view_id': False,
             'views': [(view_id, 'tree')],
             'context': {'period_id': self.period_id.id, 'attachment_information': attachment_information},
-            'domain': [('id', 'in', [report_item.id for report_item in report_item_ids])],
+            'domain': domain,
             'limit': 65535,
         }
+
+    @api.model
+    def export_xml(self, model, data, file_name):
+
+        report_model = self.env['report.template'].search([('model_id.model', '=', model)], limit=1)
+
+        save = report_model and report_model[0].save or False
+        path = report_model and report_model[0].path or False
+        database_name = self.pool._db.dbname
+        if save:
+
+            if path:
+                path = '%s/%s/%s' % (path, database_name, fields.Date.context_today(self))
+            else:
+                path = '%s/%s' % (database_name,fields.Date.context_today(self) )
+            if not os.path.exists(path):
+                os.makedirs(path)
+
+            xml_file = open('%s/%s.xml' % (path, file_name), 'wb')
+            xml_string = xmltodict.unparse(data)
+            xml_file.write(xml_string)
 
 
 class ProfitStatement(models.Model):
