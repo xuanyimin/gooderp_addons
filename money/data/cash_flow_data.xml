@@ -243,7 +243,7 @@
             <field name="line_num" eval="60"/>
             <field name="line_type">inopen_account</field>
             <field name="d_account_ids" eval="[(6, 0, [
-            ref('finance.init_account_530101'),])]"/
+            ref('finance.init_account_530101'),])]"/>
         </record>
 
         <record id="money.total_10" model="cash.flow.template">
