@@ -616,7 +616,7 @@ class CreateCleanWizard(models.TransientModel):
         #挂帐（盘亏）处理直接生成凭证
         if self.clean_type == 'guazhang':
             code = self.clean_account.code
-            if code[:3] in error_code:
+            if code[:4] in error_code:
                 raise UserError(u'您选择的类型和科目不匹配，请重新选择。')
             self._generate_voucher(Asset, residual, depreciation, self.clean_account.id)
             Asset.state = 'deficit'
@@ -630,25 +630,21 @@ class CreateCleanWizard(models.TransientModel):
             if self.clean_cost >0 and self.cost_bank:
                 self._clean_cost_generate_other_pay(Asset)
             # 直接处理：费用>0且为生成凭证
-            print '1'
             if self.clean_cost > 0 and self.cost_account:
                 code = self.cost_account.code
-                if code[:3] in error_code:
+                if code[:4] in error_code:
                     raise UserError(u'您选择的类型和科目不匹配，请重新选择。')
                 self._clean_cost_generate_voucher(Asset,clear_account_id)
             # 直接处理：收入>0且为生成其他收款单（流水）
-            print '2'
             if self.residual_income > 0 and self.income_bank:
                 self._clean_income_other_get(Asset)
             # 直接处理：收入>0且为生成凭证
-            print '3'
             if self.residual_income > 0 and self.income_account:
                 code = self.income_account.code
-                if code[:3] in error_code:
+                if code[:4] in error_code:
                     raise UserError(u'您选择的类型和科目不匹配，请重新选择。')
                 self._clean_income_voucher(Asset, clear_account_id)
             # 生成处置收入/支出凭证
-            print '4'
             self._generate_handle_voucher(Asset, income, clear_account_id)
             Asset.state = 'clean'
 
@@ -801,7 +797,7 @@ class CreateAssetWizard(models.TransientModel):
             raise UserError(u'系统占不支持外币结算固定资产')
         if self.create_type =='account' and self.account_credit:
             code = self.account_credit.code
-            if code[:3] in error_code:
+            if code[:4] in error_code:
                 raise UserError(u'您选择的类型和科目不匹配，请重新选择。')
 
 
