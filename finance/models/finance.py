@@ -935,7 +935,7 @@ class CoreCategory(models.Model):
     '''继承core cotegory，添加科目类型'''
     _inherit = 'core.category'
 
-    account_id = fields.Many2one('finance.account', u'科目', help=u'科目')
+    account_id = fields.Many2one('finance.account', u'科目', help=u'科目', domain="[('account_type','=','normal')]")
 
 
 class ChangeVoucherName(models.Model):

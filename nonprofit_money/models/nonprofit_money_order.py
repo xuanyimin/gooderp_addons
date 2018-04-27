@@ -30,10 +30,10 @@ SELECTION = [
 
 class OtherMoneyOrderLine(models.Model):
     _inherit ='other.money.order.line'
-    _description = u'流水单明细'
+    _description = u'日记帐明细'
 
     cash_flow_template_id = fields.Many2one(
-        'cash.flow.template', string=u'现金流量表行')
+        'cash.flow.template', string=u'现金流量表项目')
 
     @api.onchange('category_id')
     def onchange_category_id(self):

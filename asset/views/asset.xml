@@ -12,8 +12,7 @@
                     <field name='category_id'/>
 					<field name='cost'/>
                     <field name='net_value' sum='净值合计'/>
-                    <field name="cost_depreciation" sum='每月折旧合计'/>					
-					<field name='no_depreciation'/>
+                    <field name="cost_depreciation" sum='每月折旧合计'/>
                     <field name='state'/>
 				</tree>
 			</field>
