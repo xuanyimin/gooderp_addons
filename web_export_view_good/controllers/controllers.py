@@ -57,6 +57,7 @@ class ReportTemplate(models.Model):
     @api.model
     def get_time(self, model):
         ISOTIMEFORMAT = "%Y-%m-%d"
+        time_now= time.localtime(time.time())
         report_model = self.env['report.template'].search(
             [('model_id.model', '=', model)], limit=1)
         file_address = report_model and report_model[0].file_address or False
@@ -66,13 +67,13 @@ class ReportTemplate(models.Model):
         path = report_model and report_model[0].path or False
         database_name = self.pool._db.dbname
         if path:
-            path = '%s/%s'%(path,database_name)
+            path = '%s/%s/%s'%(path,database_name,str(time.strftime(ISOTIMEFORMAT, time_now)))
         else:
-            path = '%s'%database_name
+            path = '%s/%s'%(database_name,str(time.strftime(ISOTIMEFORMAT, time_now)))
         if path and not os.path.exists(path):
             os.makedirs(path)
 
-        return (str(time.strftime(ISOTIMEFORMAT, time.localtime(time.time()))), file_address,blank_rows,header_rows,save,path)
+        return (str(time.strftime(ISOTIMEFORMAT, time_now)), file_address,blank_rows,header_rows,save,path)
 
 
 def content_disposition(filename):
