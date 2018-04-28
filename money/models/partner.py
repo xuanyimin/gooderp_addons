@@ -148,22 +148,6 @@ class BankAccount(models.Model):
                                 inverse=_set_init_balance,
                                 help=u'资金的期初余额')
 
-    @api.onchange('account_id')
-    def onchange_account_id(self):
-        if self.init_balance:
-            # 如果有前期初值，删掉已前的单据
-            other_money_id = self.env['other.money.order'].search([
-                ('bank_id', '=', self._origin.id),
-                ('is_init', '=', True)])
-            vouch_obj = self.env['voucher'].search([('id', '=', other_money_id.voucher_id.id)])
-            vouch_obj_line = self.env['voucher.line'].search([
-                ('voucher_id', '=', vouch_obj.id),
-                ('account_id', '=', self._origin.account_id.id),
-                ('init_obj', '=', 'other_money_order-%s' % (other_money_id.id))])
-            vouch_obj_line.unlink()
-            self.init_balance = 0
-            self._set_init_balance()
-
     @api.multi
     def bank_statements(self):
         """

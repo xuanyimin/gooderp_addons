@@ -102,6 +102,7 @@ class CheckoutWizard(models.TransientModel):
                             account_ids = self.env['finance.account'].search([('id','child_of',account_id.id),('account_type','=','normal')])
                             __account_unrestricted_revenue_ids.extend(account_ids)
 
+
                         for account_id in __account_unrestricted_revenue_ids:
                             voucher_line_ids = voucher_line_obj.search([
                                 ('account_id', '=', account_id.id),
@@ -119,6 +120,7 @@ class CheckoutWizard(models.TransientModel):
                                         'credit': 0,
                                     }
                                 voucher_line.append(res)
+
 
                         # 处理限制性收入
                         __account_restricted_revenue_ids =[]
@@ -192,7 +194,7 @@ class CheckoutWizard(models.TransientModel):
                             res = {
                                 'name': u'非限定净资产结余',
                                 'account_id': self.env.ref('finance.init_account_3101').id,
-                                'debit': total_revenue_unrestricted - total_expense,
+                                'debit': total_expense - total_revenue_unrestricted,
                                 'credit':  0,
                             }
                             voucher_line.append(res)
