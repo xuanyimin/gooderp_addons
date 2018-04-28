@@ -5,6 +5,10 @@ import odoo.addons.decimal_precision as dp
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
+import logging
+_logger = logging.getLogger(__name__)
+
+
 import xmltodict
 import os
 import time
@@ -324,10 +328,12 @@ class VoucherLine(models.Model):
             raise UserError( u'不可以同时录入 贷方和借方')
 
         if self.debit and not self.credit and inner_account_debit:
+            _logger.info('inner accounts  %s'%inner_account_credit)
             raise UserError(u'借方禁止科目: %s-%s \n\n 提示：%s '% (self.account_id.code, self.account_id.name,inner_account_debit[0].restricted_debit_msg))
 
         if not self.debit and self.credit and inner_account_credit:
-            raise UserError(u'贷方禁止科目: %s-%s \n\n 提示：%s '% (self.account_id.code, self.account_id.name, inner_account_credit[0].restricted_credit_msg))
+            _logger.info('inner accounts  %s'%inner_account_credit)
+            raise UserError(u'贷方禁止科目: %s-%s \n\n 提示：%s '% (self.account_id.code, self.account_id.name, inner_account_credit[0].restrict_credit_msg))
 
     @api.model
     def create(self, values):
@@ -752,6 +758,23 @@ class FinanceAccount(models.Model):
 
         return super(FinanceAccount, self).write(values)
 
+    def button_add_child(self):
+        self.ensure_one()
+
+        view = self.env.ref('finance.view_wizard_account_add_child_form')
+
+        return {
+            'name': u'增加下级科目',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'wizard.account.add.child',
+            'views': [(view.id, 'form')],
+            'view_id': view.id,
+            'target': 'new',
+            'context': dict(self.env.context, active_id=self.id, active_ids=[self.id], modify_from_webclient=False),
+        }
+
 class WizardAccountAddChild(models.TransientModel):
     """ 向导，用于新增下级科目.
 
@@ -795,6 +818,10 @@ class WizardAccountAddChild(models.TransientModel):
         selection=[('view', 'View'), ('normal', 'Normal')], related='parent_id.account_type'
     )
 
+    has_journal_items = fields.Boolean(
+        string=u'Has Journal Items',
+    )
+
     @api.model
     def default_get(self, fields):
         if len(self.env.context.get('active_ids', list())) > 1:
@@ -802,6 +829,9 @@ class WizardAccountAddChild(models.TransientModel):
 
         account_id = self.env.context.get('active_id')
         account = self.env['finance.account'].browse(account_id)
+        has_journal_items = False
+        if account.voucher_line_ids :
+            has_journal_items = True
         if account.level >= int(self.env['ir.values'].get_default('finance.config.settings', 'default_account_hierarchy_level')):
             raise UserError(u'选择的科目层级是%s级，已经是最低层级科目了，不能建立在它下面建立下级科目！'% account.level)
 
@@ -809,6 +839,7 @@ class WizardAccountAddChild(models.TransientModel):
 
         res.update( {
             'parent_id': account_id,
+            'has_journal_items': has_journal_items
             })
     
         return res
@@ -857,11 +888,39 @@ class WizardAccountAddChild(models.TransientModel):
         if not new_account:
             raise UserError(u'新科目创建失败！')
 
-        act_window = self.env.ref('finance.finance_account_action', False)
-        return act_window
+        view =  self.env.ref('finance.finance_account_tree')
+
+        return {
+            'name': u'科目',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'finance.account',
+            'views': [(view.id, 'tree')],
+            'view_id': view.id,
+            'target': 'current',
+            'context': dict(self.env.context, hide_button=False),
+        }
 
     @api.onchange('account_code')
     def _onchange_account_code(self):
+
+        def is_number(chars):
+            try:
+                int(chars)
+                return True
+            except ValueError:
+                return False
+
+        if self.account_code and not is_number(self.account_code):
+            self.account_code = False
+            return {
+                'warning': {
+                    'title': u'错误',
+                    'message': u'科目代码必须是数字'
+                }
+            }
+
         default_child_step = self.env['ir.values'].get_default('finance.config.settings', 'default_child_step')
         if self.account_code:
             self.full_account_code = "%s%s"%(self.parent_code, self.account_code)
