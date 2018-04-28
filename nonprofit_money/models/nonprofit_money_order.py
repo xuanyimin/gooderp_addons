@@ -30,7 +30,7 @@ SELECTION = [
 
 class OtherMoneyOrderLine(models.Model):
     _inherit ='other.money.order.line'
-    _description = u'日记帐明细'
+    _description = u'日记账明细'
 
     cash_flow_template_id = fields.Many2one(
         'cash.flow.template', string=u'现金流量表项目')

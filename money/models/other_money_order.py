@@ -95,7 +95,7 @@ class OtherMoneyOrder(models.Model):
                                string=u'收支单行', readonly=True,
                                copy=True,
                                states={'draft': [('readonly', False)]},
-                               help=u'日记帐明细行')
+                               help=u'日记账明细行')
     type = fields.Selection(TYPE_SELECTION, string=u'类型', readonly=True,
                             default=lambda self: self._context.get('type'),
                             states={'draft': [('readonly', False)]},

@@ -6,7 +6,7 @@
             <field name="name">nonprofit.money.order.tree</field>
             <field name="model">other.money.order</field>
             <field name="arch" type="xml">
-                <tree string="日记帐" colors='blue:state == "draft";lightgray:state == "cancel"'>
+                <tree string="日记账" colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name="type"/>
                     <field name="name"/>
                     <field name="date"/>
@@ -25,7 +25,7 @@
             <field name="name">nonprofit.money.order.form</field>
             <field name="model">other.money.order</field>
             <field name="arch" type="xml">
-                <form string="非营利收支日记帐">
+                <form string="非营利收支日记账">
                 <header>
 					<button name="other_money_done" states="draft" string="审核" type="object" class="oe_highlight"/>
 					<button name="other_money_draft" states="done" string="反审核" type="object"/>
@@ -58,7 +58,7 @@
                             <field name="amount" sum="合计"/>
                             <field name="note"/>
                        </tree>
-                        <form string="非营利收支日记帐">
+                        <form string="非营利收支日记账">
                             <group>
                                 <field name="cash_flow_template_id" domain="[('type', '=', parent.type)]" readonly="1"/>
                                 <field name="category_id" required="1" domain="[('type', '=', parent.type)]"  />
@@ -89,7 +89,7 @@
 
         <!-- 日记帐 action -->
         <record id="nonprofit_money_receipt_action" model="ir.actions.act_window">
-            <field name="name">日记帐</field>
+            <field name="name">日记账</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">other.money.order</field>
             <field name="view_mode">tree,form</field>
@@ -99,7 +99,7 @@
             <field name="domain">[]</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
-                点击创建日记帐
+                点击创建日记账
               </p>
             </field>
         </record>
