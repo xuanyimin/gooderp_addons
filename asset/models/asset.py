@@ -604,7 +604,7 @@ class CreateCleanWizard(models.TransientModel):
         if self.clean_type == 'handle' and not (Asset.category_id.clean_income.id or Asset.category_id.clean_costs.id):
             raise UserError(u'直接处理必须要处置收入科目及处置支出科目')
         if not Asset.account_accumulated_depreciation and not Asset.forever_no_depreciation:
-            raise UserError(u'请到固定资产分类:%s累计折旧科目'%Asset.account_accumulated_depreciation.name)
+            raise UserError(u'处置固定资产必须要在固定资产分类（%s）中设置固定资产处置收入科目和固定资产处置成本科目'%Asset.account_accumulated_depreciation.name)
         if self.clean_type == 'guazhang' and not self.clean_account.id:
             raise UserError(u'盘亏处理必须要挂账科目')
         depreciation2 = sum(line.cost_depreciation for line in Asset.line_ids)
