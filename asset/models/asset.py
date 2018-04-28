@@ -969,6 +969,7 @@ class CreateDepreciationWizard(models.TransientModel):
                         'voucher_id': vouch_obj.id,
                         'account_id': Asset.account_accumulated_depreciation.id,
                         'name': u'固定资产折旧',
+                        'ref': '%s,%s' % (self._name, self.id)
                         })
         return res
 
