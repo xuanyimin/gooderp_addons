@@ -24,6 +24,8 @@
                                 辅助核算余额表。
     ''',
     'depends': ['num_to_china', 'web_sublist', 'good_process', 'ir_sequence_autoreset'],
+    'external_dependencies': {
+        'python' : ['xmltodict']},
     'version': '11.11',
     'data': [
         'security/groups.xml',
@@ -31,6 +33,7 @@
         'data/finance_voucher_data.xml',
         'data/finance_data.xml',
         'data/finance_export_template_data.xml',
+        'data/ir_cron.xml',
         'views/res_config_view.xml',
         'views/finance_conf.xml',
         'wizard/checkout_wizard.xml',

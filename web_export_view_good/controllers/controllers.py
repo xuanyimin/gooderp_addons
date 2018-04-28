@@ -39,6 +39,7 @@ from odoo.tools import misc
 from odoo import http
 import odoo
 import urllib2
+import os
 
 
 class ReportTemplate(models.Model):
@@ -48,18 +49,31 @@ class ReportTemplate(models.Model):
     model_id = fields.Many2one('ir.model', u'模型',required=True)
     file_address = fields.Char(u'模板文件路径',required=True)
     active = fields.Boolean(u'可用', default=True)
-    blank_rows = fields.Integer(u'空白行数',required=True, default= 0)
-    header_rows = fields.Integer(u'表头行数',required=True, default= 0)
+    blank_rows = fields.Integer(u'空白行数',required=True)
+    header_rows = fields.Integer(u'表头额外行数',required=False)
+    save = fields.Boolean(string=u'保存副本', )
+    path = fields.Char(string=u'副本保存路径', )
 
     @api.model
     def get_time(self, model):
         ISOTIMEFORMAT = "%Y-%m-%d"
+        time_now= time.localtime(time.time())
         report_model = self.env['report.template'].search(
             [('model_id.model', '=', model)], limit=1)
         file_address = report_model and report_model[0].file_address or False
         blank_rows = report_model and report_model[0].blank_rows or False
         header_rows = report_model and report_model[0].header_rows or False
-        return (str(time.strftime(ISOTIMEFORMAT, time.localtime(time.time()))), file_address,blank_rows,header_rows)
+        save = report_model and report_model[0].save or False
+        path = report_model and report_model[0].path or False
+        database_name = self.pool._db.dbname
+        if path:
+            path = '%s/%s/%s'%(path,database_name,str(time.strftime(ISOTIMEFORMAT, time_now)))
+        else:
+            path = '%s/%s'%(database_name,str(time.strftime(ISOTIMEFORMAT, time_now)))
+        if path and not os.path.exists(path):
+            os.makedirs(path)
+
+        return (str(time.strftime(ISOTIMEFORMAT, time_now)), file_address,blank_rows,header_rows,save,path)
 
 
 def content_disposition(filename):
@@ -90,8 +104,16 @@ class ExcelExportView(ExcelExport, ):
         rows = data.get('rows', [])
         file_address = data.get('file_address', [])
 
+        excel_data = self.from_data_excel(columns_headers, [rows, file_address])
+        if data.get('save'):
+            path=''
+            if data.get('path'):
+                path = '%s/'%data.get('path')
+            excel_file = open('%s%s.xls'%(path,files_name),'wb')
+            excel_file.write(excel_data)
+
         return request.make_response(
-            self.from_data_excel(columns_headers, [rows, file_address]),
+            excel_data,
             headers=[
                 ('Content-Disposition', content_disposition(files_name)),
                 ('Content-Type', self.content_type)],

@@ -174,6 +174,35 @@ class CashFlowWizard(models.TransientModel):
         view_id = self.env.ref('money.cash_flow_statement_tree').id
         attachment_information = u'编制单位：' + self.env.user.company_id.name + u',,' + self.period_id.year\
                                  + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
+
+        # 第一行 为字段名
+        #  从第二行开始 为数据
+
+        field_list = ['name', 'line_num', 'year_amount', 'amount']
+        domain = [('id', 'in', rep_ids)]
+        export_data = {
+            "database": self.pool._db.dbname,
+            "date": fields.Date.context_today(self),
+            "report_name": u"现金流量表",
+            "report_code": u"会民非03表",
+            "rows": self.env['cash.flow.statement'].search_count(domain),
+            "cols": len(field_list),
+            "report_items": []
+        }
+        
+        _data_dict = self.env['cash.flow.statement'].search_read(domain, field_list)
+
+        for _data in _data_dict:
+            row = {}
+            idx = 1
+            for field in field_list:
+                row.update({'col%s' % idx: _data.get(field, False) or ''})
+                idx += 1
+
+            export_data['report_items'].append(row)
+
+        self.env['create.balance.sheet.wizard'].export_xml('cash.flow.statement', {'data': export_data}, u'现金流量表%s' % self.period_id.name)
+
         return {
             'type': 'ir.actions.act_window',
             'name': u'现金流量表：' + self.period_id.name,
@@ -184,6 +213,6 @@ class CashFlowWizard(models.TransientModel):
             'view_id': False,
             'views': [(view_id, 'tree')],
             'context': {'period_id': self.period_id.id, 'attachment_information': attachment_information},
-            'domain': [('id', 'in', rep_ids)],
+            'domain': domain,
             'limit': 65535,
         }

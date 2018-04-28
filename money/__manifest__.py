@@ -24,6 +24,7 @@
     'depends': ['finance', 'report_docx'],
     'data': [
         'data/money_data.xml',
+        'data/finance_export_template_data.xml',
         'data/cash_flow_data.xml',
         'data/export_data.xml',
         'security/groups.xml',

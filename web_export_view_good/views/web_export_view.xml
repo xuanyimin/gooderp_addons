@@ -18,6 +18,8 @@
                     <field name="file_address"/>
                     <field name="blank_rows"/>
                     <field name="header_rows"/>
+                    <field name="save"/>
+                    <field name="path"/>
                     <field name="active" />
                 </tree>
             </field>

@@ -153,7 +153,9 @@ function button_export_action () {
                             headers: header,
                             files_name:view.ViewManager.title,
                             rows: export_rows,
-                            file_address: data[1]
+                            file_address: data[1],
+                            save: data[4],
+                            path: data[5],
                         })
                     }, complete: $.unblockUI});
             });
