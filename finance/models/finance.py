@@ -5,6 +5,10 @@ import odoo.addons.decimal_precision as dp
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
+import logging
+_logger = logging.getLogger(__name__)
+
+
 import xmltodict
 import os
 import time
@@ -324,10 +328,12 @@ class VoucherLine(models.Model):
             raise UserError( u'不可以同时录入 贷方和借方')
 
         if self.debit and not self.credit and inner_account_debit:
+            _logger.info('inner accounts  %s'%inner_account_credit)
             raise UserError(u'借方禁止科目: %s-%s \n\n 提示：%s '% (self.account_id.code, self.account_id.name,inner_account_debit[0].restricted_debit_msg))
 
         if not self.debit and self.credit and inner_account_credit:
-            raise UserError(u'贷方禁止科目: %s-%s \n\n 提示：%s '% (self.account_id.code, self.account_id.name, inner_account_credit[0].restricted_credit_msg))
+            _logger.info('inner accounts  %s'%inner_account_credit)
+            raise UserError(u'贷方禁止科目: %s-%s \n\n 提示：%s '% (self.account_id.code, self.account_id.name, inner_account_credit[0].restrict_credit_msg))
 
     @api.model
     def create(self, values):
