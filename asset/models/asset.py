@@ -618,7 +618,7 @@ class CreateCleanWizard(models.TransientModel):
             code = self.clean_account.code
             if code[:4] in error_code:
                 raise UserError(u'您选择的类型和科目不匹配，请重新选择。')
-            self._generate_voucher(Asset, residual, depreciation, self.clean_account.id)
+            self._generate_voucher(Asset, residual, depreciation, self.clean_account)
             Asset.state = 'deficit'
         # 按发票收入生成收入单
         else:
@@ -855,6 +855,11 @@ class CreateAssetWizard(models.TransientModel):
         })
         other_money_order_line.onchange_category_id()
         other_money_order.other_money_done()
+
+        chang_account = self.env['voucher.line'].search(
+            [('voucher_id', '=', other_money_order.voucher_id.id),
+             ('account_id', '=', category.account_id.id)])
+        chang_account.write({'account_id': Asset.account_asset.id})
         return other_money_order
 
     @api.one
