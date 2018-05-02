@@ -99,6 +99,17 @@ class BankAccount(models.Model):
     '''查看账户对账单'''
     _inherit = 'bank.account'
 
+    @api.multi
+    def write(self, vals):
+        res = super(BankAccount, self).write(vals)
+        old_account = vals.get('account_id')
+        new_account = self.account_id.id
+        if old_account and new_account == old_account:
+            wang = self.env['other.money.order'].search([
+                ('bank_id', '=', self.id)])
+            if wang:
+                raise UserError(u'科目不可以修改')
+        return res
 
     @api.one
     def _set_init_balance(self):
@@ -130,8 +141,8 @@ class BankAccount(models.Model):
                     'tax_amount': 0,
                 })],
                 'state': 'draft',
-                'currency_amount': self.currency_amount,
             })
+            other_money_init.write({'name': u'初始化%s'%self.name})
             # 审核 其他收入单
             other_money_init.other_money_done()
         else:

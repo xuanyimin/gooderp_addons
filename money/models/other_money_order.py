@@ -37,7 +37,13 @@ class OtherMoneyOrder(models.Model):
     @api.model
     def create(self, values):
         # 创建单据时，更新订单类型的不同，生成不同的单据编号
-        if values.get('type') == 'other_get':
+        if self.env.context.get('type') == 'other_get':
+            values.update(
+                {'name': self.env['ir.sequence'].next_by_code('other.get.order')})
+        elif self.env.context.get('type') == 'other_pay':
+            values.update(
+                {'name': self.env['ir.sequence'].next_by_code('other.pay.order')})
+        elif values.get('type') == 'other_get':
             values.update(
                 {'name': self.env['ir.sequence'].next_by_code('other.get.order')})
         elif values.get('type') == 'other_pay' or values.get('name', '/') == '/':
