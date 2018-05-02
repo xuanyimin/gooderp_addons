@@ -766,14 +766,25 @@ class FinanceAccount(models.Model):
         """
         限制科目删除条件
         """
+        parent_ids =[]
         for record in self:
+            if record.parent_id not in parent_ids:
+                parent_ids.append(record.parent_id)
+
             if record.source == 'init' and record.env.context.get('modify_from_webclient', False):
                 raise UserError(u'不能删除预设会计科目!')
 
             if record.env.context.get('modify_from_webclient', False) and record.voucher_line_ids:
                 raise UserError(u'不能删除有记账凭证的会计科目!')
     
-        return super(FinanceAccount, self).unlink()
+        result = super(FinanceAccount, self).unlink()
+        
+        # 如果 下级科目全删除了，则将 上级科目设置为 普通科目
+        for parent_id in parent_ids:
+            if len(parent_id.child_ids.ids) == 0:
+                parent_id.account_type = 'normal'
+
+        return result
 
     def button_add_child(self):
         self.ensure_one()
