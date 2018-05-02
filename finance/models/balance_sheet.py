@@ -85,10 +85,10 @@ class CreateBalanceSheetWizard(models.TransientModel):
             subject_vals = []
             if len(parameter_str_list) == 1:
                 subject_ids = self.env['finance.account'].search(
-                    [('code', '=', parameter_str_list[0])])
+                    [('code', '=', parameter_str_list[0]),('account_type','!=','view')])
             else:
                 subject_ids = self.env['finance.account'].search(
-                    [('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1])])
+                    [('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1]),('account_type','!=','view')])
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [
                                                               subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
             for trial_balance in trial_balances:
@@ -281,10 +281,10 @@ class CreateBalanceSheetWizard(models.TransientModel):
             sign_out = False
             if len(parameter_str_list) == 1:
                 subject_ids = self.env['finance.account'].search(
-                    [('code', '=', parameter_str_list[0])])
+                    [('code', '=', parameter_str_list[0]),('account_type','!=','view')])
             else:
                 subject_ids = self.env['finance.account'].search(
-                    [('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1])])
+                    [('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1]),('account_type','!=','view')])
             if subject_ids:   # 本行计算科目借贷方向
                 for line in subject_ids:
                     if line.balance_directions == 'in':
@@ -317,10 +317,10 @@ class CreateBalanceSheetWizard(models.TransientModel):
             subject_vals = []
             if len(formula_list) == 1:
                 subject_ids = self.env['finance.account'].search(
-                    [('code', '=', formula_list[0])])
+                    [('code', '=', formula_list[0]),('account_type','!=','view')])
             else:
                 subject_ids = self.env['finance.account'].search(
-                    [('code', '>=', formula_list[0]), ('code', '<=', formula_list[1])])
+                    [('code', '>=', formula_list[0]), ('code', '<=', formula_list[1]),('account_type','!=','view')])
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [
                                                               subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
             for trial_balance in trial_balances:

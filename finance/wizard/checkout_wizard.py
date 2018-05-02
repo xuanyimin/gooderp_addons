@@ -69,29 +69,45 @@ class CheckoutWizard(models.TransientModel):
                         account_restricted_net_asset_id = self.env.ref('finance.init_account_3102')
                         # 非限定性收入 科目
                         account_unrestricted_revenue_ids =[]
-                        account_unrestricted_revenue_ids.append(self.env.ref('finance.init_account_410101'))
-                        account_unrestricted_revenue_ids.append(self.env.ref('finance.init_account_420101'))
-                        account_unrestricted_revenue_ids.append(self.env.ref('finance.init_account_430101'))
-                        account_unrestricted_revenue_ids.append(self.env.ref('finance.init_account_440101'))
-                        account_unrestricted_revenue_ids.append(self.env.ref('finance.init_account_450101'))
-                        account_unrestricted_revenue_ids.append(self.env.ref('finance.init_account_460101'))
-                        account_unrestricted_revenue_ids.append(self.env.ref('finance.init_account_490101'))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code','=','410101')], limit=1))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '420101')], limit=1))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '430101')], limit=1))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '440101')], limit=1))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '450101')], limit=1))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '460101')], limit=1))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '490101')], limit=1))
                         # 限定性收入 科目
                         account_restricted_revenue_ids =[]
-                        account_restricted_revenue_ids.append(self.env.ref('finance.init_account_410102'))
-                        account_restricted_revenue_ids.append(self.env.ref('finance.init_account_420102'))
-                        account_restricted_revenue_ids.append(self.env.ref('finance.init_account_430102'))
-                        account_restricted_revenue_ids.append(self.env.ref('finance.init_account_440102'))
-                        account_restricted_revenue_ids.append(self.env.ref('finance.init_account_450102'))
-                        account_restricted_revenue_ids.append(self.env.ref('finance.init_account_460102'))
+                        account_restricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '410102')], limit=1))
+                        account_restricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '420102')], limit=1))
+                        account_restricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '430102')], limit=1))
+                        account_restricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '440102')], limit=1))
+                        account_restricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '450102')], limit=1))
+                        account_restricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '460102')], limit=1))
                         account_restricted_revenue_ids.append(self.env.ref('finance.init_account_490102'))
                         # 费用 科目
                         account_expense_ids =[]
-                        account_expense_ids.append( self.env.ref('finance.init_account_5101'))
-                        account_expense_ids.append( self.env.ref('finance.init_account_5201'))
-                        account_expense_ids.append( self.env.ref('finance.init_account_5301'))
-                        account_expense_ids.append( self.env.ref('finance.init_account_5401'))
-
+                        account_expense_ids.append(
+                            self.env['finance.account'].search([('code', '=', '5101')], limit=1))
+                        account_expense_ids.append(
+                            self.env['finance.account'].search([('code', '=', '5201')], limit=1))
+                        account_expense_ids.append(
+                            self.env['finance.account'].search([('code', '=', '5301')], limit=1))
+                        account_expense_ids.append(
+                            self.env['finance.account'].search([('code', '=', '5401')], limit=1))
                         total_revenue_unrestricted = 0  # 非限定性收入类科目合计
                         total_revenue_restricted = 0  # 限定性收入类科目合计
                         total_expense = 0  # 费用类科目合计
