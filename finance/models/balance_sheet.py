@@ -348,7 +348,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
 
     def deal_with_activity_formula(self, report_fields_formula, period_id, report_fields):
         if report_fields_formula:
-            return_vals = sum([self.compute_activity(formula, period_id, report_fields)
+            return_vals = sum([self.compute_profit(formula, period_id, report_fields)
                                for formula in report_fields_formula.split(';')])
         else:
             return_vals = 0
@@ -430,7 +430,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
 
         return {      # 返回生成业务活动表的数据的列表
             'type': 'ir.actions.act_window',
-            'name': u'业务活动表' + self.period_id.name,
+            'name': u'业务活动表：' + self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'business.activity.statement',

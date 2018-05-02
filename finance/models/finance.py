@@ -324,8 +324,8 @@ class VoucherLine(models.Model):
 
         inner_account_credit = [ acc for acc in account_ids if acc in prohibit_account_credit_ids]
 
-        if self.debit and self.credit:
-            raise UserError( u'不可以同时录入 贷方和借方')
+        # if self.debit and self.credit:
+        #     raise UserError( u'不可以同时录入 贷方和借方')
 
         if self.debit and not self.credit and inner_account_debit:
             _logger.info('inner accounts  %s'%inner_account_credit)
@@ -592,8 +592,8 @@ class FinanceAccount(models.Model):
 
             # 下级科目按记账凭证计算
             else:
-                record.debit = sum(record.voucher_line_ids.mapped('debit'))
-                record.credit = sum(record.voucher_line_ids.mapped('credit'))
+                record.debit = sum(record.voucher_line_ids.filtered(lambda self: self.state == 'done').mapped('debit'))
+                record.credit = sum(record.voucher_line_ids.filtered(lambda self: self.state == 'done').mapped('credit'))
                 record.balance = record.debit - record.credit
 
     @api.multi
@@ -622,12 +622,12 @@ class FinanceAccount(models.Model):
                 period = self.env['finance.period'].browse(period_id)
 
             if period:
-                debit = sum(self.voucher_line_ids.filtered(lambda self: self.period_id==period).mapped('debit'))
-                credit = sum(self.voucher_line_ids.filtered(lambda self: self.period_id==period).mapped('credit'))
+                debit = sum(self.voucher_line_ids.filtered(lambda self: self.period_id==period and self.state == 'done').mapped('debit'))
+                credit = sum(self.voucher_line_ids.filtered(lambda self: self.period_id==period and self.state == 'done').mapped('credit'))
                 balance = self.debit - self.credit
             else:
-                debit = sum(self.voucher_line_ids.mapped('debit'))
-                credit = sum(self.voucher_line_ids.mapped('credit'))
+                debit = sum(self.voucher_line_ids.filtered(lambda self: self.state == 'done').mapped('debit'))
+                credit = sum(self.voucher_line_ids.filtered(lambda self: self.state == 'done').mapped('credit'))
                 balance = self.debit - self.credit
 
             data.update( {'debit': debit, 'credit':credit , 'balance':balance})
@@ -754,9 +754,26 @@ class FinanceAccount(models.Model):
         """
         for record in self:
             if record.source == 'init' and record.env.context.get('modify_from_webclient', False):
-                raise UserError(u'不能删改预设会计科目!')
+                raise UserError(u'不能修改预设会计科目!')
+
+            if record.env.context.get('modify_from_webclient', False) and record.voucher_line_ids:
+                raise UserError(u'不能修改有记账凭证的会计科目!')
 
         return super(FinanceAccount, self).write(values)
+
+    @api.multi
+    def unlink(self):
+        """
+        限制科目删除条件
+        """
+        for record in self:
+            if record.source == 'init' and record.env.context.get('modify_from_webclient', False):
+                raise UserError(u'不能删除预设会计科目!')
+
+            if record.env.context.get('modify_from_webclient', False) and record.voucher_line_ids:
+                raise UserError(u'不能删除有记账凭证的会计科目!')
+    
+        return super(FinanceAccount, self).unlink()
 
     def button_add_child(self):
         self.ensure_one()
