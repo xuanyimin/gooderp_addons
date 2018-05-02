@@ -163,8 +163,15 @@ class CreateBalanceSheetWizard(models.TransientModel):
             "report_code": u"会民非01表",
             "rows": self.env['balance.sheet'].search_count(domain),
             "cols": len(field_list),
-            "report_items": []
+            "report_item": []
         }
+
+        header ={}
+        idx = 1
+        for field in field_list:
+            header.update({'col%s' % idx: self.env['balance.sheet']._fields.get(field).string})
+            idx += 1
+        export_data['report_item'].append(header)
 
         _data_dict = self.env['balance.sheet'].search_read(domain, field_list)
 
@@ -175,7 +182,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
                 row.update({'col%s' % idx: _data.get(field, False) or ''})
                 idx += 1
 
-            export_data['report_items'].append(row)
+            export_data['report_item'].append(row)
 
         self.export_xml('balance.sheet', {'data': export_data}, u'资产负债表%s' % self.period_id.name)
 
@@ -239,8 +246,15 @@ class CreateBalanceSheetWizard(models.TransientModel):
             "report_code": u"会企02表",
             "rows": self.env['profit.statement'].search_count(domain),
             "cols": len(field_list),
-            "report_items": []
+            "report_item": []
         }
+
+        header ={}
+        idx = 1
+        for field in field_list:
+            header.update({'col%s' % idx: self.env['profit.statement']._fields.get(field).string})
+            idx += 1
+        export_data['report_item'].append(header)
 
         _data_dict = self.env['profit.statement'].search_read(domain, field_list)
 
@@ -251,7 +265,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
                 row.update({'col%s' % idx: _data.get(field, False) or ''})
                 idx += 1
 
-            export_data['report_items'].append(row)
+            export_data['report_item'].append(row)
 
         self.export_xml('profit.statement', {'data': export_data}, u'利润表%s' % self.period_id.name)
 
@@ -334,7 +348,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
 
     def deal_with_activity_formula(self, report_fields_formula, period_id, report_fields):
         if report_fields_formula:
-            return_vals = sum([self.compute_activity(formula, period_id, report_fields)
+            return_vals = sum([self.compute_profit(formula, period_id, report_fields)
                                for formula in report_fields_formula.split(';')])
         else:
             return_vals = 0
@@ -391,8 +405,15 @@ class CreateBalanceSheetWizard(models.TransientModel):
             "report_code": u"会民非02表",
             "rows": self.env['business.activity.statement'].search_count(domain),
             "cols": len(field_list),
-            "report_items": []
+            "report_item": []
         }
+
+        header ={}
+        idx = 1
+        for field in field_list:
+            header.update({'col%s' % idx: self.env['business.activity.statement']._fields.get(field).string})
+            idx += 1
+        export_data['report_item'].append(header)
 
         _data_dict = self.env['business.activity.statement'].search_read(domain, field_list)
 
@@ -403,13 +424,13 @@ class CreateBalanceSheetWizard(models.TransientModel):
                 row.update({'col%s' % idx: _data.get(field, False) or ''})
                 idx += 1
 
-            export_data['report_items'].append(row)
+            export_data['report_item'].append(row)
 
         self.export_xml('business.activity.statement', {'data': export_data}, u'业务活动表%s'% self.period_id.name)
 
         return {      # 返回生成业务活动表的数据的列表
             'type': 'ir.actions.act_window',
-            'name': u'业务活动表' + self.period_id.name,
+            'name': u'业务活动表：' + self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'business.activity.statement',
@@ -438,8 +459,11 @@ class CreateBalanceSheetWizard(models.TransientModel):
             if not os.path.exists(path):
                 os.makedirs(path)
 
+            import sys
+            reload(sys)
+            sys.setdefaultencoding('utf8')
             xml_file = open('%s/%s.xml' % (path, file_name), 'wb')
-            xml_string = xmltodict.unparse(data)
+            xml_string = xmltodict.unparse(data, pretty=True)
             xml_file.write(xml_string)
 
 
