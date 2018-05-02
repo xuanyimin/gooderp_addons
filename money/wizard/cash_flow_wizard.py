@@ -187,8 +187,15 @@ class CashFlowWizard(models.TransientModel):
             "report_code": u"会民非03表",
             "rows": self.env['cash.flow.statement'].search_count(domain),
             "cols": len(field_list),
-            "report_items": []
+            "report_item": []
         }
+
+        header ={}
+        idx = 1
+        for field in field_list:
+            header.update({'col%s' % idx: self.env['cash.flow.statement']._fields.get(field).string})
+            idx += 1
+        export_data['report_item'].append(header)
         
         _data_dict = self.env['cash.flow.statement'].search_read(domain, field_list)
 
@@ -199,7 +206,7 @@ class CashFlowWizard(models.TransientModel):
                 row.update({'col%s' % idx: _data.get(field, False) or ''})
                 idx += 1
 
-            export_data['report_items'].append(row)
+            export_data['report_item'].append(row)
 
         self.env['create.balance.sheet.wizard'].export_xml('cash.flow.statement', {'data': export_data}, u'现金流量表%s' % self.period_id.name)
 

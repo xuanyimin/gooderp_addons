@@ -163,8 +163,15 @@ class CreateBalanceSheetWizard(models.TransientModel):
             "report_code": u"会民非01表",
             "rows": self.env['balance.sheet'].search_count(domain),
             "cols": len(field_list),
-            "report_items": []
+            "report_item": []
         }
+
+        header ={}
+        idx = 1
+        for field in field_list:
+            header.update({'col%s' % idx: self.env['balance.sheet']._fields.get(field).string})
+            idx += 1
+        export_data['report_item'].append(header)
 
         _data_dict = self.env['balance.sheet'].search_read(domain, field_list)
 
@@ -239,8 +246,15 @@ class CreateBalanceSheetWizard(models.TransientModel):
             "report_code": u"会企02表",
             "rows": self.env['profit.statement'].search_count(domain),
             "cols": len(field_list),
-            "report_items": []
+            "report_item": []
         }
+
+        header ={}
+        idx = 1
+        for field in field_list:
+            header.update({'col%s' % idx: self.env['profit.statement']._fields.get(field).string})
+            idx += 1
+        export_data['report_item'].append(header)
 
         _data_dict = self.env['profit.statement'].search_read(domain, field_list)
 
@@ -391,8 +405,15 @@ class CreateBalanceSheetWizard(models.TransientModel):
             "report_code": u"会民非02表",
             "rows": self.env['business.activity.statement'].search_count(domain),
             "cols": len(field_list),
-            "report_items": []
+            "report_item": []
         }
+
+        header ={}
+        idx = 1
+        for field in field_list:
+            header.update({'col%s' % idx: self.env['business.activity.statement']._fields.get(field).string})
+            idx += 1
+        export_data['report_item'].append(header)
 
         _data_dict = self.env['business.activity.statement'].search_read(domain, field_list)
 
