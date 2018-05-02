@@ -175,7 +175,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
                 row.update({'col%s' % idx: _data.get(field, False) or ''})
                 idx += 1
 
-            export_data['report_items'].append(row)
+            export_data['report_item'].append(row)
 
         self.export_xml('balance.sheet', {'data': export_data}, u'资产负债表%s' % self.period_id.name)
 
@@ -251,7 +251,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
                 row.update({'col%s' % idx: _data.get(field, False) or ''})
                 idx += 1
 
-            export_data['report_items'].append(row)
+            export_data['report_item'].append(row)
 
         self.export_xml('profit.statement', {'data': export_data}, u'利润表%s' % self.period_id.name)
 
@@ -403,7 +403,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
                 row.update({'col%s' % idx: _data.get(field, False) or ''})
                 idx += 1
 
-            export_data['report_items'].append(row)
+            export_data['report_item'].append(row)
 
         self.export_xml('business.activity.statement', {'data': export_data}, u'业务活动表%s'% self.period_id.name)
 
@@ -438,8 +438,11 @@ class CreateBalanceSheetWizard(models.TransientModel):
             if not os.path.exists(path):
                 os.makedirs(path)
 
+            import sys
+            reload(sys)
+            sys.setdefaultencoding('utf8')
             xml_file = open('%s/%s.xml' % (path, file_name), 'wb')
-            xml_string = xmltodict.unparse(data)
+            xml_string = xmltodict.unparse(data, pretty=True)
             xml_file.write(xml_string)
 
 

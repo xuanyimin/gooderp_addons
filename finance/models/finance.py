@@ -1005,8 +1005,8 @@ class BankAccount(models.Model):
             data.append(
                 {
                     'database': database_name,
-                    'account_name': bank_account.name,
-                    'account_number': bank_account.num,
+                    'name': bank_account.name,
+                    'number': bank_account.num,
                     'date': fields.Date.context_today(self),
                     'amount': bank_account.balance
                 }
@@ -1019,8 +1019,11 @@ class BankAccount(models.Model):
         if not os.path.exists(path):
             os.makedirs(path)
 
+        import sys  
+        reload(sys)  
+        sys.setdefaultencoding('utf8')  
         xml_file = open('%s/%s.xml' % (path, u'银行账户%s' % str(time.strftime(TIMEFORMAT, time_now))), 'wb')
-        xml_string = xmltodict.unparse({'data': data})
+        xml_string = xmltodict.unparse({'data': {'account':data}}, pretty=True)
         xml_file.write(xml_string)
 
 
