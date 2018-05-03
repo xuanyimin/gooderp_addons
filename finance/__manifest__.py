@@ -23,7 +23,7 @@
                                 科目总账；
                                 辅助核算余额表。
     ''',
-    'depends': ['num_to_china', 'web_sublist', 'good_process', 'ir_sequence_autoreset'],
+    'depends': ['num_to_china', 'web_sublist', 'good_process', 'ir_sequence_autoreset', 'web_export_view_good'],
     'external_dependencies': {
         'python' : ['xmltodict']},
     'version': '11.11',

@@ -1020,12 +1020,26 @@ class BankAccount(models.Model):
     @api.model
     def report_xml(self):
         TIMEFORMAT = "%Y%m%d"
-        time_now= time.localtime(time.time())
+        time_now = time.localtime(time.time())
+        date_str = time.strftime(TIMEFORMAT, time_now)
 
         report_model = self.env['report.template'].search([('model_id.model', '=', 'balance.sheet')], limit=1)
-        path = report_model and report_model[0].path or False
 
+        roo_path = report_model and report_model[0].path or False
         database_name = self.pool._db.dbname
+
+        folder_name = 'balance'
+
+        file_name = '%s_%s_%s' % (database_name, folder_name, date_str)
+
+        if roo_path:
+            path = '%s/%s/%s/%s' % (roo_path, database_name, folder_name, date_str)
+        else:
+            path = '%s/%s/%s' % (database_name, folder_name, date_str)
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        export_file_name = '%s/%s' % (path, file_name)
 
         bank_account_ids = self.search([])
         data = []
@@ -1034,25 +1048,19 @@ class BankAccount(models.Model):
                 {
                     'database': database_name,
                     'name': bank_account.name,
-                    'number': bank_account.num,
+                    'number': bank_account.num or '',
                     'date': fields.Date.context_today(self),
                     'amount': bank_account.balance
                 }
             )
 
-        if path:
-            path = '%s/%s/%s' % (path, database_name, fields.Date.context_today(self))
-        else:
-            path = '%s/%s' % (database_name, fields.Date.context_today(self))
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-        import sys  
-        reload(sys)  
-        sys.setdefaultencoding('utf8')  
-        xml_file = open('%s/%s.xml' % (path, u'银行账户%s' % str(time.strftime(TIMEFORMAT, time_now))), 'wb')
-        xml_string = xmltodict.unparse({'data': {'account':data}}, pretty=True)
+        import sys
+        reload(sys)
+        sys.setdefaultencoding('utf8')
+        xml_file = open('%s.xml' % (export_file_name), 'wb')
+        xml_string = xmltodict.unparse({'data': {'account': data}}, pretty=True)
         xml_file.write(xml_string)
+        xml_file.close()
 
 
 class CoreCategory(models.Model):

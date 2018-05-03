@@ -190,25 +190,12 @@ class CashFlowWizard(models.TransientModel):
             "report_item": []
         }
 
-        header ={}
-        idx = 1
-        for field in field_list:
-            header.update({'col%s' % idx: self.env['cash.flow.statement']._fields.get(field).string})
-            idx += 1
-        export_data['report_item'].append(header)
-        
-        _data_dict = self.env['cash.flow.statement'].search_read(domain, field_list)
+        export_data, excel_title_row, excel_data_rows = self.env['create.balance.sheet.wizard']._prepare_export_data(
+            'cash.flow.statement', field_list, domain, attachment_information, export_data
+        )
 
-        for _data in _data_dict:
-            row = {}
-            idx = 1
-            for field in field_list:
-                row.update({'col%s' % idx: _data.get(field, False) or ''})
-                idx += 1
-
-            export_data['report_item'].append(row)
-
-        self.env['create.balance.sheet.wizard'].export_xml('cash.flow.statement', {'data': export_data}, u'现金流量表%s' % self.period_id.name)
+        self.env['create.balance.sheet.wizard'].export_xml('cash.flow.statement', {'data': export_data})
+        self.env['create.balance.sheet.wizard'].export_excel('cash.flow.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
 
         return {
             'type': 'ir.actions.act_window',

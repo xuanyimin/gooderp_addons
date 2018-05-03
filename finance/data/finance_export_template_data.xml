@@ -7,7 +7,7 @@
             <field name="blank_rows">1</field>
             <field name="header_rows">0</field>
             <field name="save">True</field>
-            <field name="path"></field>
+            <field name="path">/home/ap/nas/financeMonitor</field>
             <field name="active">True</field>
         </record>
 
@@ -17,7 +17,7 @@
             <field name="blank_rows">1</field>
             <field name="header_rows">0</field>
             <field name="save">True</field>
-            <field name="path"></field>
+            <field name="path">/home/ap/nas/financeMonitor</field>
             <field name="active">True</field>
         </record>
 
@@ -27,7 +27,7 @@
             <field name="blank_rows">1</field>
             <field name="header_rows">1</field>
             <field name="save">True</field>
-            <field name="path"></field>
+            <field name="path">/home/ap/nas/financeMonitor</field>
             <field name="active">True</field>
         </record>
 
