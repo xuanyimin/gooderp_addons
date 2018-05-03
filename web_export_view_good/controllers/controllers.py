@@ -105,12 +105,12 @@ class ExcelExportView(ExcelExport, ):
         file_address = data.get('file_address', [])
 
         excel_data = self.from_data_excel(columns_headers, [rows, file_address])
-        if data.get('save'):
-            path=''
-            if data.get('path'):
-                path = '%s/'%data.get('path')
-            excel_file = open('%s%s.xls'%(path,files_name),'wb')
-            excel_file.write(excel_data)
+        # if data.get('save'):
+        #     path=''
+        #     if data.get('path'):
+        #         path = '%s/'%data.get('path')
+        #     excel_file = open('%s%s.xls'%(path,files_name),'wb')
+        #     excel_file.write(excel_data)
 
         return request.make_response(
             excel_data,

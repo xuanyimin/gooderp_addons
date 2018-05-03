@@ -6,6 +6,9 @@ from math import fabs
 import calendar
 import os
 import xmltodict
+import logging
+import time
+_logger = logging.getLogger(__name__)
 
 
 class BalanceSheet(models.Model):
@@ -166,25 +169,12 @@ class CreateBalanceSheetWizard(models.TransientModel):
             "report_item": []
         }
 
-        header ={}
-        idx = 1
-        for field in field_list:
-            header.update({'col%s' % idx: self.env['balance.sheet']._fields.get(field).string})
-            idx += 1
-        export_data['report_item'].append(header)
+        export_data, excel_title_row, excel_data_rows = self._prepare_export_data(
+            'balance.sheet', field_list, domain, attachment_information, export_data
+        )
 
-        _data_dict = self.env['balance.sheet'].search_read(domain, field_list)
-
-        for _data in _data_dict:
-            row = {}
-            idx = 1
-            for field in field_list:
-                row.update({'col%s' % idx: _data.get(field, False) or ''})
-                idx += 1
-
-            export_data['report_item'].append(row)
-
-        self.export_xml('balance.sheet', {'data': export_data}, u'资产负债表%s' % self.period_id.name)
+        self.export_xml('balance.sheet', {'data': export_data})
+        self.export_excel('balance.sheet', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
 
         return {     # 返回生成资产负债表的数据的列表
             'type': 'ir.actions.act_window',
@@ -249,25 +239,12 @@ class CreateBalanceSheetWizard(models.TransientModel):
             "report_item": []
         }
 
-        header ={}
-        idx = 1
-        for field in field_list:
-            header.update({'col%s' % idx: self.env['profit.statement']._fields.get(field).string})
-            idx += 1
-        export_data['report_item'].append(header)
+        export_data, excel_title_row, excel_data_rows = self._prepare_export_data(
+            'profit.statement', field_list, domain, attachment_information, export_data
+        )
 
-        _data_dict = self.env['profit.statement'].search_read(domain, field_list)
-
-        for _data in _data_dict:
-            row = {}
-            idx = 1
-            for field in field_list:
-                row.update({'col%s' % idx: _data.get(field, False) or ''})
-                idx += 1
-
-            export_data['report_item'].append(row)
-
-        self.export_xml('profit.statement', {'data': export_data}, u'利润表%s' % self.period_id.name)
+        self.export_xml('profit.statement', {'data': export_data})
+        self.export_excel('profit.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
 
         return {      # 返回生成利润表的数据的列表
             'type': 'ir.actions.act_window',
@@ -392,12 +369,13 @@ class CreateBalanceSheetWizard(models.TransientModel):
 
         # 第一行 为字段名
         #  从第二行开始 为数据
+        domain = [('id', 'in', [report_item.id for report_item in report_item_ids])]
 
         field_list = [
             'balance', 'line_num', 'current_unrestricted', 'current_restricted', 'current_total', 'cumulative_unrestricted',
             'cumulative_restricted', 'cumulative_total'
         ]
-        domain = [('id', 'in', [report_item.id for report_item in report_item_ids])]
+        # excel_data_rows = []
         export_data = {
             "database": self.pool._db.dbname,
             "date": fields.Date.context_today(self),
@@ -408,25 +386,12 @@ class CreateBalanceSheetWizard(models.TransientModel):
             "report_item": []
         }
 
-        header ={}
-        idx = 1
-        for field in field_list:
-            header.update({'col%s' % idx: self.env['business.activity.statement']._fields.get(field).string})
-            idx += 1
-        export_data['report_item'].append(header)
+        export_data, excel_title_row, excel_data_rows = self._prepare_export_data(
+            'business.activity.statement', field_list, domain, attachment_information, export_data
+        )
 
-        _data_dict = self.env['business.activity.statement'].search_read(domain, field_list)
-
-        for _data in _data_dict:
-            row = {}
-            idx = 1
-            for field in field_list:
-                row.update({'col%s' % idx: _data.get(field, False) or ''})
-                idx += 1
-
-            export_data['report_item'].append(row)
-
-        self.export_xml('business.activity.statement', {'data': export_data}, u'业务活动表%s'% self.period_id.name)
+        self.export_xml('business.activity.statement', {'data': export_data})
+        self.export_excel('business.activity.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
 
         return {      # 返回生成业务活动表的数据的列表
             'type': 'ir.actions.act_window',
@@ -443,28 +408,126 @@ class CreateBalanceSheetWizard(models.TransientModel):
         }
 
     @api.model
-    def export_xml(self, model, data, file_name):
+    def _prepare_export_data(self, model, field_list, domain, attachment_information, export_data):
+        excel_data_rows = []
+        xml_data_dict = export_data
+        header = {}
+        excel_title_row = []
+        company_row = attachment_information.split(',')
+        header_row = []
+        operation_row = []
+        idx = 1
+        for field in field_list:
+            header.update({'col%s' % idx: self.env[model]._fields.get(field).string})
+            excel_title_row.append('')
+            header_row.append(self.env[model]._fields.get(field).string)
+            operation_row.append('')
+            idx += 1
+        xml_data_dict['report_item'].append(header)
+        excel_title_row[0] = xml_data_dict.get('report_name')
+        excel_data_rows.append(company_row)
+        excel_data_rows.append(header_row)
+
+        _data_dict = self.env[model].search_read(domain, field_list)
+
+        for _data in _data_dict:
+            row = {}
+            sheet_row = []
+            idx = 1
+            for field in field_list:
+                row.update({'col%s' % idx: _data.get(field, False) or ''})
+                sheet_row.append(_data.get(field, False) or '')
+                idx += 1
+
+            xml_data_dict['report_item'].append(row)
+            excel_data_rows.append(sheet_row)
+
+        operation_row[0] = u'操作人'
+        operation_row[1] = self.env.user.name
+        operation_row[len(operation_row) - 2] = u'操作时间'
+        operation_row[len(operation_row) - 1] = fields.Date.context_today(self)
+
+        excel_data_rows.append(operation_row)
+
+        return xml_data_dict, excel_title_row, excel_data_rows
+
+
+    @api.model
+    def _get_report_template(self, model):
+        TIMEFORMAT = "%Y%m%d"
+        time_now = time.localtime(time.time())
+        date_str = time.strftime(TIMEFORMAT, time_now)
 
         report_model = self.env['report.template'].search([('model_id.model', '=', model)], limit=1)
 
         save = report_model and report_model[0].save or False
-        path = report_model and report_model[0].path or False
+        roo_path = report_model and report_model[0].path or False
+        file_address = report_model and report_model[0].file_address or False
+        blank_rows = report_model and report_model[0].blank_rows or False
+        header_rows = report_model and report_model[0].header_rows or False
         database_name = self.pool._db.dbname
-        if save:
 
-            if path:
-                path = '%s/%s/%s' % (path, database_name, fields.Date.context_today(self))
+        folder_name_mapping = {
+            'balance.sheet': 'liabilities',
+            'business.activity.statement': 'business',
+            'profit.statement': 'profit',
+            'cash.flow.statement': 'cashFlow'
+        }
+
+        folder_name = folder_name_mapping.get(model)
+
+        file_name = '%s_%s_%s' % (database_name, folder_name, date_str)
+
+        export_file_name = False
+
+        if save:
+            if roo_path:
+                path = '%s/%s/%s/%s' % (roo_path, database_name, folder_name, date_str)
             else:
-                path = '%s/%s' % (database_name,fields.Date.context_today(self) )
+                path = '%s/%s/%s' % (database_name, folder_name, date_str)
             if not os.path.exists(path):
                 os.makedirs(path)
 
+            export_file_name = '%s/%s' % (path, file_name)
+
+        return save, export_file_name, file_address, blank_rows, header_rows
+
+    @api.model
+    def export_excel(self, model, data):
+        save, export_file_name, template_file, blank_rows, header_rows = self._get_report_template(model)
+        title = data.get('columns_headers')
+        rows = data.get('rows')
+
+        if header_rows:
+            i = header_rows
+            while i > 0:
+                rows.insert(1, [])
+                i = i - 1
+
+        if blank_rows:
+            i = blank_rows
+            while i > 0:
+                rows.insert(0, [])
+                i = i - 1
+        if save:
+            ExcelExportViewer = ExcelExportView()
+            excel_data = ExcelExportViewer.from_data_excel(title, [rows, template_file])
+
+            excel_file = open('%s.xls' % (export_file_name), 'wb')
+            excel_file.write(excel_data)
+            excel_file.close()
+
+    @api.model
+    def export_xml(self, model, data):
+        save, export_file_name,template_file, blank_rows, header_rows = self._get_report_template(model)
+        if save:
             import sys
             reload(sys)
             sys.setdefaultencoding('utf8')
-            xml_file = open('%s/%s.xml' % (path, file_name), 'wb')
+            xml_file = open('%s.xml' % (export_file_name), 'wb')
             xml_string = xmltodict.unparse(data, pretty=True)
             xml_file.write(xml_string)
+            xml_file.close()
 
 
 class ProfitStatement(models.Model):

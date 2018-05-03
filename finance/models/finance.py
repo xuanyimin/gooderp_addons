@@ -766,14 +766,25 @@ class FinanceAccount(models.Model):
         """
         限制科目删除条件
         """
+        parent_ids =[]
         for record in self:
+            if record.parent_id not in parent_ids:
+                parent_ids.append(record.parent_id)
+
             if record.source == 'init' and record.env.context.get('modify_from_webclient', False):
                 raise UserError(u'不能删除预设会计科目!')
 
             if record.env.context.get('modify_from_webclient', False) and record.voucher_line_ids:
                 raise UserError(u'不能删除有记账凭证的会计科目!')
     
-        return super(FinanceAccount, self).unlink()
+        result = super(FinanceAccount, self).unlink()
+        
+        # 如果 下级科目全删除了，则将 上级科目设置为 普通科目
+        for parent_id in parent_ids:
+            if len(parent_id.child_ids.ids) == 0:
+                parent_id.account_type = 'normal'
+
+        return result
 
     def button_add_child(self):
         self.ensure_one()
@@ -866,46 +877,42 @@ class WizardAccountAddChild(models.TransientModel):
         self.ensure_one()
         account_type = self.parent_id.account_type
         new_account = False
-        full_account_code = '%s%s'%(self.parent_code, self.account_code)
+        full_account_code = '%s%s' % (self.parent_code, self.account_code)
         if account_type == 'normal':
-            # 挂账科目，需要进行科目转换
-            # step1, 老科目改为临时名
-            origin_name = self.parent_id.name
-            origin_code = self.parent_id.code
-            self.parent_id.write({
-                'code': 'tmp_%s' % self.parent_id.code,
-                'name': 'tmp_%s' % self.parent_id.name,
-            })
-            # step2, 建新科目用作上级，类型为view，将上级科目设置为老科目的上级科目
+            # 挂账科目，需要对现有凭证进行科目转换
+            # step1, 建新科目
             new_account = self.parent_id.copy(
                 {
-                    'code': origin_code,
-                    'name': origin_name,
-                    'account_type': 'view',
-                })
-            # step3, 老科目改为正式名
+                    'code': full_account_code,
+                    'name': self.account_name,
+                    'account_type': 'normal',
+                    'source': 'manual',
+                    'parent_id': self.parent_id.id
+                }
+            )
+            # step2, 将关联凭证改到新科目
+            self.env['voucher.line'].search([('account_id', '=', self.parent_id.id)]).write({'account_id': new_account.id})
+            # step3, 老科目改为 视图
             self.parent_id.write({
-                'code': full_account_code,
-                'name': self.account_name,
-                'account_type': 'normal',
-                'source': 'manual',
-                'parent_id': new_account.id
+                'account_type': 'view',
             })
 
         elif account_type == 'view':
             # 直接新增下级科目，无需转换科目
-            new_account=self.parent_id.copy({
-                'code': full_account_code,
-                'name': self.account_name,
-                'account_type': 'normal',
-                'source': 'manual',
-                'parent_id': self.parent_id.id
-            })
+            new_account = self.parent_id.copy(
+                {
+                    'code': full_account_code,
+                    'name': self.account_name,
+                    'account_type': 'normal',
+                    'source': 'manual',
+                    'parent_id': self.parent_id.id
+                }
+            )
 
         if not new_account:
             raise UserError(u'新科目创建失败！')
 
-        view =  self.env.ref('finance.finance_account_tree')
+        view = self.env.ref('finance.finance_account_tree')
 
         return {
             'name': u'科目',
@@ -1004,12 +1011,26 @@ class BankAccount(models.Model):
     @api.model
     def report_xml(self):
         TIMEFORMAT = "%Y%m%d"
-        time_now= time.localtime(time.time())
+        time_now = time.localtime(time.time())
+        date_str = time.strftime(TIMEFORMAT, time_now)
 
         report_model = self.env['report.template'].search([('model_id.model', '=', 'balance.sheet')], limit=1)
-        path = report_model and report_model[0].path or False
 
+        roo_path = report_model and report_model[0].path or False
         database_name = self.pool._db.dbname
+
+        folder_name = 'balance'
+
+        file_name = '%s_%s_%s' % (database_name, folder_name, date_str)
+
+        if roo_path:
+            path = '%s/%s/%s/%s' % (roo_path, database_name, folder_name, date_str)
+        else:
+            path = '%s/%s/%s' % (database_name, folder_name, date_str)
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        export_file_name = '%s/%s' % (path, file_name)
 
         bank_account_ids = self.search([])
         data = []
@@ -1018,25 +1039,19 @@ class BankAccount(models.Model):
                 {
                     'database': database_name,
                     'name': bank_account.name,
-                    'number': bank_account.num,
+                    'number': bank_account.num or '',
                     'date': fields.Date.context_today(self),
                     'amount': bank_account.balance
                 }
             )
 
-        if path:
-            path = '%s/%s/%s' % (path, database_name, fields.Date.context_today(self))
-        else:
-            path = '%s/%s' % (database_name, fields.Date.context_today(self))
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-        import sys  
-        reload(sys)  
-        sys.setdefaultencoding('utf8')  
-        xml_file = open('%s/%s.xml' % (path, u'银行账户%s' % str(time.strftime(TIMEFORMAT, time_now))), 'wb')
-        xml_string = xmltodict.unparse({'data': {'account':data}}, pretty=True)
+        import sys
+        reload(sys)
+        sys.setdefaultencoding('utf8')
+        xml_file = open('%s.xml' % (export_file_name), 'wb')
+        xml_string = xmltodict.unparse({'data': {'account': data}}, pretty=True)
         xml_file.write(xml_string)
+        xml_file.close()
 
 
 class CoreCategory(models.Model):
