@@ -70,6 +70,7 @@ class OtherMoneyOrder(models.Model):
         if not self.rate_silent:
             self.rate_silent = 1
 
+
     state = fields.Selection([
         ('draft', u'草稿'),
         ('done', u'已确认'),
@@ -212,6 +213,10 @@ class OtherMoneyOrder(models.Model):
         """创建凭证并审核非初始化凭证"""
         init_obj = ''
         # 初始化单的话，先找是否有初始化凭证，没有则新建一个
+        if self.bank_id.currency_id:
+            rate_silent = self.env['res.currency'].get_rate_silent(self.date , self.bank_id.currency_id.id)
+        else:
+            rate_silent = 1
         if self.is_init:
             vouch_obj = self.env['voucher'].search([('is_init', '=', True)])
             if not vouch_obj:
@@ -224,16 +229,16 @@ class OtherMoneyOrder(models.Model):
             init_obj = 'other_money_order-%s' % (self.id)
 
         if self.type == 'other_get':  # 其他收入单
-            self.other_get_create_voucher_line(vouch_obj, init_obj)
+            self.other_get_create_voucher_line(vouch_obj, init_obj,rate_silent)
         else:  # 其他支出单
-            self.other_pay_create_voucher_line(vouch_obj)
+            self.other_pay_create_voucher_line(vouch_obj,rate_silent)
 
         # 如果非初始化单则审核
         if not self.is_init:
             vouch_obj.voucher_done()
         return vouch_obj
 
-    def other_get_create_voucher_line(self, vouch_obj, init_obj):
+    def other_get_create_voucher_line(self, vouch_obj, init_obj, rate_silent):
         """
         其他收入单生成凭证明细行
         :param vouch_obj: 凭证
@@ -254,10 +259,10 @@ class OtherMoneyOrder(models.Model):
                          })
             if self.bank_id.currency_id.id:
                 vals.update({
-                         'amount': (line.amount + line.tax_amount) * self.rate_silent,
+                         'amount': (line.amount + line.tax_amount) * rate_silent,
                          'currency_id': self.bank_id.currency_id.id,
                          'currency_amount': abs(line.amount + line.tax_amount),
-                         'rate_silent': self.rate_silent,
+                         'rate_silent': rate_silent,
                          })
             else:
                 vals.update({
@@ -269,7 +274,7 @@ class OtherMoneyOrder(models.Model):
                     'name': u"%s %s" % (vals.get('name'), vals.get('note')),
                     'partner_id': vals.get('partner_credit', ''),
                     'account_id': vals.get('credit_account_id'),
-                    'credit': line.amount * self.rate_silent,
+                    'credit': line.amount * rate_silent,
                     'voucher_id': vals.get('vouch_obj_id'),
                     'auxiliary_id': vals.get('credit_auxiliary_id', False),
                 })
@@ -298,7 +303,7 @@ class OtherMoneyOrder(models.Model):
             'rate_silent': vals.get('rate_silent'),
         })
 
-    def other_pay_create_voucher_line(self, vouch_obj):
+    def other_pay_create_voucher_line(self, vouch_obj,rate_silent):
         """
         其他支出单生成凭证明细行
         :param vouch_obj: 凭证
@@ -318,10 +323,10 @@ class OtherMoneyOrder(models.Model):
                          })
             if self.bank_id.currency_id.id:
                 vals.update({
-                             'amount': (line.amount + line.tax_amount) * self.rate_silent,
+                             'amount': (line.amount + line.tax_amount) * rate_silent,
                              'currency_id': self.bank_id.currency_id.id,
                              'currency_amount': abs(line.amount + line.tax_amount),
-                             'rate_silent': self.rate_silent,
+                             'rate_silent': rate_silent,
                              })
             else:
                 vals.update({
@@ -331,7 +336,7 @@ class OtherMoneyOrder(models.Model):
             self.env['voucher.line'].create({
                 'name': u"%s %s " % (vals.get('name'), vals.get('note')),
                 'account_id': vals.get('debit_account_id'),
-                'debit': (line.amount) * self.rate_silent,
+                'debit': (line.amount) * rate_silent,
                 'voucher_id': vals.get('vouch_obj_id'),
                 'partner_id': vals.get('partner_debit', ''),
                 'auxiliary_id': vals.get('debit_auxiliary_id', False),
