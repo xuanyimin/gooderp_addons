@@ -161,7 +161,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
         domain = [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])]
         export_data = {
             "database": self.pool._db.dbname,
-            "date": fields.Date.context_today(self),
+            "company": company_row.name,
+            "date": self.period_id.year + u'年' + self.period_id.month + u'月' + str(days) + u'日',
             "report_name": u"资产负债表",
             "report_code": u"会民非01表",
             "rows": self.env['balance.sheet'].search_count(domain),
@@ -231,7 +232,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
         domain = [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])]
         export_data = {
             "database": self.pool._db.dbname,
-            "date": fields.Date.context_today(self),
+            "company": company_row.name,
+            "date": self.period_id.year + u'年' + self.period_id.month + u'月' + str(days) + u'日',
             "report_name": u"利润表",
             "report_code": u"会企02表",
             "rows": self.env['profit.statement'].search_count(domain),
@@ -378,7 +380,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
         # excel_data_rows = []
         export_data = {
             "database": self.pool._db.dbname,
-            "date": fields.Date.context_today(self),
+            "company": company_row.name,
+            "date": self.period_id.year + u'年' + self.period_id.month + u'月' + str(days) + u'日',
             "report_name": u"业务活动表",
             "report_code": u"会民非02表",
             "rows": self.env['business.activity.statement'].search_count(domain),
