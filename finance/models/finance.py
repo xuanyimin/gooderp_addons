@@ -996,14 +996,9 @@ class ResCompany(models.Model):
 class BankAccount(models.Model):
     _inherit = 'bank.account'
 
-    @api.one
-    @api.depends('account_id')
-    def _compute_currency_id(self):
-        self.currency_id = self.account_id.currency_id.id
-
     account_id = fields.Many2one('finance.account', u'科目', domain="[('account_type','=','normal')]")
     currency_id = fields.Many2one(
-        'res.currency', u'外币币别', compute='_compute_currency_id', store=True)
+        'res.currency', u'外币币别', related='account_id.currency_id', store=True)
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision('Amount'))
 
     @api.model
