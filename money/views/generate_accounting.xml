@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <field name="name" position="after">
 					<field name="account_id" attrs="{'required': [('type', '!=', 'attribute')]}" options="{'no_open': True, 'no_create': True}"/>
-                    <field name="cash_flow_template_id" options="{'no_open': True, 'no_create': True}"/>
+                    <field name="cash_flow_template_id" required='True' options="{'no_open': True, 'no_create': True}"/>
 				</field>
             </field>
         </record>
