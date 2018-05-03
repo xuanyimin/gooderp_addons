@@ -175,8 +175,7 @@ class CashFlowWizard(models.TransientModel):
         view_id = self.env.ref('money.cash_flow_statement_tree').id
         days = calendar.monthrange(int(self.period_id.year), int(self.period_id.month))[1]
         attachment_information = u'编制单位：' + self.env.user.company_id.name + u',,' + self.period_id.year\
-                                 + u'年' + self.period_id.month + u'月'  + \
-            str(days) + u'日' + u',' + u'单位：元'
+                                 + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
 
         # 第一行 为字段名
         #  从第二行开始 为数据
@@ -186,7 +185,7 @@ class CashFlowWizard(models.TransientModel):
         export_data = {
             "database": self.pool._db.dbname,
             "company": self.env.user.company_id.name,
-            "date":  self.period_id.year + u'年' + self.period_id.month + u'月' + str(days) + u'日' ,
+            "date":  self.period_id.year + u'年' + self.period_id.month + u'月' ,
             "report_name": u"现金流量表",
             "report_code": u"会民非03表",
             "rows": self.env['cash.flow.statement'].search_count(domain),

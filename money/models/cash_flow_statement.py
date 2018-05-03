@@ -42,8 +42,8 @@ class CashFlowStatement(models.Model):
     _name = 'cash.flow.statement'
     name = fields.Char(u'项目')
     line_num = fields.Char(u'行次')
-    amount = fields.Float(u'本月金额', digits=dp.get_precision('Amount'))
-    year_amount = fields.Float(u'本年累计金额', digits=dp.get_precision('Amount'))
+    amount = fields.Float(u'本月数', digits=dp.get_precision('Amount'))
+    year_amount = fields.Float(u'本年累计数 ', digits=dp.get_precision('Amount'))
 
 
 class CoreCategory(models.Model):

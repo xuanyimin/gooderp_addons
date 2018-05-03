@@ -81,8 +81,8 @@
                     <tree string="现金流量表" create="false">
                         <field name="name"/>
                         <field name="line_num"/>
-                        <field name="year_amount"/>
                         <field name="amount"/>
+                        <field name="year_amount"/>
                     </tree>
                 </field>
             </record>

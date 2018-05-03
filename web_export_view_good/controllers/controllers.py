@@ -220,7 +220,7 @@ class ExcelExportView(ExcelExport, ):
         # frozen headings instead of split panes
         worksheet.set_panes_frozen(True)
         # in general, freeze after last heading row
-        worksheet.set_horz_split_pos(3)
+        # worksheet.set_horz_split_pos(3)
         # if user does unfreeze, don't leave a split there
         worksheet.set_remove_splits(True)
         fp_currency = StringIO.StringIO()

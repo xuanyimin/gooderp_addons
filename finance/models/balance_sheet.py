@@ -26,17 +26,17 @@ class BalanceSheet(models.Model):
     line = fields.Integer(u'序号', required=True, help=u'资产负债表的行次')
     balance = fields.Char(u'资产')
     line_num = fields.Char(u'行次', help=u'此处行次并不是出报表的实际的行数,只是显示用的用来符合国人习惯')
-    ending_balance = fields.Float(u'期末余额')
+    ending_balance = fields.Float(u'期末数')
     balance_formula = fields.Text(
         u'科目范围', help=u'设定本行的资产负债表的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
-    beginning_balance = fields.Float(u'年初余额')
+    beginning_balance = fields.Float(u'年初数')
 
     balance_two = fields.Char(u'负债和所有者权益')
     line_num_two = fields.Char(u'行次', help=u'此处行次并不是出报表的实际的行数,只是显示用的用来符合国人习惯')
-    ending_balance_two = fields.Float(u'期末余额')
+    ending_balance_two = fields.Float(u'期末数')
     balance_two_formula = fields.Text(
         u'科目范围', help=u'设定本行的资产负债表的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
-    beginning_balance_two = fields.Float(u'年初余额', help=u'报表行本年的年余额')
+    beginning_balance_two = fields.Float(u'年初数', help=u'报表行本年的年余额')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -222,8 +222,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         days = calendar.monthrange(
             int(self.period_id.year), int(self.period_id.month))[1]
         attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year\
-                                 + u'年' + self.period_id.month + u'月' + \
-            str(days) + u'日' + u',' + u'单位：元'
+                                 + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
 
         # 第一行 为字段名
         #  从第二行开始 为数据
@@ -233,7 +232,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         export_data = {
             "database": self.pool._db.dbname,
             "company": company_row.name,
-            "date": self.period_id.year + u'年' + self.period_id.month + u'月' + str(days) + u'日',
+            "date": self.period_id.year + u'年' + self.period_id.month + u'月',
             "report_name": u"利润表",
             "report_code": u"会企02表",
             "rows": self.env['profit.statement'].search_count(domain),
@@ -366,8 +365,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         days = calendar.monthrange(
             int(self.period_id.year), int(self.period_id.month))[1]
         attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year\
-                                 + u'年' + self.period_id.month + u'月' + \
-            str(days) + u'日' + u',' + u'单位：元'
+                                 + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
 
         # 第一行 为字段名
         #  从第二行开始 为数据
@@ -381,7 +379,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         export_data = {
             "database": self.pool._db.dbname,
             "company": company_row.name,
-            "date": self.period_id.year + u'年' + self.period_id.month + u'月' + str(days) + u'日',
+            "date": self.period_id.year + u'年' + self.period_id.month + u'月',
             "report_name": u"业务活动表",
             "report_code": u"会民非02表",
             "rows": self.env['business.activity.statement'].search_count(domain),
