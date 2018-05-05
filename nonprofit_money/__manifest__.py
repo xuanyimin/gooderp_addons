@@ -13,7 +13,7 @@
     'depends': ['keep_good','auto_exchange'],
     'data': [
         'views/nonprofit_money_order_view.xml',
-        'data/mony_flow_data.xml',
+        'security/groups_ccb.xml',
     ],
     'demo': [],
     'application': True,

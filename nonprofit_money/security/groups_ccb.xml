@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data noupdate="0">
+		<!--
+		为了满足用户界面的权限设置需要，将用户组分成这些功能类别 
+		-->
+		<!-- 通用，所有GoodERP建行模块使用这个类别 -->
+		<record model="ir.module.category" id="Gooderp_ccb">
+			<field name="name">建行用户组</field>
+			<field name="sequence">1</field>
+		</record>
+		<!-- 以下为按角色分组 -->
+		<record id="ccb_account" model="res.groups">
+			<field name='name'>会计</field>
+			<field name='category_id' ref="Gooderp_ccb"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+			<field name="menu_access" eval="[(4, ref('finance.finance_menu'))]"/>
+			<field name="comment">用于显示会计菜单</field>
+		</record>
+		<record id="ccb_money" model="res.groups">
+			<field name='name'>出纳</field>
+			<field name='category_id' ref="Gooderp_ccb"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+			<field name="menu_access" eval="[(4, ref('money.menu_money_manage')),
+			(4, ref('money.report_other_money_statements_action')),
+			(4, ref('nonprofit_money.menu_nonprofit_money_receipt_action')),
+			(4, ref('money.menu_money_transfer_order_action')),
+			(4, ref('money.menu_money_root'))]"/>
+			<field name="comment">用于显示出纳菜单</field>
+		</record>
+		<record id="ccb_root" model="res.groups">
+			<field name='name'>管理员</field>
+			<field name='category_id' ref="Gooderp_ccb"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+			<field name="comment">用于显示管理员菜单</field>
+		</record>
+	</data>
+</openerp>

@@ -11,7 +11,7 @@
                     <field name="name"/>
                     <field name="date"/>
                     <field name="partner_id"/>
-                    <field name="total_amount"/>
+                    <field name="total_amount" />
                     <field name="state"/>
                     <field name="_approve_state"/>
                     <field name="note"/>
@@ -64,6 +64,7 @@
                                 <field name="category_id" required="1" domain="[('type', '=', parent.type)]"  />
                                 <field name="auxiliary_id"/>
                                 <field name="amount" sum="合计"/>
+                                <field name="tax_amount" invisible="1" sum="合计"/>
                                 <field name="note"/>
                             </group>
                         </form>

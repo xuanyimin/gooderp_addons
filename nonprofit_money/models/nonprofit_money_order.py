@@ -23,11 +23,6 @@ import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api
 from odoo.tools import float_compare
 
-SELECTION = [
-        ('other_pay', u'支出'),
-        ('other_get', u'收入'),
-    ]
-
 class OtherMoneyOrderLine(models.Model):
     _inherit ='other.money.order.line'
     _description = u'日记账明细'
@@ -56,18 +51,3 @@ class OtherMoneyOrder(models.Model):
                     raise UserError(u'请到类型%s设置现金流量表项' % self.category_id.name)
                 line.write({'cash_flow_template_id': line.category_id.cash_flow_template_id.id})
                 return res
-
-class mony_flow(models.Model):
-    ''' 是对其他收支业务的更细分类 '''
-    _name = 'mony.flow'
-    _description = u'收支项'
-
-    type = fields.Selection(SELECTION, u'类型',
-                            default=lambda self: self._context.get('type'))
-    name = fields.Char(u'名称', required=True)
-    active = fields.Boolean(u'启用', default=True )
-    company_id = fields.Many2one(
-        'res.company',
-        string=u'公司',
-        change_default=True,
-        default=lambda self: self.env['res.company']._company_default_get())
