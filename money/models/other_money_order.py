@@ -387,23 +387,23 @@ class OtherMoneyOrderLine(models.Model):
 
     other_money_id = fields.Many2one('other.money.order',
                                      u'其他收支', ondelete='cascade',
-                                     help=u'其他收支单行对应的其他收支单')
+                                     )
     service = fields.Many2one('service', u'收支项', ondelete='restrict',
-                              help=u'其他收支单行上对应的收支项')
+                              )
     category_id = fields.Many2one('core.category',
                                   u'类别', ondelete='restrict',
                                   help=u'类型：运费、咨询费等')
     auxiliary_id = fields.Many2one('auxiliary.financing', u'辅助核算',
-                                   help=u'其他收支单行上的辅助核算')
+                                   )
     amount = fields.Float(u'金额',
                           digits=dp.get_precision('Amount'),
-                          help=u'其他收支单行上的金额')
+                          )
     tax_rate = fields.Float(u'税率(%)',
                             default=lambda self: self.env.user.company_id.import_tax_rate,
-                            help=u'其他收支单行上的税率')
+                            )
     tax_amount = fields.Float(u'税额',
                               digits=dp.get_precision('Amount'),
-                              help=u'其他收支单行上的税额')
+                            )
     note = fields.Char(u'备注',
                        help=u'可以为该单据添加一些需要的标识信息')
     company_id = fields.Many2one(

@@ -260,7 +260,7 @@
             <field name="view_mode">pivot,graph</field>
         </record>
 
-        <menuitem id='dupont_menu_finance' name="杜邦分析"
+        <menuitem id='dupont_menu_finance' name="杜邦分析" groups="base.group_no_one"
                   action='dupont_action' parent='finance.checkout_menu' sequence='100'/>
     </data>
 </openerp>

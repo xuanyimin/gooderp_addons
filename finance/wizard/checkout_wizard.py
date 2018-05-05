@@ -114,10 +114,11 @@ class CheckoutWizard(models.TransientModel):
 
                         # 处理非限制性收入
                         __account_unrestricted_revenue_ids =[]
+                        print account_unrestricted_revenue_ids
                         for account_id in account_unrestricted_revenue_ids:
                             account_ids = self.env['finance.account'].search([('id','child_of',account_id.id),('account_type','=','normal')])
                             __account_unrestricted_revenue_ids.extend(account_ids)
-
+                        print '1',__account_unrestricted_revenue_ids
 
                         for account_id in __account_unrestricted_revenue_ids:
                             voucher_line_ids = voucher_line_obj.search([
@@ -136,7 +137,7 @@ class CheckoutWizard(models.TransientModel):
                                         'credit': 0,
                                     }
                                 voucher_line.append(res)
-
+                        print '2',voucher_line
 
                         # 处理限制性收入
                         __account_restricted_revenue_ids =[]
@@ -233,7 +234,7 @@ class CheckoutWizard(models.TransientModel):
                                 'credit': 0,
                             }
                             voucher_line.append(res)
-
+                        print '99999',voucher_line
                         # 生成凭证
                         if voucher_line:
                             valus = {
