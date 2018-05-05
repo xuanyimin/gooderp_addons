@@ -260,7 +260,7 @@
             <field name="view_mode">tree</field>
         </record>
 
-        <menuitem id='auxiliary_financing_menu' action='auxiliary_financing_action' parent='finance_setting_menu' sequence='30'/>       
+        <menuitem id='auxiliary_financing_menu' action='auxiliary_financing_action' parent='finance_setting_menu' sequence='30'/>
 
         <!--会计期间-->
         <record id="period_tree" model="ir.ui.view">
@@ -295,6 +295,6 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
         </record>
-        <menuitem id='period_menu' action='period_action' parent='finance_setting_menu' sequence='10'/>
+        <menuitem id='period_menu' action='period_action' parent='finance_setting_menu' sequence='10' groups="base.group_no_one"/>
     </data>
 </openerp>

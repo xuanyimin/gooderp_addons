@@ -8,6 +8,7 @@ import os
 import xmltodict
 import logging
 import time
+
 _logger = logging.getLogger(__name__)
 
 
@@ -88,12 +89,13 @@ class CreateBalanceSheetWizard(models.TransientModel):
             subject_vals = []
             if len(parameter_str_list) == 1:
                 subject_ids = self.env['finance.account'].search(
-                    [('code', '=', parameter_str_list[0]),('account_type','!=','view')])
+                    [('code', '=', parameter_str_list[0]), ('account_type', '!=', 'view')])
             else:
                 subject_ids = self.env['finance.account'].search(
-                    [('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1]),('account_type','!=','view')])
+                    [('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1]),
+                     ('account_type', '!=', 'view')])
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [
-                                                              subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
+                subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
             for trial_balance in trial_balances:
                 # 根据参数code 对应的科目的 方向 进行不同的操作
                 #  trial_balance.subject_name_id.costs_types == 'assets'解决：累计折旧 余额记贷方
@@ -147,9 +149,9 @@ class CreateBalanceSheetWizard(models.TransientModel):
         company_row = self.env['res.company'].browse(force_company)
         days = calendar.monthrange(
             int(self.period_id.year), int(self.period_id.month))[1]
-        attachment_information = u'编制单位：' + company_row.name + u',,,,' + self.period_id.year\
+        attachment_information = u'编制单位：' + company_row.name + u',,,,' + self.period_id.year \
                                  + u'年' + self.period_id.month + u'月' + \
-            str(days) + u'日' + u',,,' + u'单位：元'
+                                 str(days) + u'日' + u',,,' + u'单位：元'
 
         # 第一行 为字段名
         #  从第二行开始 为数据
@@ -176,7 +178,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         self.export_xml('balance.sheet', {'data': export_data})
         self.export_excel('balance.sheet', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
 
-        return {     # 返回生成资产负债表的数据的列表
+        return {  # 返回生成资产负债表的数据的列表
             'type': 'ir.actions.act_window',
             'name': u'资产负债表：' + self.period_id.name,
             'view_type': 'form',
@@ -212,17 +214,20 @@ class CreateBalanceSheetWizard(models.TransientModel):
         current_period_field = [
             'current_occurrence_debit', 'current_occurrence_credit']
         for balance_sheet_obj in balance_sheet_objs:
-            balance_sheet_obj.write({'cumulative_occurrence_balance': self.deal_with_profit_formula(balance_sheet_obj.occurrence_balance_formula, self.period_id, year_begain_field),
-                                     'current_occurrence_balance': self.compute_profit(balance_sheet_obj.occurrence_balance_formula, self.period_id, current_period_field)})
+            balance_sheet_obj.write({'cumulative_occurrence_balance': self.deal_with_profit_formula(
+                balance_sheet_obj.occurrence_balance_formula, self.period_id, year_begain_field),
+                'current_occurrence_balance': self.compute_profit(
+                    balance_sheet_obj.occurrence_balance_formula, self.period_id,
+                    current_period_field)})
         force_company = self._context.get('force_company')
         if not force_company:
             force_company = self.env.user.company_id.id
         company_row = self.env['res.company'].browse(force_company)
         days = calendar.monthrange(
             int(self.period_id.year), int(self.period_id.month))[1]
-        attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year\
+        attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year \
                                  + u'年' + self.period_id.month + u'月' + \
-            str(days) + u'日' + u',' + u'单位：元'
+                                 str(days) + u'日' + u',' + u'单位：元'
 
         # 第一行 为字段名
         #  从第二行开始 为数据
@@ -246,7 +251,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         self.export_xml('profit.statement', {'data': export_data})
         self.export_excel('profit.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
 
-        return {      # 返回生成利润表的数据的列表
+        return {  # 返回生成利润表的数据的列表
             'type': 'ir.actions.act_window',
             'name': u'利润表：' + self.period_id.name,
             'view_type': 'form',
@@ -272,18 +277,19 @@ class CreateBalanceSheetWizard(models.TransientModel):
             sign_out = False
             if len(parameter_str_list) == 1:
                 subject_ids = self.env['finance.account'].search(
-                    [('code', '=', parameter_str_list[0]),('account_type','!=','view')])
+                    [('code', '=', parameter_str_list[0]), ('account_type', '!=', 'view')])
             else:
                 subject_ids = self.env['finance.account'].search(
-                    [('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1]),('account_type','!=','view')])
-            if subject_ids:   # 本行计算科目借贷方向
+                    [('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1]),
+                     ('account_type', '!=', 'view')])
+            if subject_ids:  # 本行计算科目借贷方向
                 for line in subject_ids:
                     if line.balance_directions == 'in':
                         sign_in = True
                     if line.balance_directions == 'out':
                         sign_out = True
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [
-                                                              subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
+                subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
             for trial_balance in trial_balances:
                 if trial_balance.subject_name_id.balance_directions == 'in':
                     subject_vals_in.append(
@@ -291,7 +297,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
                 elif trial_balance.subject_name_id.balance_directions == 'out':
                     subject_vals_out.append(
                         trial_balance[compute_field_list[1]])
-                if sign_out and sign_in:    # 方向有借且有贷
+                if sign_out and sign_in:  # 方向有借且有贷
                     total_sum = sum(subject_vals_out) - sum(subject_vals_in)
                 else:
                     if subject_vals_in:
@@ -308,25 +314,130 @@ class CreateBalanceSheetWizard(models.TransientModel):
             subject_vals = []
             if len(formula_list) == 1:
                 subject_ids = self.env['finance.account'].search(
-                    [('code', '=', formula_list[0]),('account_type','!=','view')])
+                    [('code', '=', formula_list[0]), ('account_type', '!=', 'view')])
             else:
                 subject_ids = self.env['finance.account'].search(
-                    [('code', '>=', formula_list[0]), ('code', '<=', formula_list[1]),('account_type','!=','view')])
+                    [('code', '>=', formula_list[0]), ('code', '<=', formula_list[1]), ('account_type', '!=', 'view')])
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [
-                                                              subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
+                subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
             for trial_balance in trial_balances:
                 subject_vals.append(trial_balance[report_fields[0]])
                 subject_vals.append(trial_balance[report_fields[1]])
 
             return sum(subject_vals)
-
         else:
             return 0
 
-    def deal_with_activity_formula(self, report_fields_formula, period_id, report_fields):
-        if report_fields_formula:
+    @api.multi
+    def compute_vourch_profit(self, report_fields_formula, period_id, report_fields):
+        """ 根据传进来的 的科目的code 进行业务活动表的计算 """
+        begint, end = report_fields_formula.split(';')
+        no, end_date = self.env['finance.period'].get_period_month_date_range(period_id)
+        begint_date, no = self.env['finance.period'].get_period_month_date_range(
+            self.env['finance.period'].get_year_fist_period_id())
+        if begint[0] != '-':
+            begint_list = begint.split('~')
+            if len(begint_list) == 1:
+                subject_ids = self.env['finance.account'].search(
+                    [('code', '=', begint_list[0]), ('account_type', '!=', 'view')])
+            else:
+                subject_ids = self.env['finance.account'].search(
+                    [('code', '>=', begint_list[0]), ('code', '<=', begint_list[1]),
+                     ('account_type', '!=', 'view')])
+            for subject in subject_ids:
+                if 'cumulative_occurrence_debit' in report_fields:
+                    begint_obj_ids = self.env['voucher.line'].search(
+                        [('account_id', '=', subject.id), ('date', '>=', begint_date), ('date', '<=', end_date),
+                         ('credit', '>', 0)])
+                else:
+                    begint_obj_ids = self.env['voucher.line'].search(
+                        [('account_id', '=', subject.id), ('period_id', '=', period_id.id), ('credit', '>', 0)])
+            end_list = end[1:].split('~')
+            if len(end_list) == 1:
+                subject_ids2 = self.env['finance.account'].search(
+                    [('code', '=', end_list[0]), ('account_type', '!=', 'view')])
+            else:
+                subject_ids2 = self.env['finance.account'].search(
+                    [('code', '>=', end_list[0]), ('code', '<=', end_list[1]),
+                     ('account_type', '!=', 'view')])
+            for subject2 in subject_ids2:
+                if 'cumulative_occurrence_debit' in report_fields:
+                    end_obj_ids = self.env['voucher.line'].search(
+                        [('account_id', '=', subject2.id), ('date', '>=', begint_date), ('date', '<=', end_date),
+                         ('debit', '>', 0)])
+                else:
+                    end_obj_ids = self.env['voucher.line'].search(
+                        [('account_id', '=', subject2.id), ('period_id', '=', period_id.id), ('debit', '>', 0)])
+
+            vouchers = self.env['voucher'].filtered(
+                lambda self: len(self.line_ids) == 2 and self.line_ids.mapped('account_id') in (
+                    subject_ids + subject_ids2).ids)
+
+            subject_vals = 0
+            for begint_obj in begint_obj_ids:
+                for end_obj in end_obj_ids:
+                    print begint_obj.voucher_id, end_obj.voucher_id
+                    if begint_obj.voucher_id == end_obj.voucher_id and len(begint_obj.voucher_id.line_ids) == 2:
+                        subject_vals += (begint_obj.debit or begint_obj.credit)
+            return subject_vals
+        elif begint[0] == '-':
+            begint_list = begint[1:].split('~')
+            if len(begint_list) == 1:
+                subject_ids = self.env['finance.account'].search(
+                    [('code', '=', begint_list[0]), ('account_type', '!=', 'view')])
+            else:
+                subject_ids = self.env['finance.account'].search(
+                    [('code', '>=', begint_list[0]), ('code', '<=', begint_list[1]),
+                     ('account_type', '!=', 'view')])
+            for subject in subject_ids:
+                if 'cumulative_occurrence_debit' in report_fields:
+                    begint_obj_ids = self.env['voucher.line'].search(
+                        [('account_id', '=', subject.id), ('date', '>=', begint_date), ('date', '<=', end_date),
+                         ('credit', '>', 0)])
+                else:
+                    begint_obj_ids = self.env['voucher.line'].search(
+                        [('account_id', '=', subject.id), ('period_id', '=', period_id.id), ('credit', '>', 0)])
+            end_list = end.split('~')
+            if len(end_list) == 1:
+                subject_ids2 = self.env['finance.account'].search(
+                    [('code', '=', end_list[0]), ('account_type', '!=', 'view')])
+            else:
+                subject_ids2 = self.env['finance.account'].search(
+                    [('code', '>=', end_list[0]), ('code', '<=', end_list[1]),
+                     ('account_type', '!=', 'view')])
+            for subject2 in subject_ids2:
+                if 'cumulative_occurrence_debit' in report_fields:
+                    end_obj_ids = self.env['voucher.line'].search(
+                        [('account_id', '=', subject2.id), ('date', '>=', begint_date), ('date', '<=', end_date),
+                         ('debit', '>', 0)])
+                else:
+                    end_obj_ids = self.env['voucher.line'].search(
+                        [('account_id', '=', subject2.id), ('period_id', '=', period_id.id), ('debit', '>', 0)])
+
+            vouchers = self.env['voucher'].filtered(
+                lambda self: len(self.line_ids) == 2 and self.line_ids.mapped('account_id') in (
+                    subject_ids + subject_ids2).ids)
+            subject_vals = 0
+            for begint_obj in begint_obj_ids:
+                for end_obj in end_obj_ids:
+                    if begint_obj.voucher_id == end_obj.voucher_id and len(begint_obj.voucher_id.line_ids) == 2:
+                        subject_vals += (begint_obj.debit or begint_obj.credit)
+            return 0 - subject_vals
+
+    @api.multi
+    def compute_lines(self, report_fields_formula):
+        pass
+
+    def deal_with_activity_formula(self, report_fields_formula, period_id, report_fields, type):
+        if type == 'code' and report_fields_formula:
             return_vals = sum([self.compute_profit(formula, period_id, report_fields)
                                for formula in report_fields_formula.split(';')])
+        elif type == 'vourch' and report_fields_formula:
+            return_vals = self.compute_vourch_profit(report_fields_formula, period_id, report_fields)
+
+        elif type == 'lines' and report_fields_formula:
+            return_vals = 0
+            self.compute_lines(report_fields_formula)
         else:
             return_vals = 0
         return return_vals
@@ -339,40 +450,44 @@ class CreateBalanceSheetWizard(models.TransientModel):
         balance_wizard.create_trial_balance()
         view_id = self.env.ref('finance.view_business_activity_statement_tree').id
         report_item_ids = self.env['business.activity.statement'].search([])
-
-        current_fields =['cumulative_occurrence_debit','cumulative_occurrence_credit']
-        cumulative_fields =['current_occurrence_debit','current_occurrence_credit']
+        current_fields = ['cumulative_occurrence_debit', 'cumulative_occurrence_credit']
+        cumulative_fields = ['current_occurrence_debit', 'current_occurrence_credit']
 
         for report_item in report_item_ids:
-            cumulative_restricted =  self.deal_with_activity_formula(report_item.formula_restricted, self.period_id, cumulative_fields)
-            cumulative_unrestricted =  self.deal_with_activity_formula(report_item.formula_unrestricted, self.period_id, cumulative_fields)
-            current_restricted =  self.deal_with_activity_formula(report_item.formula_restricted, self.period_id, current_fields)
-            current_unrestricted =  self.deal_with_activity_formula(report_item.formula_unrestricted, self.period_id, current_fields)
+            cumulative_restricted = self.deal_with_activity_formula(report_item.formula_restricted, self.period_id,
+                                                                    cumulative_fields, report_item.type)
+            cumulative_unrestricted = self.deal_with_activity_formula(report_item.formula_unrestricted, self.period_id,
+                                                                      cumulative_fields, report_item.type)
+            current_restricted = self.deal_with_activity_formula(report_item.formula_restricted, self.period_id,
+                                                                 current_fields, report_item.type)
+            current_unrestricted = self.deal_with_activity_formula(report_item.formula_unrestricted, self.period_id,
+                                                                   current_fields, report_item.type)
 
             report_item.write({'cumulative_restricted': cumulative_restricted,
-                             'cumulative_unrestricted': cumulative_unrestricted,
-                             'cumulative_total': cumulative_restricted +cumulative_unrestricted , 
-                             'current_restricted': current_restricted ,
-                             'current_unrestricted': current_unrestricted ,
-                             'current_total':  current_restricted+  current_unrestricted ,
+                               'cumulative_unrestricted': cumulative_unrestricted,
+                               'cumulative_total': cumulative_restricted + cumulative_unrestricted,
+                               'current_restricted': current_restricted,
+                               'current_unrestricted': current_unrestricted,
+                               'current_total': current_restricted + current_unrestricted,
 
-                                     })
+                               })
         force_company = self._context.get('force_company')
         if not force_company:
             force_company = self.env.user.company_id.id
         company_row = self.env['res.company'].browse(force_company)
         days = calendar.monthrange(
             int(self.period_id.year), int(self.period_id.month))[1]
-        attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year\
+        attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year \
                                  + u'年' + self.period_id.month + u'月' + \
-            str(days) + u'日' + u',' + u'单位：元'
+                                 str(days) + u'日' + u',' + u'单位：元'
 
         # 第一行 为字段名
         #  从第二行开始 为数据
         domain = [('id', 'in', [report_item.id for report_item in report_item_ids])]
 
         field_list = [
-            'balance', 'line_num', 'current_unrestricted', 'current_restricted', 'current_total', 'cumulative_unrestricted',
+            'balance', 'line_num', 'current_unrestricted', 'current_restricted', 'current_total',
+            'cumulative_unrestricted',
             'cumulative_restricted', 'cumulative_total'
         ]
         # excel_data_rows = []
@@ -393,7 +508,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         self.export_xml('business.activity.statement', {'data': export_data})
         self.export_excel('business.activity.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
 
-        return {      # 返回生成业务活动表的数据的列表
+        return {  # 返回生成业务活动表的数据的列表
             'type': 'ir.actions.act_window',
             'name': u'业务活动表：' + self.period_id.name,
             'view_type': 'form',
@@ -450,7 +565,6 @@ class CreateBalanceSheetWizard(models.TransientModel):
         excel_data_rows.append(operation_row)
 
         return xml_data_dict, excel_title_row, excel_data_rows
-
 
     @api.model
     def _get_report_template(self, model):
@@ -519,7 +633,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
 
     @api.model
     def export_xml(self, model, data):
-        save, export_file_name,template_file, blank_rows, header_rows = self._get_report_template(model)
+        save, export_file_name, template_file, blank_rows, header_rows = self._get_report_template(model)
         if save:
             import sys
             reload(sys)
@@ -565,10 +679,13 @@ class BusinessActivityStatement(models.Model):
     _description = u'业务活动表'
 
     sequence = fields.Integer(u'序号')
-
+    type = fields.Selection([('code', u'编码'),
+                             ('lines', u'行'),
+                             ('vourch', u'凭证')], string=u'类别', copy=False, default='code',
+                            index=True, )
     balance = fields.Char(u'项目', help=u'报表的行次的总一个名称')
     line_num = fields.Char(u'行次', help=u'生成报表的行次')
-    cumulative_total = fields.Float(u'合计', help=u'本年累计数合计', compute='_compute_total' )
+    cumulative_total = fields.Float(u'合计', help=u'本年累计数合计', compute='_compute_total')
     cumulative_restricted = fields.Float(u'限定性', help=u'本年累计数限定性')
     cumulative_unrestricted = fields.Float(u'非限定性', help=u'本年累计数非限定性')
     current_total = fields.Float(u'合计', help=u'本月数合计', compute='_compute_total')
@@ -587,5 +704,5 @@ class BusinessActivityStatement(models.Model):
     @api.depends('cumulative_restricted', 'cumulative_unrestricted', 'current_restricted', 'current_unrestricted')
     def _compute_total(self):
         for record in self:
-            record.cumulative_total = record.cumulative_restricted +  record.cumulative_unrestricted
-            record.current_total = record.current_restricted +  record.current_unrestricted
+            record.cumulative_total = record.cumulative_restricted + record.cumulative_unrestricted
+            record.current_total = record.current_restricted + record.current_unrestricted
