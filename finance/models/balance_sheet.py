@@ -290,13 +290,44 @@ class CreateBalanceSheetWizard(models.TransientModel):
                         sign_out = True
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [
                 subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
+            no, end_date = self.env['finance.period'].get_period_month_date_range(period_id)
+            begint_date, no = self.env['finance.period'].get_period_month_date_range(
+                self.env['finance.period'].get_year_fist_period_id())
             for trial_balance in trial_balances:
                 if trial_balance.subject_name_id.balance_directions == 'in':
-                    subject_vals_in.append(
-                        trial_balance[compute_field_list[0]])
+                    update = trial_balance[compute_field_list[0]]
+                    if 'current' in compute_field_list[0]:
+                        checkout_id = self.env['voucher'].search([('is_checkout', '=', True),('period_id', '=', period_id.id)], limit=1)
+                        voucher_line = self.env['voucher.line'].search([('voucher_id', '=', checkout_id.id),('account_id','=',trial_balance.subject_name_id.id)])
+                        if voucher_line and voucher_line.debit != trial_balance[compute_field_list[0]]:
+                            update = voucher_line.credit
+                    else:
+                        checkout_ids = self.env['voucher'].search(
+                            [('is_checkout', '=', True), ('date', '>=', begint_date), ('date', '<=', end_date)])
+                        voucher_line_ids = self.env['voucher.line'].search([('voucher_id', 'in', checkout_ids.ids), (
+                        'account_id', '=', trial_balance.subject_name_id.id)])
+                        voucher_debit = 0
+                        for voucher_line in voucher_line_ids:
+                            voucher_debit += voucher_line.credit
+                        if voucher_debit != trial_balance[compute_field_list[1]]:
+                            update = voucher_debit
+                    subject_vals_in.append(update)
                 elif trial_balance.subject_name_id.balance_directions == 'out':
-                    subject_vals_out.append(
-                        trial_balance[compute_field_list[1]])
+                    update = trial_balance[compute_field_list[1]]
+                    if 'current' in compute_field_list[1]:
+                        checkout_id = self.env['voucher'].search([('is_checkout', '=', True), ('period_id', '=', period_id.id)], limit=1)
+                        voucher_line = self.env['voucher.line'].search([('voucher_id', '=', checkout_id.id), ('account_id', '=', trial_balance.subject_name_id.id)])
+                        if voucher_line and voucher_line.debit != trial_balance[compute_field_list[1]]:
+                            update = voucher_line.debit
+                    else:
+                        checkout_ids = self.env['voucher'].search([('is_checkout', '=', True), ('date', '>=', begint_date), ('date', '<=', end_date)])
+                        voucher_line_ids = self.env['voucher.line'].search([('voucher_id', 'in', checkout_ids.ids), ('account_id', '=', trial_balance.subject_name_id.id)])
+                        voucher_debit = 0
+                        for voucher_line in voucher_line_ids:
+                            voucher_debit += voucher_line.debit
+                        if voucher_debit != trial_balance[compute_field_list[1]]:
+                            update = voucher_debit
+                    subject_vals_out.append(update)
                 if sign_out and sign_in:  # 方向有借且有贷
                     total_sum = sum(subject_vals_out) - sum(subject_vals_in)
                 else:
@@ -376,7 +407,6 @@ class CreateBalanceSheetWizard(models.TransientModel):
             subject_vals = 0
             for begint_obj in begint_obj_ids:
                 for end_obj in end_obj_ids:
-                    print begint_obj.voucher_id, end_obj.voucher_id
                     if begint_obj.voucher_id == end_obj.voucher_id and len(begint_obj.voucher_id.line_ids) == 2:
                         subject_vals += (begint_obj.debit or begint_obj.credit)
             return subject_vals
