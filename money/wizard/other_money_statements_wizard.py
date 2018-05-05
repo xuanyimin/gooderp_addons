@@ -40,7 +40,7 @@ class OtherMoneyStatementsReportWizard(models.Model):
         view = self.env.ref('money.other_money_statements_report_tree')
 
         return {
-            'name': u'其他收支明细表',
+            'name': u'日记帐明细表',
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'other.money.statements.report',
