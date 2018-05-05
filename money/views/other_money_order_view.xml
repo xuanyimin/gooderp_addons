@@ -67,10 +67,10 @@
                     </field>
                     <group>
                     	<group>
-		                	<field name="bank_id"/>
+		                	<field name="bank_id" options="{'no_open': True, 'no_create': True}"/>
 
 		                </group>
-		                <group>	
+		                <group>
 		                	<field name="total_amount"/>
                             <field name="rate_silent" />
 		                </group>
@@ -118,7 +118,7 @@
               </p>
             </field>
         </record>
-        
+
         <!-- 其他支出单 action -->
         <record id="other_money_payment_action" model="ir.actions.act_window">
             <field name="name">其他支出单</field>
