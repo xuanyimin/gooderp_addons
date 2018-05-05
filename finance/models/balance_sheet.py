@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 from odoo.addons.web_export_view_good.controllers.controllers import ExcelExportView, ReportTemplate
+from odoo.exceptions import UserError
 from math import fabs
 import calendar
 import os
@@ -455,10 +456,33 @@ class CreateBalanceSheetWizard(models.TransientModel):
             return 0 - subject_vals
 
     @api.multi
-    def compute_lines(self, report_fields_formula):
-        pass
+    def compute_lines(self, report_fields_formula, report_field):
+        import re
+        all_num = re.findall("\d+", report_fields_formula)
+        all_op = re.findall("\D", report_fields_formula)
 
-    def deal_with_activity_formula(self, report_fields_formula, period_id, report_fields, type):
+        report_values = []
+        for line_num in all_num:
+            report_item = self.env['business.activity.statement'].search([('line_num', '=', line_num)])
+            if not report_item:
+                raise UserError(u"错误的报告行号: %s，请在报告模板设置确认是否设置正确" % line_num)
+
+            report_values.append(report_item[report_field])
+
+        def _sum(vals, ops):
+            result = vals.pop(0)
+            idx = 0
+            for val in vals:
+                if ops[idx] == "+":
+                    result += val
+                elif ops[idx] == "-":
+                    result -= val
+                idx += 1
+            return result
+
+        return _sum(report_values, all_op)
+
+    def deal_with_activity_formula(self, report_fields_formula, period_id, report_fields, type, report_field):
         if type == 'code' and report_fields_formula:
             return_vals = sum([self.compute_profit(formula, period_id, report_fields)
                                for formula in report_fields_formula.split(';')])
@@ -466,8 +490,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
             return_vals = self.compute_vourch_profit(report_fields_formula, period_id, report_fields)
 
         elif type == 'lines' and report_fields_formula:
-            return_vals = 0
-            self.compute_lines(report_fields_formula)
+            return_vals = self.compute_lines(report_fields_formula, report_field)
         else:
             return_vals = 0
         return return_vals
@@ -485,13 +508,13 @@ class CreateBalanceSheetWizard(models.TransientModel):
 
         for report_item in report_item_ids:
             cumulative_restricted = self.deal_with_activity_formula(report_item.formula_restricted, self.period_id,
-                                                                    cumulative_fields, report_item.type)
+                                                                    cumulative_fields, report_item.type, 'cumulative_restricted')
             cumulative_unrestricted = self.deal_with_activity_formula(report_item.formula_unrestricted, self.period_id,
-                                                                      cumulative_fields, report_item.type)
+                                                                      cumulative_fields, report_item.type, 'cumulative_unrestricted')
             current_restricted = self.deal_with_activity_formula(report_item.formula_restricted, self.period_id,
-                                                                 current_fields, report_item.type)
+                                                                 current_fields, report_item.type, 'current_restricted')
             current_unrestricted = self.deal_with_activity_formula(report_item.formula_unrestricted, self.period_id,
-                                                                   current_fields, report_item.type)
+                                                                   current_fields, report_item.type, 'current_unrestricted')
 
             report_item.write({'cumulative_restricted': cumulative_restricted,
                                'cumulative_unrestricted': cumulative_unrestricted,
