@@ -199,7 +199,7 @@ class CheckoutWizard(models.TransientModel):
 
                         # 非限定性净资产 结转
 
-                        if total_expense>0 and (total_revenue_unrestricted - total_expense) > 0:
+                        if total_revenue_unrestricted - total_expense > 0:
                             res = {
                                 'name': u'非限定净资产结余',
                                 'account_id': self.env.ref('finance.init_account_3101').id,
@@ -207,7 +207,7 @@ class CheckoutWizard(models.TransientModel):
                                 'credit': total_revenue_unrestricted - total_expense,
                             }
                             voucher_line.append(res)
-                        elif total_expense>0 and (total_revenue_unrestricted - total_expense) < 0:
+                        elif total_revenue_unrestricted - total_expense < 0:
                             res = {
                                 'name': u'非限定净资产结余',
                                 'account_id': self.env.ref('finance.init_account_3101').id,
