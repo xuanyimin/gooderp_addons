@@ -296,29 +296,30 @@ class CreateBalanceSheetWizard(models.TransientModel):
                 self.env['finance.period'].get_year_fist_period_id())
             for trial_balance in trial_balances:
                 if trial_balance.subject_name_id.balance_directions == 'in':
-                    update = trial_balance[compute_field_list[0]]
+                    update = trial_balance[compute_field_list[0]]-trial_balance[compute_field_list[1]]
                     if 'current' in compute_field_list[0]:
                         checkout_id = self.env['voucher'].search([('is_checkout', '=', True),('period_id', '=', period_id.id)], limit=1)
                         voucher_line = self.env['voucher.line'].search([('voucher_id', '=', checkout_id.id),('account_id','=',trial_balance.subject_name_id.id)])
-                        if voucher_line and voucher_line.debit != trial_balance[compute_field_list[0]]:
+                        if voucher_line and voucher_line.debit != update:
                             update = voucher_line.credit
                     else:
                         checkout_ids = self.env['voucher'].search(
                             [('is_checkout', '=', True), ('date', '>=', begint_date), ('date', '<=', end_date)])
                         voucher_line_ids = self.env['voucher.line'].search([('voucher_id', 'in', checkout_ids.ids), (
                         'account_id', '=', trial_balance.subject_name_id.id)])
-                        voucher_debit = 0
+                        voucher_credit = 0
                         for voucher_line in voucher_line_ids:
-                            voucher_debit += voucher_line.credit
-                        if voucher_debit != trial_balance[compute_field_list[1]]:
-                            update = voucher_debit
+                            voucher_credit += voucher_line.credit
+                        print '9999',voucher_credit,trial_balance[compute_field_list[0]]
+                        if voucher_credit != update:
+                            update += voucher_credit
                     subject_vals_in.append(update)
                 elif trial_balance.subject_name_id.balance_directions == 'out':
-                    update = trial_balance[compute_field_list[1]]
+                    update = trial_balance[compute_field_list[1]]-trial_balance[compute_field_list[0]]
                     if 'current' in compute_field_list[1]:
                         checkout_id = self.env['voucher'].search([('is_checkout', '=', True), ('period_id', '=', period_id.id)], limit=1)
                         voucher_line = self.env['voucher.line'].search([('voucher_id', '=', checkout_id.id), ('account_id', '=', trial_balance.subject_name_id.id)])
-                        if voucher_line and voucher_line.debit != trial_balance[compute_field_list[1]]:
+                        if voucher_line and voucher_line.debit != update:
                             update = voucher_line.debit
                     else:
                         checkout_ids = self.env['voucher'].search([('is_checkout', '=', True), ('date', '>=', begint_date), ('date', '<=', end_date)])
@@ -326,8 +327,9 @@ class CreateBalanceSheetWizard(models.TransientModel):
                         voucher_debit = 0
                         for voucher_line in voucher_line_ids:
                             voucher_debit += voucher_line.debit
-                        if voucher_debit != trial_balance[compute_field_list[1]]:
-                            update = voucher_debit
+                        print '8888', voucher_debit, trial_balance[compute_field_list[1]]
+                        if voucher_debit != update:
+                            update += voucher_debit
                     subject_vals_out.append(update)
                 if sign_out and sign_in:  # 方向有借且有贷
                     total_sum = sum(subject_vals_out) - sum(subject_vals_in)
@@ -367,6 +369,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         no, end_date = self.env['finance.period'].get_period_month_date_range(period_id)
         begint_date, no = self.env['finance.period'].get_period_month_date_range(
             self.env['finance.period'].get_year_fist_period_id())
+        begint_obj_ids = end_obj_ids = []
         if begint[0] != '-':
             begint_list = begint.split('~')
             if len(begint_list) == 1:
@@ -401,15 +404,13 @@ class CreateBalanceSheetWizard(models.TransientModel):
                     end_obj_ids = self.env['voucher.line'].search(
                         [('account_id', '=', subject2.id), ('period_id', '=', period_id.id), ('debit', '>', 0)])
 
-            vouchers = self.env['voucher'].filtered(
-                lambda self: len(self.line_ids) == 2 and self.line_ids.mapped('account_id') in (
-                    subject_ids + subject_ids2).ids)
-
             subject_vals = 0
+            print begint_obj_ids,end_obj_ids
             for begint_obj in begint_obj_ids:
                 for end_obj in end_obj_ids:
                     if begint_obj.voucher_id == end_obj.voucher_id and len(begint_obj.voucher_id.line_ids) == 2:
                         subject_vals += (begint_obj.debit or begint_obj.credit)
+            print '2222',subject_vals
             return subject_vals
         elif begint[0] == '-':
             begint_list = begint[1:].split('~')
@@ -445,14 +446,12 @@ class CreateBalanceSheetWizard(models.TransientModel):
                     end_obj_ids = self.env['voucher.line'].search(
                         [('account_id', '=', subject2.id), ('period_id', '=', period_id.id), ('debit', '>', 0)])
 
-            vouchers = self.env['voucher'].filtered(
-                lambda self: len(self.line_ids) == 2 and self.line_ids.mapped('account_id') in (
-                    subject_ids + subject_ids2).ids)
             subject_vals = 0
             for begint_obj in begint_obj_ids:
                 for end_obj in end_obj_ids:
                     if begint_obj.voucher_id == end_obj.voucher_id and len(begint_obj.voucher_id.line_ids) == 2:
                         subject_vals += (begint_obj.debit or begint_obj.credit)
+            print '11111', subject_vals
             return 0 - subject_vals
 
     @api.multi

@@ -45,6 +45,7 @@
                     <field name="sequence" widget="handle"/>
                     <field name="balance" />
                     <field name="line_num" />
+                    <field name="type" />
                     <field name="formula_restricted" />
                     <field name="formula_unrestricted" />
                 </tree>
