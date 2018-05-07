@@ -93,17 +93,30 @@ class TrialBalance(models.Model):
             res.update({field: sum(trial_balance_items.mapped(field[6:]))})
 
         if period_id == period_id.get_init_period():
-            diff = res.get('total_cumulative_occurrence_debit', 0) - res.get('total_cumulative_occurrence_credit', 0)
-            if diff != 0:
-                raise UserError(u'期间：%s 本年累计发生额借贷不平\n\n差异金额：%s' % (period_id.name, diff))
-        else:
-            diff = res.get('total_initial_balance_debit', 0) - res.get('total_initial_balance_credit', 0)
-            if diff != 0:
-                raise UserError(u'期间：%s 期初余额借贷不平\n\n差异金额：%s' % (period_id.name, diff))
+            diff_year_init = res.get('total_year_init_debit', 0) - res.get('total_year_init_credit', 0)
+            diff_cumulative_occurrence = res.get('total_cumulative_occurrence_debit', 0
+                                                 ) - res.get('total_cumulative_occurrence_credit', 0)
+            diff_ending_balance = res.get('total_ending_balance_debit', 0) - res.get('total_ending_balance_credit', 0)
 
-            diff = res.get('total_current_occurrence_debit', 0) - res.get('total_current_occurrence_credit', 0)
-            if diff != 0:
-                raise UserError(u'期间：%s 本期发生额借贷不平\n\n差异金额：%s' % (period_id.name, diff))
+            if diff_year_init != 0:
+                raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_year_init))
+            elif diff_cumulative_occurrence != 0:
+                raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_cumulative_occurrence))
+            elif diff_ending_balance != 0:
+                raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_ending_balance))
+
+        else:
+            diff_initial_balance = res.get('total_initial_balance_debit', 0) - res.get('total_initial_balance_credit', 0)
+            diff_current_occurrence = res.get('total_current_occurrence_debit', 0
+                                              ) - res.get('total_current_occurrence_credit', 0)
+            diff_ending_balance = res.get('total_ending_balance_debit', 0) - res.get('total_ending_balance_credit', 0)
+
+            if diff_initial_balance != 0:
+                raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_initial_balance))
+            elif diff_current_occurrence != 0:
+                raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_current_occurrence))
+            elif diff_ending_balance != 0:
+                raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_ending_balance))
 
         return True
 
@@ -140,22 +153,31 @@ class CheckTrialBalanceWizard(models.TransientModel):
         res.update({'period_id': period_id.id, 'is_init_period': is_init_period})
 
         if is_init_period:
-            if self.total_cumulative_occurrence_debit != self.total_cumulative_occurrence_credit:
-                diff = self.total_cumulative_occurrence_debit - self.total_cumulative_occurrence_credit
-                res.update({ 'is_balance': False, 'result':'2', 'diff': diff })
+            diff_year_init = res.get('total_year_init_debit', 0) - res.get('total_year_init_credit', 0)
+            diff_cumulative_occurrence = res.get('total_cumulative_occurrence_debit', 0
+                                                 ) - res.get('total_cumulative_occurrence_credit', 0)
+            diff_ending_balance = res.get('total_ending_balance_debit', 0) - res.get('total_ending_balance_credit', 0)
+            if diff_year_init != 0:
+                res.update({'is_balance': False, 'result': '2', 'diff': diff_year_init})
+            elif diff_cumulative_occurrence != 0:
+                res.update({'is_balance': False, 'result': '2', 'diff': diff_cumulative_occurrence})
+            elif diff_ending_balance != 0:
+                res.update({'is_balance': False, 'result': '2', 'diff': diff_ending_balance})
             else:
-                res.update({ 'is_balance': True, 'result':'1' })
+                res.update({'is_balance': True, 'result': '1'})
         else:
 
-            if self.total_initial_balance_debit != self.total_initial_balance_credit:
-                diff = self.total_initial_balance_debit - self.total_initial_balance_credit
-                res.update({ 'is_balance': False, 'result':'3', 'diff': diff })
-
-            elif self.total_current_occurrence_debit != self.total_current_occurrence_credit:
-                diff = self.total_current_occurrence_debit - self.total_current_occurrence_credit
-                res.update({ 'is_balance': False, 'result':'4', 'diff': diff })
+            diff_initial_balance = res.get('total_initial_balance_debit',0) - res.get('total_initial_balance_credit',0)
+            diff_current_occurrence = res.get('total_current_occurrence_debit',0) - res.get('total_current_occurrence_credit',0)
+            diff_ending_balance = res.get('total_ending_balance_debit',0) - res.get('total_ending_balance_credit',0)
+            if diff_initial_balance != 0:
+                res.update({'is_balance': False, 'result': '2', 'diff': diff_initial_balance})
+            elif diff_current_occurrence != 0:
+                res.update({'is_balance': False, 'result': '2', 'diff': diff_current_occurrence})
+            elif diff_ending_balance != 0:
+                res.update({'is_balance': False, 'result': '2', 'diff': diff_ending_balance})
             else:
-                res.update({ 'is_balance': True, 'result':'1' })
+                res.update({'is_balance': True, 'result': '1'})
 
         return res
 
@@ -188,7 +210,7 @@ class CheckTrialBalanceWizard(models.TransientModel):
         u'本年累计发生额(贷方)', digits=dp.get_precision('Amount'), default=0)
     result = fields.Selection(
             string=u'借贷平衡情况',
-            selection=[('1', u'借贷平衡'), ('2', u'本年累计发生额借贷不平'),('3', u'期初余额借贷不平'),('4', u'本期发生额借贷不平')]
+            selection=[('1', u'借贷平衡'), ('2', u'借贷不平')]
         )
     is_balance = fields.Boolean(
             string=u'Is Balance',
@@ -218,6 +240,27 @@ class ChangeCumulativeOccurrenceWizard(models.TransientModel):
     cumulative_occurrence_credit = fields.Float(
         u'本年累计发生额(贷方)', digits=dp.get_precision('Amount'))
 
+    cumulative_occurrence = fields.Float(u'本年累计实际发生额', digits=dp.get_precision('Amount'))
+
+    account_id = fields.Many2one(
+        string=u'科目',
+        comodel_name='finance.account',
+        ondelete='set null',
+    )
+
+    costs_types = fields.Selection(
+        [
+            ('assets', u'资产'),
+            ('debt', u'负债'),
+            ('equity', u'所有者权益'),
+            ('in', u'收入类'),
+            ('out', u'费用类'),
+            ('cost', u'成本类'),
+        ],
+        u'科目类型',
+        related='account_id.user_type.costs_types',
+    )
+
     trial_balance_id = fields.Many2one(
         string=u'Trial Balance',
         comodel_name='trial.balance',
@@ -241,7 +284,8 @@ class ChangeCumulativeOccurrenceWizard(models.TransientModel):
                         'cumulative_occurrence_credit': trial_balance_item.cumulative_occurrence_credit,
                         'old_cumulative_occurrence_debit': trial_balance_item.cumulative_occurrence_debit,
                         'old_cumulative_occurrence_credit': trial_balance_item.cumulative_occurrence_credit,
-                        'trial_balance_id': active_id
+                        'trial_balance_id': active_id,
+                        'account_id': trial_balance_item.subject_name_id.id
                 })
         return res
     
@@ -250,17 +294,23 @@ class ChangeCumulativeOccurrenceWizard(models.TransientModel):
         parent_accounts =[]
         account = self.trial_balance_id.subject_name_id
         while account :
-            account = account.parent_id
             parent_accounts.append(account)
+            account = account.parent_id
 
-        self.trial_balance_id.cumulative_occurrence_debit  = self.cumulative_occurrence_debit
-        self.trial_balance_id.cumulative_occurrence_credit  = self.cumulative_occurrence_credit
-        diff_cumulative_occurrence_debit = self.cumulative_occurrence_debit - self.old_cumulative_occurrence_debit
-        diff_cumulative_occurrence_credit = self.cumulative_occurrence_credit - self.old_cumulative_occurrence_credit
+        diff_cumulative_occurrence_debit = 0
+        diff_cumulative_occurrence_credit = 0
+
+        if self.costs_types in ('in', 'out'):
+            diff_cumulative_occurrence_debit = self.cumulative_occurrence - self.old_cumulative_occurrence_debit
+            diff_cumulative_occurrence_credit = self.cumulative_occurrence - self.old_cumulative_occurrence_credit
+        else:
+            diff_cumulative_occurrence_debit = self.cumulative_occurrence_debit - self.old_cumulative_occurrence_debit
+            diff_cumulative_occurrence_credit = self.cumulative_occurrence_credit - self.old_cumulative_occurrence_credit
+
         for account in parent_accounts:
             trial_balance_ids = self.env['trial.balance'].search( [ ('subject_name_id', '=', account.id), ('period_id', '=', self.trial_balance_id.period_id.id)])
             for trial_balance_id in trial_balance_ids:
-                trial_balance_id.write({'cumulative_occurrence_debit' : trial_balance_id.cumulative_occurrence_debit +diff_cumulative_occurrence_debit})
+                trial_balance_id.write({'cumulative_occurrence_debit' : trial_balance_id.cumulative_occurrence_debit + diff_cumulative_occurrence_debit})
                 trial_balance_id.write({'cumulative_occurrence_credit':  trial_balance_id.cumulative_occurrence_credit + diff_cumulative_occurrence_credit})
 
         view = self.env.ref('finance.init_balance_tree')
