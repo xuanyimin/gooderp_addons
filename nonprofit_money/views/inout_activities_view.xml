@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+            <record id="inout_activities_template_tree" model="ir.ui.view">
+                <field name="name">inout.activities.template.tree</field>
+                <field name="model">inout.activities.template</field>
+                <field name="arch" type="xml">
+                    <tree string="宗教活动场所月收支情况公开表模板">
+                        <field name="sequence" invisible="1"/>
+                        <field name="name"/>
+                        <field name="line_type"/>
+                    </tree>
+                </field>
+            </record>
+
+            <record id="inout_activities_template_form" model="ir.ui.view">
+                <field name="name">inout.activities.template.form</field>
+                <field name="model">inout.activities.template</field>
+                <field name="arch" type="xml">
+                    <form string="宗教活动场所月收支情况公开表模板">
+                        <group>
+                          <field name="name"/>
+                          <field name="line_type"/>
+                        </group>
+                        <group>
+                            <field name="category_ids" attrs="{'invisible': [('line_type','!=','category')]}" >
+                               <tree string="收支类别" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                            <field name="begin_ids" attrs="{'invisible': [('line_type','!=','begin')]}">
+                               <tree string="期初科目" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                            <field name="end_ids" attrs="{'invisible': [('line_type','!=','end')]}">
+                               <tree string="期末科目" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                            <field name="plus_ids" attrs="{'invisible': [('line_type','!=','lines')]}">
+                               <tree string="+表行" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                            <field name="nega_ids" attrs="{'invisible': [('line_type','!=','lines')]}">
+                               <tree string="-表行" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                            <field name="c_account_ids" attrs="{'invisible': [('line_type','!=','outopen_account')]}">
+                               <tree string="贷方累计会计科目" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                            <field name="d_account_ids" attrs="{'invisible': [('line_type','!=','inopen_account')]}">
+                               <tree string="借方累计会计科目" editable="bottom">
+                                  <field name="name"/>
+                               </tree>
+                            </field>
+                        </group>
+                    </form>
+               </field>
+            </record>
+            <record id="action_inout_activities_template" model="ir.actions.act_window">
+                <field name="name">收支情况公开表模板</field>
+                <field name="res_model">inout.activities.template</field>
+                <field name="type">ir.actions.act_window</field>
+                <field name="view_type">form</field>
+                <field name="view_mode">tree,form</field>
+                <field name="view_id" ref="inout_activities_template_tree"/>
+            </record> 
+            <menuitem id='menu_inout_activities_template' action='action_inout_activities_template' parent='finance.finance_setting_menu' groups="base.group_no_one" sequence='90'/>
+
+            <record id="inout_flow_statement_tree" model="ir.ui.view">
+                <field name="name">inout.flow.statement.tree</field>
+                <field name="model">inout.flow.statement</field>
+                <field name="arch" type="xml">
+                    <tree string="宗教活动场所月收支情况公开表" create="false">
+                        <field name="name"/>
+                        <field name="amount"/>
+                    </tree>
+                </field>
+            </record>
+    </data>
+</openerp>
