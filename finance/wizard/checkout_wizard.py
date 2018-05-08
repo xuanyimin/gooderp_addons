@@ -43,6 +43,7 @@ class CheckoutWizard(models.TransientModel):
                 last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(
                     balance.period_id)
                 if last_period:
+                    self.env['trial.balance'].check_trial_balance(last_period)
                     if not last_period.is_closed:
                         raise UserError(u'上一个会计期间%s未结账' % last_period.name)
                 if balance.period_id.is_closed:
