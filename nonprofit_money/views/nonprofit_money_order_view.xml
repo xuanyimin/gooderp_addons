@@ -53,7 +53,7 @@
                     <field name="line_ids" context="{'order_type': type}">
                     	<tree string="`明细" editable="bottom">
                     		<field name="cash_flow_template_id" domain="[('type', '=', parent.type)]" readonly="1"/>
-							<field name="category_id" required="1" domain="[('type', '=', parent.type)]"  />
+							<field name="category_id" required="1" domain="[('type', '=', parent.type)]"  options="{'no_open': True, 'no_create': True}"/>
                     		<field name="auxiliary_id"/>
                             <field name="amount" sum="合计"/>
                             <field name="note"/>
