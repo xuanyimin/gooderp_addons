@@ -204,6 +204,7 @@ class VoucherLine(models.Model):
     '''凭证明细'''
     _name = 'voucher.line'
     _description = u'会计凭证明细'
+    _order = 'debit, credit desc'
 
     @api.model
     def _default_get(self, data):
@@ -1028,7 +1029,7 @@ class ResCompany(models.Model):
 class BankAccount(models.Model):
     _inherit = 'bank.account'
 
-    account_id = fields.Many2one('finance.account', u'科目', domain="[('account_type','=','normal')]")
+    account_id = fields.Many2one('finance.account', u'科目', domain="[('account_type','=','normal'),('costs_types','=','assets')]")
     currency_id = fields.Many2one(
         'res.currency', u'外币币别', related='account_id.currency_id', store=True)
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision('Amount'))
@@ -1083,7 +1084,7 @@ class CoreCategory(models.Model):
     '''继承core cotegory，添加科目类型'''
     _inherit = 'core.category'
 
-    account_id = fields.Many2one('finance.account', u'科目', help=u'科目', domain="[('account_type','=','normal')]")
+    account_id = fields.Many2one('finance.account', u'科目', help=u'科目', domain="[('account_type','=','normal'),('exchange','=',False)]")
 
 
 class ChangeVoucherName(models.Model):
