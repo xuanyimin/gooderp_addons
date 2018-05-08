@@ -1095,8 +1095,8 @@
             <field name='balance'>三、限定性净资产转为非限定性净资产</field>
             <field name='line_num'>40</field>
             <field name='type'>vourch</field>
-            <field name='formula_restricted'>3102~310299999999;-3101~310199999999</field>
-            <field name='formula_unrestricted'>3101~310199999999;-3102~310299999999</field>
+            <field name='formula_restricted'>3101~310199999999;-3102~310299999999</field>
+            <field name='formula_unrestricted'>-3101~310199999999;3102~310299999999</field>
         </record>
         <record id='as_20' model='business.activity.statement'>
             <field name='balance'>四、净资产变动额（若为净资产减少额，以“-”号填列）</field>
