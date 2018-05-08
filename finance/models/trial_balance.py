@@ -912,8 +912,11 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 if not local_currcy_period:  # 无下一期间，退出循环。
                     break_flag = False
                 # 无余额不显示
-                if self.no_balance and cumulative_year_occurrence[0].get('credit') == 0 \
-                        and cumulative_year_occurrence[0].get('debit') == 0:
+                if self.no_balance \
+                        and cumulative_year_occurrence[0].get('credit') == 0 \
+                        and cumulative_year_occurrence[0].get('debit') == 0 \
+                        and cumulative_year_occurrence[1].get('credit') == 0 \
+                        and cumulative_year_occurrence[1].get('debit') == 0:
                     continue
                 for vals in create_vals:
                     del vals['date']
