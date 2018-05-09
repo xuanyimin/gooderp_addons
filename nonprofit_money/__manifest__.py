@@ -12,8 +12,8 @@
     'version': '11.11',
     'depends': ['keep_good','auto_exchange'],
     'data': [
-        'views/nonprofit_money_order_view.xml',
         'views/inout_activities_view.xml',
+        'views/nonprofit_money_order_view.xml',
         'security/groups_ccb.xml',
         'data/inout_activities_template.xml',
     ],

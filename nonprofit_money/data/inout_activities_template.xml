@@ -5,107 +5,115 @@
             <field name="sequence">1</field>
             <field name="name">上月转入</field>
             <field name="line_type">begin</field>
-            <field name="begin_ids" eval="[
-            (4, ref('finance.init_account_1001')),
-            (4, ref('finance.init_account_1002'))]"/>
+            <field name="begin_ids">1001~100299999999</field>
         </record>
 
         <record id="nonprofit_money.in_out_2" model="inout.activities.template">
             <field name="sequence">2</field>
-            <field name="name">功德箱或奉献箱</field>
-            <field name="line_type">category</field>
+            <field name="name">一、本月收入</field>
         </record>
 
         <record id="nonprofit_money.in_out_3" model="inout.activities.template">
             <field name="sequence">3</field>
-            <field name="name">捐款</field>
+            <field name="name">（一）功德箱或奉献箱</field>
             <field name="line_type">category</field>
         </record>
 
         <record id="nonprofit_money.in_out_4" model="inout.activities.template">
             <field name="sequence">4</field>
-            <field name="name">门票</field>
+            <field name="name">（二）捐款</field>
             <field name="line_type">category</field>
         </record>
 
         <record id="nonprofit_money.in_out_5" model="inout.activities.template">
             <field name="sequence">5</field>
-            <field name="name">其他</field>
+            <field name="name">（三）门票</field>
             <field name="line_type">category</field>
         </record>
 
         <record id="nonprofit_money.in_out_6" model="inout.activities.template">
             <field name="sequence">6</field>
-            <field name="name">功德箱或奉献箱</field>
+            <field name="name">（四）其他</field>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="nonprofit_money.in_out_7" model="inout.activities.template">
+            <field name="sequence">7</field>
+            <field name="name">收入小计</field>
             <field name="line_type">lines</field>
             <field name="plus_ids" eval="[(6, 0, [
-            ref('nonprofit_money.in_out_2'),
+            ref('nonprofit_money.in_out_6'),
             ref('nonprofit_money.in_out_3'),
             ref('nonprofit_money.in_out_4'),
             ref('nonprofit_money.in_out_5')])]"/>
         </record>
 
-        <record id="nonprofit_money.in_out_7" model="inout.activities.template">
-            <field name="sequence">7</field>
-            <field name="name">基建</field>
-            <field name="line_type">category</field>
-        </record>
-
         <record id="nonprofit_money.in_out_8" model="inout.activities.template">
             <field name="sequence">8</field>
-            <field name="name">办公</field>
-            <field name="line_type">category</field>
+            <field name="name">二、本月支出</field>
         </record>
 
         <record id="nonprofit_money.in_out_9" model="inout.activities.template">
             <field name="sequence">9</field>
-            <field name="name">水电</field>
+            <field name="name">（一）基建</field>
             <field name="line_type">category</field>
         </record>
 
         <record id="nonprofit_money.in_out_10" model="inout.activities.template">
             <field name="sequence">10</field>
-            <field name="name">交通</field>
+            <field name="name">（二）办公</field>
             <field name="line_type">category</field>
         </record>
 
         <record id="nonprofit_money.in_out_11" model="inout.activities.template">
             <field name="sequence">11</field>
-            <field name="name">通信</field>
+            <field name="name">（三）水电</field>
             <field name="line_type">category</field>
         </record>
 
         <record id="nonprofit_money.in_out_12" model="inout.activities.template">
             <field name="sequence">12</field>
-            <field name="name">补贴</field>
+            <field name="name">（四）交通</field>
             <field name="line_type">category</field>
         </record>
 
         <record id="nonprofit_money.in_out_13" model="inout.activities.template">
             <field name="sequence">13</field>
-            <field name="name">伙食</field>
+            <field name="name">（五）通信</field>
             <field name="line_type">category</field>
         </record>
 
         <record id="nonprofit_money.in_out_14" model="inout.activities.template">
             <field name="sequence">14</field>
-            <field name="name">慈善</field>
+            <field name="name">（六）补贴</field>
             <field name="line_type">category</field>
         </record>
 
         <record id="nonprofit_money.in_out_15" model="inout.activities.template">
             <field name="sequence">15</field>
-            <field name="name">其他</field>
+            <field name="name">（七）伙食</field>
             <field name="line_type">category</field>
         </record>
 
         <record id="nonprofit_money.in_out_16" model="inout.activities.template">
             <field name="sequence">16</field>
-            <field name="name">小计</field>
+            <field name="name">（八）慈善</field>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="nonprofit_money.in_out_17" model="inout.activities.template">
+            <field name="sequence">17</field>
+            <field name="name">（九）其他</field>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="nonprofit_money.in_out_18" model="inout.activities.template">
+            <field name="sequence">18</field>
+            <field name="name">费用小计</field>
             <field name="line_type">lines</field>
             <field name="plus_ids" eval="[(6, 0, [
-            ref('nonprofit_money.in_out_7'),
-            ref('nonprofit_money.in_out_8'),
+            ref('nonprofit_money.in_out_16'),
+            ref('nonprofit_money.in_out_17'),
             ref('nonprofit_money.in_out_9'),
             ref('nonprofit_money.in_out_10'),
             ref('nonprofit_money.in_out_11'),
@@ -115,15 +123,15 @@
             ref('nonprofit_money.in_out_15'),])]"/>
         </record>
 
-        <record id="nonprofit_money.in_out_17" model="inout.activities.template">
-            <field name="sequence">17</field>
-            <field name="name">本月合计</field>
+        <record id="nonprofit_money.in_out_19" model="inout.activities.template">
+            <field name="sequence">19</field>
+            <field name="name">本月余额</field>
             <field name="line_type">lines</field>
             <field name="plus_ids" eval="[(6, 0, [
             ref('nonprofit_money.in_out_1'),
-            ref('nonprofit_money.in_out_6'),])]"/>
+            ref('nonprofit_money.in_out_7'),])]"/>
             <field name="nega_ids" eval="[(6, 0, [
-            ref('nonprofit_money.in_out_16'),])]"/>
+            ref('nonprofit_money.in_out_18'),])]"/>
         </record>
 
     </data>

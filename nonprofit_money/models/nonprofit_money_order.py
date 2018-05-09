@@ -77,9 +77,9 @@ class InoutActivitiesTemplate(models.Model):
     category_ids = fields.One2many('core.category', 'inout_activities_template_id', string=u'收支活动表类别',
                                 copy=False, )
     # for type begin
-    begin_ids = fields.Many2many('finance.account', string=u'会计科目期初')
+    begin_ids = fields.Char(string=u'期初科目范围')
     # for type end
-    end_ids = fields.Many2many('finance.account', string=u'会计科目期末')
+    end_ids = fields.Char(string=u'期末科目范围')
     # for type lines
     plus_ids = fields.Many2many(
         'inout.activities.template', 'activitiesc_p', 'activitiesc_id', 'activitiesp_id', string=u'+表行')
@@ -94,5 +94,5 @@ class InoutActivitiesTemplate(models.Model):
 class InoutFlowStatement(models.Model):
     _name = 'inout.flow.statement'
     name = fields.Char(u'项目')
-    line_num = fields.Char(u'行次')
+    sequence = fields.Char(u'行次')
     amount = fields.Float(u'本月数', digits=dp.get_precision('Amount'))

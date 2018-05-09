@@ -87,7 +87,7 @@ class CashFlowWizard(models.TransientModel):
         if tem.line_type == 'voucher':
             # 凭证指定科目本年累计发生额
             account_id = self.env.ref('finance.account_exchange')
-            voucher_ids = self.env['voucher'].search([('is_exchange','=',True),('period_id','=',self.period_id)], limit = 1)
+            voucher_ids = self.env['voucher'].search([('is_exchange','=',True),('period_id','=',self.period_id.id)], limit = 1)
             ret = amount = 0
             for voucher in voucher_ids:
                 for line in voucher.line_ids:
@@ -167,7 +167,7 @@ class CashFlowWizard(models.TransientModel):
             no, end_date = self.env['finance.period'].get_period_month_date_range(period_id)
             begin_date, no = self.env['finance.period'].get_period_month_date_range(
                 self.env['finance.period'].get_year_fist_period_id())
-            voucher_ids = self.env['voucher'].search([('is_exchange','=',True),('date','>=',begin_date),('date','=<',end_date)])
+            voucher_ids = self.env['voucher'].search([('is_exchange','=',True),('date','>=',begin_date),('date','<=',end_date)])
             ret = amount = 0
             for voucher in voucher_ids:
                 for line in voucher.line_ids:
