@@ -53,22 +53,29 @@ class InoutFlowWizard(models.TransientModel):
                                                                                           ('other_money_id.date', '<=', date_end)])])
         if tem.line_type == 'begin':
             # 科目期初金额合计
-            ret = sum([acc.initial_balance_debit - acc.initial_balance_credit
-                       for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
-                                                                    ('subject_name_id', 'in', [b.id for b in tem.begin_ids])])])
+            formula_list = tem.begin_ids.split('~')
+            ret = 0
+            if len(formula_list) == 1:
+                subject_ids = self.env['finance.account'].search(
+                    [('code', '=', formula_list[0]), ('account_type', '!=', 'view')])
+            else:
+                subject_ids = self.env['finance.account'].search(
+                    [('code', '>=', formula_list[0]), ('code', '<=', formula_list[1]), ('account_type', '!=', 'view')])
+            trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [
+                subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
+            for account in trial_balances:
+                ret += account.initial_balance_debit - account.initial_balance_credit
         if tem.line_type == 'end':
-            # 科目期末金额合计
-            ret = sum([acc.ending_balance_debit - acc.ending_balance_credit
-                       for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
-                                                                    ('subject_name_id', 'in', [e.id for e in tem.end_ids])])])
+            pass
         if tem.line_type == 'lines':
             # 根据其他报表行计算
-            for line in self.env['cash.flow.statement'].browse(report_ids):
+            for line in self.env['inout.flow.statement'].browse(report_ids):
                 for l in tem.plus_ids:
-                    if l.line_num == line.line_num:
+                    print l.sequence, line.sequence,line.amount
+                    if str(l.sequence) == str(line.sequence):
                         ret += line.amount
                 for l in tem.nega_ids:
-                    if l.line_num == line.line_num:
+                    if str(l.sequence) == str(line.sequence):
                         ret -= line.amount
         if tem.line_type == 'inopen_account':
             # 科目本期借方合计
@@ -116,23 +123,18 @@ class InoutFlowWizard(models.TransientModel):
                                                                                           ('other_money_id.date', '>=', date_start),
                                                                                           ('other_money_id.date', '<=', date_end)])])
         if tem.line_type == 'begin':
-            # 科目期初金额合计
-            ret = sum([acc.year_init_debit - acc.year_init_credit
-                       for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
-                                                                    ('subject_name_id', 'in', [b.id for b in tem.begin_ids])])])
+            pass
         if tem.line_type == 'end':
             # 科目期末金额合计
-            ret = sum([acc.ending_balance_debit - acc.ending_balance_credit
-                       for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
-                                                                    ('subject_name_id', 'in', [e.id for e in tem.end_ids])])])
+            pass
         if tem.line_type == 'lines':
             # 根据其他报表行计算
-            for line in self.env['cash.flow.statement'].browse(report_ids):
+            for line in self.env['inout.flow.statement'].browse(report_ids):
                 for l in tem.plus_ids:
-                    if l.line_num == line.line_num:
+                    if l.sequence == line.sequence:
                         ret += line.year_amount
                 for l in tem.nega_ids:
-                    if l.line_num == line.line_num:
+                    if l.sequence == line.sequence:
                         ret -= line.year_amount
 
         if tem.line_type == 'inopen_account':
@@ -154,21 +156,14 @@ class InoutFlowWizard(models.TransientModel):
     def inout_show(self):
         """生成现金流量表"""
         rep_ids = []
-        '''
-        old_report = self.env['cash.flow.statement'].search([('period_id','=',self.period_id.id)])
-        if old_report:
-            rep_ids = [rep.id for rep in old_report]
-        else:
-        '''
         if self.period_id:
-            templates = self.env['cash.flow.template'].search([])
+            templates = self.env['inout.activities.template'].search([])
             for tem in templates:
-                new_rep = self.env['cash.flow.statement'].create(
+                new_rep = self.env['inout.flow.statement'].create(
                     {
                         'name': tem.name,
-                        'line_num': tem.line_num,
+                        'sequence': tem.sequence,
                         'amount': self.get_amount(tem, rep_ids, self.period_id),
-                        'year_amount': self.get_year_amount(tem, rep_ids, self.period_id),
                     }
                 )
                 rep_ids.append(new_rep.id)
@@ -180,7 +175,7 @@ class InoutFlowWizard(models.TransientModel):
         # 第一行 为字段名
         #  从第二行开始 为数据
 
-        field_list = ['name', 'line_num', 'year_amount', 'amount']
+        field_list = ['name', 'amount']
         domain = [('id', 'in', rep_ids)]
         export_data = {
             "database": self.pool._db.dbname,
@@ -188,17 +183,18 @@ class InoutFlowWizard(models.TransientModel):
             "date":  self.period_id.year + u'年' + self.period_id.month + u'月' ,
             "report_name": u"现金流量表",
             "report_code": u"会民非03表",
-            "rows": self.env['cash.flow.statement'].search_count(domain),
+            "rows": self.env['inout.flow.statement'].search_count(domain),
             "cols": len(field_list),
             "report_item": []
         }
 
         export_data, excel_title_row, excel_data_rows = self.env['create.balance.sheet.wizard']._prepare_export_data(
-            'cash.flow.statement', field_list, domain, attachment_information, export_data
+            'inout.flow.statement', field_list, domain, attachment_information, export_data
         )
 
         self.env['create.balance.sheet.wizard'].export_xml('inout.flow.statement', {'data': export_data})
-        self.env['create.balance.sheet.wizard'].export_excel('inout.flow.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
+        self.env['create.balance.sheet.wizard'].export_excel('inout.flow.statement', {'columns_headers': excel_title_row,
+                                                                                     'rows': excel_data_rows})
 
         return {
             'type': 'ir.actions.act_window',

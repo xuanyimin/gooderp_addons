@@ -28,16 +28,8 @@
                               <field name="name"/>
                            </tree>
                         </field>
-                        <field name="begin_ids" attrs="{'invisible': [('line_type','!=','begin')]}">
-                           <tree string="期初科目" editable="bottom">
-                              <field name="name"/>
-                           </tree>
-                        </field>
-                        <field name="end_ids" attrs="{'invisible': [('line_type','!=','end')]}">
-                           <tree string="期末科目" editable="bottom">
-                              <field name="name"/>
-                           </tree>
-                        </field>
+                        <field name="begin_ids" attrs="{'invisible': [('line_type','!=','begin')]}"/>
+                        <field name="end_ids" attrs="{'invisible': [('line_type','!=','end')]}"/>
                         <field name="plus_ids" attrs="{'invisible': [('line_type','!=','lines')]}">
                            <tree string="+表行" editable="bottom">
                               <field name="name"/>
@@ -77,6 +69,7 @@
             <field name="model">inout.flow.statement</field>
             <field name="arch" type="xml">
                 <tree string="宗教活动场所月收支情况公开表" create="false">
+                    <field name="sequence"  invisible="1"/>
                     <field name="name"/>
                     <field name="amount"/>
                 </tree>
@@ -106,8 +99,8 @@
             <field name="target">new</field>
         </record>
 
-            <!--现金流量表菜单-->
-        <menuitem id='menu_inout_flow_wizard' name='收支情况表' action='inout_flow_wizard_action' parent='finance.voucher_books_menu' sequence='35'/>
+            <!--收支情况表菜单-->
+        <menuitem id='menu_inout_flow_wizard' name='收支情况表' action='inout_flow_wizard_action' parent='money.menu_money_report' sequence='35'/>
 
     </data>
 </openerp>
