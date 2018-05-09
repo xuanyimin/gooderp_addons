@@ -28,7 +28,7 @@ class CreateExchangeWizard(models.TransientModel):
     def _get_last_date(self):
         return self.env['finance.period'].get_period_month_date_range(self.env['finance.period'].get_date_now_period_id())[1]
 
-    date = fields.Date(u'记账日期', required=True, default=_get_last_date)
+    date = fields.Date(u'记账日期', required=True,)
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
@@ -41,13 +41,13 @@ class CreateExchangeWizard(models.TransientModel):
         default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
-    def create_partner_exchange_line(self, vals):
+    def create_partner_exchange_line(self, vals,date):
         '''
         有partner的汇兑损益
         '''
         account_id = vals.get('account_id')
         voucher_lines = self.env['voucher.line'].search(
-            [('account_id', '=', account_id)])
+            [('account_id', '=', account_id),('date','<=',date)])
         account = vals.get('account')
         res = {}
         for line in voucher_lines:
@@ -102,13 +102,13 @@ class CreateExchangeWizard(models.TransientModel):
                     dict(val, partner_id=partner_id))
 
     @api.multi
-    def create_account_exchange_line(self, vals):
+    def create_account_exchange_line(self, vals,date):
         '''
         无partner的汇兑损益
         '''
         account_id = vals.get('account_id')
         voucher_lines = self.env['voucher.line'].search(
-            [('account_id', '=', account_id)])
+            [('account_id', '=', account_id),('date','<=',date)])
         account = vals.get('account')
         currency_amount = 0
         debit = 0
@@ -166,12 +166,12 @@ class CreateExchangeWizard(models.TransientModel):
                 })
 
     @api.multi
-    def create_exchang_line(self, vals):
+    def create_exchang_line(self, vals,date):
         '''
         当有主营业务收入,结汇等不需要汇兑损益的科目出现后，汇兑损益将不平，就会出现财务费用汇兑损益，
         '''
         vouch_obj = vals.get('vouch_obj_id')
-        voucher = self.env['voucher'].search([('id', '=', vouch_obj)])
+        voucher = self.env['voucher'].search([('id', '=', vouch_obj),('date','<=',date)])
         voucher_lines = voucher.line_ids
         account_id = self.env.ref('finance.account_exchange')
         exp = 0
@@ -200,7 +200,9 @@ class CreateExchangeWizard(models.TransientModel):
             })
 
     def create_exchange(self):
-        vouch_obj = self.env['voucher'].create({'date': self.date})
+        vouch_obj = self.env['voucher'].create({'date': self.date,
+                                                'is_exchange':True})
+        begin_date,date = self.env['finance.period'].get_period_month_date_range(self.period_id)
         '''只有外币＋期末需要调汇的科目才会能生成调汇凭证的明细行'''
         vals = {}
         for account_id in self.env['finance.account'].search([
@@ -215,13 +217,13 @@ class CreateExchangeWizard(models.TransientModel):
                          'rate_silent': rate_silent,
                          })
             if account_id.auxiliary_financing:
-                self.create_partner_exchange_line(vals)
+                self.create_partner_exchange_line(vals,date)
             else:
-                self.create_account_exchange_line(vals)
+                self.create_account_exchange_line(vals,date)
         '''
         当出现结汇，主营业务收入等一方不为需期末调汇科目时会出现一方需要调汇，一方不需要调汇，那时期末前面的明细行就会不平衡，就需要贷财务费用－汇兑损益
         '''
-        self.create_exchang_line(vals)
+        self.create_exchang_line(vals,date)
 
         if not vouch_obj.line_ids:
             vouch_obj.unlink()
