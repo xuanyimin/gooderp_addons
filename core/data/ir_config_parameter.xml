@@ -53,7 +53,7 @@
         </record>
         <record id="app_odoo_customize.app_support_url" model="ir.config_parameter">
             <field name="key">app_support_url</field>
-            <field name="value"></field>
+            <field name="value">False</field>
         </record>
         <record id="app_odoo_customize.app_account_title" model="ir.config_parameter">
             <field name="key">app_account_title</field>
