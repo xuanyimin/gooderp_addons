@@ -3,7 +3,7 @@
     <data noupdate="0">
         <record id="app_odoo_customize.app_system_name" model="ir.config_parameter">
             <field name="key">app_system_name</field>
-            <field name="value">GoodERP</field>
+            <field name="value">宗教场所财务综合服务平台</field>
         </record>
 
         <record id="app_odoo_customize.app_show_lang" model="ir.config_parameter">
@@ -53,7 +53,7 @@
         </record>
         <record id="app_odoo_customize.app_support_url" model="ir.config_parameter">
             <field name="key">app_support_url</field>
-            <field name="value">http://shang.qq.com/wpa/qunwpa?idkey=f0b47f9891e6f5361c4bdc841c424eb13035d981da9451995eca13cb42273725</field>
+            <field name="value"></field>
         </record>
         <record id="app_odoo_customize.app_account_title" model="ir.config_parameter">
             <field name="key">app_account_title</field>
