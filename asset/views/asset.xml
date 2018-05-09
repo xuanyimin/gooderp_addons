@@ -70,7 +70,7 @@
                             <field name="chang_type" attrs="{'required':[('chang_cost', '&gt;', 0)], 'invisible': [('chang_cost', '&lt;=', 0)]}"/>
                             <field name="account_credit" options="{'no_open': True, 'no_create': True}"
                                     attrs="{'required':[('chang_type', '=', 'account'),('chang_cost', '&gt;', 0)], 'invisible': ['|',('chang_type', '!=', 'account'), ('chang_cost', '&lt;=', 0)]}" />
-                            <field name="bank_account" attrs="{'required':[('chang_type', '=', 'bank'),('chang_cost', '&gt;', 0)], 'invisible': ['|',('chang_type', '!=', 'bank'),('chang_cost', '&lt;=', 0)]}"/>
+                            <field name="bank_account" attrs="{'required':[('chang_type', '=', 'bank'),('chang_cost', '&gt;', 0)], 'invisible': ['|',('chang_type', '!=', 'bank'),('chang_cost', '&lt;=', 0)]}" options="{'no_open': True, 'no_create': True}"/>
                         </group>
                         <group>
                             <field name="change_reason" required="1"/>
@@ -102,7 +102,7 @@
                                    domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"
                                    attrs="{'required':[('create_type', '=', 'partner')], 'invisible': [('create_type', '!=', 'partner')]}"/>
                             <field name="bank_account"
-                                    attrs="{'required':[('create_type', '=', 'bank')], 'invisible': [('create_type', '!=', 'bank')]}"/>
+                                    attrs="{'required':[('create_type', '=', 'bank')], 'invisible': [('create_type', '!=', 'bank')]}" options="{'no_open': True, 'no_create': True}"/>
                         </group>
                     </group>
                     <footer>
@@ -164,7 +164,7 @@
                             <group>
                                 <field name='code'/>
                                 <field name="name"/>
-                                <field name="category_id"/>
+                                <field name="category_id" options="{'no_open': True, 'no_create': True}"/>
                                 <field name="cost"/>
                                 <field name="surplus_value"/>
                             </group>
