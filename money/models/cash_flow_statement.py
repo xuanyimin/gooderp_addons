@@ -10,7 +10,8 @@ LINE_TYPES = [('get', u'销售收款'),
               ('end', u'科目期末'),
               ('lines', u'表行计算'),
               ('inopen_account', u'本期收入发生额'),
-              ('outopen_account', u'本期支出发生额')]
+              ('outopen_account', u'本期支出发生额'),
+              ('voucher',u'凭证')]
 
 class CashFlowTemplate(models.Model):
     _name = 'cash.flow.template'
@@ -36,6 +37,7 @@ class CashFlowTemplate(models.Model):
     d_account_ids = fields.Many2many('finance.account', string=u'借方累计会计科目')
     # for type begin
     c_account_ids = fields.Many2many('finance.account', string=u'贷方累计会计科目')
+    is_exchange = fields.Boolean(u'结汇凭证', help=u'是否是结汇凭证')
 
 
 class CashFlowStatement(models.Model):

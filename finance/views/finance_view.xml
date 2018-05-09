@@ -60,7 +60,7 @@
                             </group>
                         </group>
                         <field name="line_ids" context="{'line_ids':line_ids}">
-                            <tree editable='bottom'>
+                            <tree editable='bottom' default_order="debit desc">
                                 <field name='name'/>
                                 <field name='account_id'  options="{'no_create': True}"
                                        context="{'show_balance':False}"

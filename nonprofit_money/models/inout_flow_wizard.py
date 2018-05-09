@@ -4,8 +4,8 @@ from odoo import fields, models, api
 import calendar
 
 
-class CashFlowWizard(models.TransientModel):
-    _name = "cash.flow.wizard"
+class InoutFlowWizard(models.TransientModel):
+    _name = "inout.flow.wizard"
 
     def _default_period_id_impl(self):
         """
@@ -32,8 +32,7 @@ class CashFlowWizard(models.TransientModel):
               ('end',u'科目期末'),
               ('lines',u'表行计算')
               ('in_account_ids',u'本期收入发生额'),
-              ('out_account_ids',u'本期支出发生额'),
-              ('voucher',u'凭证')]
+              ('out_account_ids',u'本期支出发生额')]
         '''
         date_start, date_end = self.env['finance.period'].get_period_month_date_range(
             period_id)
@@ -84,18 +83,6 @@ class CashFlowWizard(models.TransientModel):
                                                                     ('subject_name_id', 'in',
                                                                      [o.id for o in tem.c_account_ids])])])
 
-        if tem.line_type == 'voucher':
-            # 凭证指定科目本年累计发生额
-            account_id = self.env.ref('finance.account_exchange')
-            voucher_ids = self.env['voucher'].search([('is_exchange','=',True),('period_id','=',self.period_id)], limit = 1)
-            ret = amount = 0
-            for voucher in voucher_ids:
-                for line in voucher.line_ids:
-                    if line.account_id == account_id:
-                        amount += line.credit - line.debit
-            ret = amount
-        return ret
-
         return ret
 
     @api.model
@@ -108,8 +95,7 @@ class CashFlowWizard(models.TransientModel):
               ('end',u'科目期末'),
               ('lines',u'表行计算'),
               ('in_account_ids',u'本期收入发生额'),
-              ('out_account_ids',u'本期支出发生额'),
-              ('voucher',u'凭证')]
+              ('out_account_ids',u'本期支出发生额')]
         '''
         date_start, date_end = self.env['finance.period'].get_period_month_date_range(
             period_id)
@@ -161,23 +147,11 @@ class CashFlowWizard(models.TransientModel):
                        for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
                                                                     ('subject_name_id', 'in',
                                                                      [o.id for o in tem.c_account_ids])])])
-        if tem.line_type == 'voucher':
-            # 凭证指定科目本年累计发生额
-            account_id = self.env.ref('finance.account_exchange')
-            no, end_date = self.env['finance.period'].get_period_month_date_range(period_id)
-            begin_date, no = self.env['finance.period'].get_period_month_date_range(
-                self.env['finance.period'].get_year_fist_period_id())
-            voucher_ids = self.env['voucher'].search([('is_exchange','=',True),('date','>=',begin_date),('date','=<',end_date)])
-            ret = amount = 0
-            for voucher in voucher_ids:
-                for line in voucher.line_ids:
-                    if line.account_id == account_id:
-                        amount += line.credit - line.debit
-            ret = amount
+
         return ret
 
     @api.multi
-    def show(self):
+    def inout_show(self):
         """生成现金流量表"""
         rep_ids = []
         '''
@@ -198,7 +172,7 @@ class CashFlowWizard(models.TransientModel):
                     }
                 )
                 rep_ids.append(new_rep.id)
-        view_id = self.env.ref('money.cash_flow_statement_tree').id
+        view_id = self.env.ref('nonprofit_money.inout_flow_statement_tree').id
         days = calendar.monthrange(int(self.period_id.year), int(self.period_id.month))[1]
         attachment_information = u'编制单位：' + self.env.user.company_id.name + u',,' + self.period_id.year\
                                  + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
@@ -223,15 +197,15 @@ class CashFlowWizard(models.TransientModel):
             'cash.flow.statement', field_list, domain, attachment_information, export_data
         )
 
-        self.env['create.balance.sheet.wizard'].export_xml('cash.flow.statement', {'data': export_data})
-        self.env['create.balance.sheet.wizard'].export_excel('cash.flow.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
+        self.env['create.balance.sheet.wizard'].export_xml('inout.flow.statement', {'data': export_data})
+        self.env['create.balance.sheet.wizard'].export_excel('inout.flow.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
 
         return {
             'type': 'ir.actions.act_window',
-            'name': u'现金流量表：' + self.period_id.name,
+            'name': u'收支情况表：' + self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
-            'res_model': 'cash.flow.statement',
+            'res_model': 'inout.flow.statement',
             'target': 'current',
             'view_id': False,
             'views': [(view_id, 'tree')],

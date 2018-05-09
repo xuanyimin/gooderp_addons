@@ -540,24 +540,28 @@ class CreateCleanWizard(models.TransientModel):
         ''' 生成凭证，并确认 '''
         vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         Asset.write({'voucher_id': vouch_obj.id})
+        if self.clean_type == 'guazhang':
+            voucher_name = u'盘亏固定资产'
+        else:
+            voucher_name = u'处置固定资产'
         # 借方行,挂帐不存在income<0
-        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'处置固定资产',
+        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': voucher_name,
                                          'debit': income, 'account_id': account_id.id,
                                          })
         if depreciation:
-            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'处置固定资产',
+            self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': voucher_name,
                                              'debit': depreciation,
                                              'account_id': Asset.account_accumulated_depreciation.id,
                                              })
         # 贷方行
-        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'处置固定资产',
+        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': voucher_name,
                                          'credit': Asset.cost, 'account_id': Asset.account_asset.id,
                                          })
 
         vouch_obj.voucher_done()
         self.env['chang.line'].create({'date': self.date,
                                        'period_id': self.period_id.id,
-                                       'chang_name': u'清理固定资产',
+                                       'chang_name': voucher_name,
                                        'order_id': Asset.id,
                                        'change_vourch': vouch_obj.id
                                        })
@@ -610,7 +614,7 @@ class CreateCleanWizard(models.TransientModel):
         Asset = self.env['asset'].browse(self.env.context.get('active_id'))
         clear_account_id = Asset.category_id.clear_account_id
         if self.clean_type == 'handle' and not (Asset.category_id.clean_income.id or Asset.category_id.clean_costs.id):
-            raise UserError(u'直接处理必须要处置收入科目及处置支出科目')
+            raise UserError(u'处置固定资产必须要在固定资产分类中设置固定资产处置收入科目和固定资产处置成本科目。')
         if not Asset.account_accumulated_depreciation and not Asset.forever_no_depreciation:
             raise UserError(
                 u'处置固定资产必须要在固定资产分类（%s）中设置固定资产处置收入科目和固定资产处置成本科目' % Asset.account_accumulated_depreciation.name)
