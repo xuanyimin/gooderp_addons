@@ -50,6 +50,7 @@
                                   <field name="name"/>
                                </tree>
                             </field>
+                            <field name="is_exchange" attrs="{'invisible': [('line_type','!=','voucher')]}"/>
                             <field name="c_account_ids" attrs="{'invisible': [('line_type','!=','outopen_account')]}">
                                <tree string="贷方累计会计科目" editable="bottom">
                                   <field name="name"/>
