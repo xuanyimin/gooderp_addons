@@ -758,3 +758,192 @@ class BusinessActivityStatement(models.Model):
         for record in self:
             record.cumulative_total = record.cumulative_restricted + record.cumulative_unrestricted
             record.current_total = record.current_restricted + record.current_unrestricted
+
+class CreateBusinessActivityStatementtWizard(models.TransientModel):
+    """创建业务活动表的 wizard"""
+    _name = "create.business.activity.statement.wizard"
+    _description = u'业务活动表的向导'
+
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get()
+    )
+
+    year = fields.Selection(string=u'年度', selection=lambda self: self._get_years(), default=lambda self: self._get_default_year())
+
+    quater = fields.Selection(string=u'季度', selection=[('1', u'1季度'), ('2', u'2季度'), ('3', u'3季度'), ('4', u'4季度')])
+
+    period_ids = fields.Many2many(string=u'包含的会计期间', comodel_name='finance.period')
+
+    quater_name = fields.Char(string=u'季度名称', )
+
+    @api.model
+    def _get_years(self):
+        period_ids = self.env['finance.period'].search([])
+        years = []
+        for period_id in period_ids:
+            if period_id.year not in years:
+                years.append(period_id.year)
+        return [('%s' % year, u'%s年' % year) for year in years]
+
+    @api.model
+    def _get_default_year(self):
+        return time.strftime("%Y", time.localtime(time.time()))
+
+    @api.onchange('quater')
+    def _onchange_quater(self):
+        if self.quater == '1':
+            period_ids = self.env['finance.period'].search(
+                [('year', '=', self.year), ('month', 'in', ['1', '2', '3'])]
+            )
+            self.quater_name = u'1季度'
+            if not period_ids:
+                self.quater = False
+                return {'warning': {'title': '错误', 'message': u"%s没启用！" % self.quater_name}}
+            else:
+                lastest_month = max(period_ids.mapped('month'))
+                lastest_year = max(period_ids.mapped('year'))
+                if "%s%s"%(lastest_year,lastest_month) >= time.strftime("%Y%m", time.localtime(time.time())):
+                    self.quater = False
+                    return {'warning': {'title': '错误', 'message': u"%s没结束！" % self.quater_name}}
+
+            self.period_ids = period_ids.ids
+
+        elif self.quater == '2':
+            period_ids = self.env['finance.period'].search(
+                [('year', '=', self.year), ('month', 'in', ['4', '5', '6'])]
+            )
+            self.quater_name = u'2季度'
+            if not period_ids:
+                self.quater = False
+                return {'warning': {'title': '错误', 'message': u"%s没启用！" % self.quater_name}}
+            else:
+                lastest_month = max(period_ids.mapped('month'))
+                lastest_year = max(period_ids.mapped('year'))
+                if "%s%s"%(lastest_year,lastest_month) >= time.strftime("%Y%m", time.localtime(time.time())):
+                    self.quater = False
+                    return {'warning': {'title': '错误', 'message': u"%s没结束！" % self.quater_name}}
+
+            self.period_ids = period_ids.ids
+
+        elif self.quater == '3':
+            period_ids = self.env['finance.period'].search(
+                [('year', '=', self.year), ('month', 'in', ['7', '8', '9'])]
+            )
+            self.quater_name = u'3季度'
+            if not period_ids:
+                self.quater = False
+                return {'warning': {'title': '错误', 'message': u"%s没启用！" % self.quater_name}}
+            else:
+                lastest_month = max(period_ids.mapped('month'))
+                lastest_year = max(period_ids.mapped('year'))
+                if "%s%s"%(lastest_year,lastest_month) >= time.strftime("%Y%m", time.localtime(time.time())):
+                    self.quater = False
+                    return {'warning': {'title': '错误', 'message': u"%s没结束！" % self.quater_name}}
+
+            self.period_ids = period_ids.ids
+
+        elif self.quater == '4':
+            period_ids = self.env['finance.period'].search(
+                [('year', '=', self.year), ('month', 'in', ['10', '11', '12'])]
+            )
+            self.quater_name = u'4季度'
+            if not period_ids:
+                self.quater = False
+                return {'warning': {'title': '错误', 'message': u"%s没启用！" % self.quater_name}}
+            else:
+                lastest_month = max(period_ids.mapped('month'))
+                lastest_year = max(period_ids.mapped('year'))
+                if "%s%s"%(lastest_year,lastest_month) >= time.strftime("%Y%m", time.localtime(time.time())):
+                    self.quater = False
+                    return {'warning': {'title': '错误', 'message': u"%s没结束！" % self.quater_name}}
+
+            self.period_ids = period_ids.ids
+
+    @api.multi
+    def create_activity_statement(self):
+        """生成业务活动表"""
+        if len(self.period_ids) == 0:
+            raise UserError(u'季度选择错误！')
+        for period_id in self.period_ids:
+            balance_wizard = self.env['create.trial.balance.wizard'].create({'period_id': period_id.id})
+            balance_wizard.create_trial_balance()
+
+        view_id = self.env.ref('finance.view_business_activity_statement_tree').id
+        report_item_ids = self.env['business.activity.statement'].search([])
+        current_fields = ['cumulative_occurrence_debit', 'cumulative_occurrence_credit']
+        cumulative_fields = ['current_occurrence_debit', 'current_occurrence_credit']
+        lastest_month = max(self.period_ids.mapped('month'))
+        lastest_year = max(self.period_ids.mapped('year'))
+        lastest_period = self.env['finance.period'].search( [('year','=',lastest_year),('month','=',lastest_month)])
+
+        for report_item in report_item_ids:
+            cumulative_restricted = self.env['create.balance.sheet.wizard'].deal_with_activity_formula(report_item.formula_restricted, lastest_period,
+                                                                    cumulative_fields, report_item.type, 'cumulative_restricted')
+            cumulative_unrestricted = self.env['create.balance.sheet.wizard'].deal_with_activity_formula(report_item.formula_unrestricted, lastest_period,
+                                                                      cumulative_fields, report_item.type, 'cumulative_unrestricted')
+            current_restricted = sum( [self.env['create.balance.sheet.wizard'].deal_with_activity_formula(report_item.formula_restricted, period_id,
+                                                                 current_fields, report_item.type, 'current_restricted')  for period_id in self.period_ids ])
+            current_unrestricted =sum( [self.env['create.balance.sheet.wizard'].deal_with_activity_formula(report_item.formula_unrestricted, period_id,
+                                                                   current_fields, report_item.type, 'current_unrestricted') for period_id in self.period_ids ])
+
+            report_item.write({'cumulative_restricted': cumulative_restricted,
+                               'cumulative_unrestricted': cumulative_unrestricted,
+                               'cumulative_total': cumulative_restricted + cumulative_unrestricted,
+                               'current_restricted': current_restricted,
+                               'current_unrestricted': current_unrestricted,
+                               'current_total': current_restricted + current_unrestricted,
+
+                               })
+
+        force_company = self._context.get('force_company')
+        if not force_company:
+            force_company = self.env.user.company_id.id
+        company_row = self.env['res.company'].browse(force_company)
+
+        attachment_information = u'编制单位：' + company_row.name + u',,' + self.year \
+                                 + u'年' + self.quater_name + ',' + u'单位：元'
+
+        # # 第一行 为字段名
+        # #  从第二行开始 为数据
+        domain = [('id', 'in', [report_item.id for report_item in report_item_ids])]
+
+        field_list = [
+            'balance', 'line_num', 'current_unrestricted', 'current_restricted', 'current_total',
+            'cumulative_unrestricted',
+            'cumulative_restricted', 'cumulative_total'
+        ]
+        # excel_data_rows = []
+        export_data = {
+            "database": self.pool._db.dbname,
+            "company": company_row.name,
+            "date": self.year + u'年' + self.quater_name,
+            "report_name": u"业务活动表（季报）",
+            "report_code": u"会民非02表",
+            "rows": self.env['business.activity.statement'].search_count(domain),
+            "cols": len(field_list),
+            "report_item": []
+        }
+
+        export_data, excel_title_row, excel_data_rows = self.env['create.balance.sheet.wizard']._prepare_export_data(
+            'business.activity.statement', field_list, domain, attachment_information, export_data
+        )
+
+        self.env['create.balance.sheet.wizard'].export_xml('business.activity.statement', {'data': export_data})
+        self.env['create.balance.sheet.wizard'].export_excel('business.activity.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
+
+        return {  # 返回生成业务活动表的数据的列表
+            'type': 'ir.actions.act_window',
+            'name': u'业务活动表：' + self.year + u'年' + self.quater_name,
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'business.activity.statement',
+            'target': 'current',
+            'view_id': False,
+            'views': [(view_id, 'tree')],
+            'context': {'attachment_information': attachment_information},
+            'domain': domain,
+            'limit': 65535,
+        }
