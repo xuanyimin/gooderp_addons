@@ -95,6 +95,7 @@ class Voucher(models.Model):
                              index=True,
                              track_visibility='always', help=u'凭证所属状态!')
     is_checkout = fields.Boolean(u'结账凭证', help=u'是否是结账凭证')
+    is_exchange = fields.Boolean(u'结汇凭证', help=u'是否是结汇凭证')
     is_init = fields.Boolean(u'是否初始化凭证', help=u'是否是初始化凭证')
     company_id = fields.Many2one(
         'res.company',
