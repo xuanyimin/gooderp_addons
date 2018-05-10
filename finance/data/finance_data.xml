@@ -739,46 +739,44 @@
         </record>
         <record id='bs_15' model='balance.sheet'>
             <field name="line">16</field>
+            <field name='balance'>固定资产：</field>
             <field name='balance_two'>其他长期负债</field>
             <field name='line_num_two'>88</field>
             <field name='balance_two_formula'></field>
         </record>
-        <record id='bs_151' model='balance.sheet'>
+        <record id='bs_16' model='balance.sheet'>
             <field name="line">17</field>
-            <field name='balance'>固定资产：</field>
+            <field name='balance'>固定资产原价</field>
+            <field name='line_num'>31</field>
+            <field name='balance_formula'>1501~1501999999</field>
             <field name='balance_two'>长期负债合计</field>
             <field name='line_num_two'>90</field>
             <field name='balance_two_formula'>2501~2502999999</field>
         </record>
-        <record id='bs_16' model='balance.sheet'>
-            <field name="line">18</field>
-            <field name='balance'>固定资产原价</field>
-            <field name='line_num'>31</field>
-            <field name='balance_formula'>1501~1501999999</field>
-        </record>
         <record id='bs_17' model='balance.sheet'>
-            <field name="line">19</field>
+            <field name="line">18</field>
             <field name='balance'>减：累计折旧</field>
             <field name='line_num'>32</field>
             <field name='balance_formula'>1502~1502999999</field>
         </record>
         <record id='bs_18' model='balance.sheet'>
-            <field name="line">20</field>
+            <field name="line">19</field>
             <field name='balance'>固定资产净值</field>
             <field name='line_num'>33</field>
             <field name='balance_formula'>1501~1502999999</field>
+            <field name='balance_two'>受托代理负债:</field>
+        </record>
+        <record id='bs_19' model='balance.sheet'>
+            <field name="line">20</field>
+            <field name='balance'>在建工程</field>
+            <field name='line_num'>34</field>
+            <field name='balance_formula'>1505~1505999999</field>
             <field name='balance_two'>受托代理负债</field>
             <field name='line_num_two'>91</field>
             <field name='balance_two_formula'>2601~2601999999</field>
         </record>
-        <record id='bs_19' model='balance.sheet'>
-            <field name="line">21</field>
-            <field name='balance'>在建工程</field>
-            <field name='line_num'>34</field>
-            <field name='balance_formula'>1505~1505999999</field>
-        </record>
         <record id='bs_20' model='balance.sheet'>
-            <field name="line">22</field>
+            <field name="line">21</field>
             <field name='balance'>文物文化资产</field>
             <field name='line_num'>35</field>
             <field name='balance_formula'>1506~1506999999</field>
@@ -787,58 +785,58 @@
             <field name='balance_two_formula'>2101~2601999999</field>
         </record>
         <record id='bs_21' model='balance.sheet'>
-            <field name="line">23</field>
+            <field name="line">22</field>
             <field name='balance'>固定资产清理</field>
             <field name='line_num'>38</field>
             <field name='balance_formula'>1509~1509999999</field>
         </record>
         <record id='bs_22' model='balance.sheet'>
-            <field name="line">24</field>
+            <field name="line">23</field>
             <field name='balance'>固定资产合计</field>
             <field name='line_num'>40</field>
             <field name='balance_formula'>1501~1509999999</field>
         </record>
         <record id='bs_23' model='balance.sheet'>
-            <field name="line">25</field>
-        </record>
-        <record id='bs_24' model='balance.sheet'>
-            <field name="line">26</field>
-            <field name='balance'>无形资产：</field>
-        </record>
-        <record id='bs_25' model='balance.sheet'>
-            <field name="line">27</field>
-            <field name='balance'>无形资产</field>
-            <field name='line_num'>41</field>
-            <field name='balance_formula'>1601~1601999999</field>
+            <field name="line">24</field>
             <field name='balance_two'>净资产：</field>
         </record>
-        <record id='bs_26' model='balance.sheet'>
-            <field name="line">28</field>
+        <record id='bs_24' model='balance.sheet'>
+            <field name="line">25</field>
+            <field name='balance'>无形资产：</field>
             <field name='balance_two'>非限定性净资产</field>
             <field name='line_num_two'>101</field>
             <field name='balance_two_formula'>3101~3101999999</field>
         </record>
-        <record id='bs_27' model='balance.sheet'>
-            <field name="line">29</field>
-            <field name='balance'>受托代理资产：</field>
+        <record id='bs_25' model='balance.sheet'>
+            <field name="line">26</field>
+            <field name='balance'>无形资产</field>
+            <field name='line_num'>41</field>
+            <field name='balance_formula'>1601~1601999999</field>
             <field name='balance_two'>限定性净资产</field>
             <field name='line_num_two'>105</field>
             <field name='balance_two_formula'>3102~3102999999</field>
         </record>
-        <record id='bs_28' model='balance.sheet'>
-            <field name="line">30</field>
-            <field name='balance'>受托代理资产</field>
-            <field name='line_num'>51</field>
-            <field name='balance_formula'>1701~1701999999</field>
+        <record id='bs_26' model='balance.sheet'>
+            <field name="line">27</field>
             <field name='balance_two'>净资产合计</field>
             <field name='line_num_two'>110</field>
             <field name='balance_two_formula'>3101~3102999999</field>
         </record>
+        <record id='bs_27' model='balance.sheet'>
+            <field name="line">28</field>
+            <field name='balance'>受托代理资产：</field>
+        </record>
+        <record id='bs_28' model='balance.sheet'>
+            <field name="line">29</field>
+            <field name='balance'>受托代理资产</field>
+            <field name='line_num'>51</field>
+            <field name='balance_formula'>1701~1701999999</field>
+        </record>
         <record id='bs_29' model='balance.sheet'>
-            <field name="line">31</field>
+            <field name="line">30</field>
         </record>
         <record id='bs_30' model='balance.sheet'>
-            <field name="line">32</field>
+            <field name="line">31</field>
             <field name='balance'>资产总计</field>
             <field name='line_num'>60</field>
             <field name='balance_formula'>1001~1701999999</field>
@@ -965,7 +963,7 @@
         </record>
 
         <record id='as_0' model='business.activity.statement'>
-            <field name='balance'>一、收 入</field>
+            <field name='balance'>一、收入</field>
             <field name='line_num'></field>
             <field name='formula_restricted'></field>
             <field name='formula_unrestricted'></field>
