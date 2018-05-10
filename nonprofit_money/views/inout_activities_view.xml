@@ -72,6 +72,9 @@
                     <field name="sequence"  invisible="1"/>
                     <field name="name"/>
                     <field name="amount"/>
+                    <field name="js_man"/>
+                    <field name="pz_man"/>
+                    <field name="note"/>
                 </tree>
             </field>
         </record>

@@ -96,3 +96,6 @@ class InoutFlowStatement(models.Model):
     name = fields.Char(u'项目')
     sequence = fields.Char(u'行次')
     amount = fields.Float(u'本月数', digits=dp.get_precision('Amount'))
+    js_man = fields.Char(u'经手人')
+    pz_man = fields.Char(u'批准人')
+    note = fields.Char(u'备注')

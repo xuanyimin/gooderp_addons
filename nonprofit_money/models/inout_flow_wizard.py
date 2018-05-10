@@ -71,7 +71,6 @@ class InoutFlowWizard(models.TransientModel):
             # 根据其他报表行计算
             for line in self.env['inout.flow.statement'].browse(report_ids):
                 for l in tem.plus_ids:
-                    print l.sequence, line.sequence,line.amount
                     if str(l.sequence) == str(line.sequence):
                         ret += line.amount
                 for l in tem.nega_ids:
@@ -169,7 +168,7 @@ class InoutFlowWizard(models.TransientModel):
                 rep_ids.append(new_rep.id)
         view_id = self.env.ref('nonprofit_money.inout_flow_statement_tree').id
         days = calendar.monthrange(int(self.period_id.year), int(self.period_id.month))[1]
-        attachment_information = u'编制单位：' + self.env.user.company_id.name + u',,' + self.period_id.year\
+        attachment_information = u'编制单位：' + self.env.user.company_id.name + u',' + self.period_id.year\
                                  + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
 
         # 第一行 为字段名
@@ -187,7 +186,7 @@ class InoutFlowWizard(models.TransientModel):
             "cols": len(field_list),
             "report_item": []
         }
-
+        '''
         export_data, excel_title_row, excel_data_rows = self.env['create.balance.sheet.wizard']._prepare_export_data(
             'inout.flow.statement', field_list, domain, attachment_information, export_data
         )
@@ -195,7 +194,7 @@ class InoutFlowWizard(models.TransientModel):
         self.env['create.balance.sheet.wizard'].export_xml('inout.flow.statement', {'data': export_data})
         self.env['create.balance.sheet.wizard'].export_excel('inout.flow.statement', {'columns_headers': excel_title_row,
                                                                                      'rows': excel_data_rows})
-
+        '''
         return {
             'type': 'ir.actions.act_window',
             'name': u'收支情况表：' + self.period_id.name,

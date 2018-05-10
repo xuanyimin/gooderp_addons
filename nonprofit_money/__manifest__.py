@@ -16,6 +16,7 @@
         'views/nonprofit_money_order_view.xml',
         'security/groups_ccb.xml',
         'data/inout_activities_template.xml',
+        'data/inout_export_template_data.xml',
     ],
     'demo': [],
     'application': True,
