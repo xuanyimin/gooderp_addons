@@ -204,6 +204,8 @@ class CashFlowWizard(models.TransientModel):
         attachment_information = u'编制单位：' + self.env.user.company_id.name + u',,' + self.period_id.year\
                                  + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
 
+        report_time_slot = report_month = "%s" % (self.period_id.name)
+
         # 第一行 为字段名
         #  从第二行开始 为数据
 
@@ -224,8 +226,8 @@ class CashFlowWizard(models.TransientModel):
             'cash.flow.statement', field_list, domain, attachment_information, export_data
         )
 
-        self.env['create.balance.sheet.wizard'].export_xml('cash.flow.statement', {'data': export_data})
-        self.env['create.balance.sheet.wizard'].export_excel('cash.flow.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
+        self.env['create.balance.sheet.wizard'].export_xml('cash.flow.statement', {'data': export_data}, report_month, report_time_slot)
+        self.env['create.balance.sheet.wizard'].export_excel('cash.flow.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows}, report_month, report_time_slot)
 
         return {
             'type': 'ir.actions.act_window',

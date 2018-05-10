@@ -154,6 +154,9 @@ class CreateBalanceSheetWizard(models.TransientModel):
                                  + u'年' + self.period_id.month + u'月' + \
                                  str(days) + u'日' + u',,,' + u'单位：元'
 
+        report_month = "%s" % (self.period_id.name)
+        report_time_slot = "%s%s" % (self.period_id.name, str(days))
+
         # 第一行 为字段名
         #  从第二行开始 为数据
 
@@ -177,8 +180,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
             'balance.sheet', field_list, domain, attachment_information, export_data
         )
 
-        self.export_xml('balance.sheet', {'data': export_data})
-        self.export_excel('balance.sheet', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
+        self.export_xml('balance.sheet', {'data': export_data}, report_month, report_time_slot)
+        self.export_excel('balance.sheet', {'columns_headers': excel_title_row, 'rows': excel_data_rows}, report_month, report_time_slot)
 
         return {  # 返回生成资产负债表的数据的列表
             'type': 'ir.actions.act_window',
@@ -230,6 +233,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
         attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year \
                                  + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
 
+        report_time_slot = report_month = "%s" % (self.period_id.name)
+
         # 第一行 为字段名
         #  从第二行开始 为数据
 
@@ -250,8 +255,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
             'profit.statement', field_list, domain, attachment_information, export_data
         )
 
-        self.export_xml('profit.statement', {'data': export_data})
-        self.export_excel('profit.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
+        self.export_xml('profit.statement', {'data': export_data}, report_month, report_time_slot)
+        self.export_excel('profit.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows}, report_month, report_time_slot)
 
         return {  # 返回生成利润表的数据的列表
             'type': 'ir.actions.act_window',
@@ -532,6 +537,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
         attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year \
                                  + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
 
+        report_time_slot = report_month = "%s"%(self.name)
+
         # 第一行 为字段名
         #  从第二行开始 为数据
         domain = [('id', 'in', [report_item.id for report_item in report_item_ids])]
@@ -557,8 +564,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
             'business.activity.statement', field_list, domain, attachment_information, export_data
         )
 
-        self.export_xml('business.activity.statement', {'data': export_data})
-        self.export_excel('business.activity.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
+        self.export_xml('business.activity.statement', {'data': export_data}, report_month, report_time_slot)
+        self.export_excel('business.activity.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows}, report_month, report_time_slot)
 
         return {  # 返回生成业务活动表的数据的列表
             'type': 'ir.actions.act_window',
@@ -619,11 +626,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         return xml_data_dict, excel_title_row, excel_data_rows
 
     @api.model
-    def _get_report_template(self, model):
-        TIMEFORMAT = "%Y%m%d"
-        time_now = time.localtime(time.time())
-        date_str = time.strftime(TIMEFORMAT, time_now)
-
+    def _get_report_template(self, model, report_month, report_time_slot):
         report_model = self.env['report.template'].search([('model_id.model', '=', model)], limit=1)
 
         save = report_model and report_model[0].save or False
@@ -642,15 +645,15 @@ class CreateBalanceSheetWizard(models.TransientModel):
 
         folder_name = folder_name_mapping.get(model)
 
-        file_name = '%s_%s_%s' % (database_name, folder_name, date_str)
+        file_name = '%s_%s_%s' % (database_name, folder_name, report_time_slot)
 
         export_file_name = False
 
         if save:
             if roo_path:
-                path = '%s/%s/%s/%s' % (roo_path, database_name, folder_name, date_str)
+                path = '%s/%s/%s/%s' % (roo_path, database_name, folder_name, report_month)
             else:
-                path = '%s/%s/%s' % (database_name, folder_name, date_str)
+                path = '%s/%s/%s' % (database_name, folder_name, report_month)
             if not os.path.exists(path):
                 os.makedirs(path)
 
@@ -659,8 +662,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
         return save, export_file_name, file_address, blank_rows, header_rows
 
     @api.model
-    def export_excel(self, model, data):
-        save, export_file_name, template_file, blank_rows, header_rows = self._get_report_template(model)
+    def export_excel(self, model, data, report_month, report_time_slot):
+        save, export_file_name, template_file, blank_rows, header_rows = self._get_report_template(model, report_month, report_time_slot)
         title = data.get('columns_headers')
         rows = data.get('rows')
 
@@ -684,8 +687,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
             excel_file.close()
 
     @api.model
-    def export_xml(self, model, data):
-        save, export_file_name, template_file, blank_rows, header_rows = self._get_report_template(model)
+    def export_xml(self, model, data, report_month, report_time_slot):
+        save, export_file_name, template_file, blank_rows, header_rows = self._get_report_template(model, report_month, report_time_slot)
         if save:
             import sys
             reload(sys)
@@ -906,6 +909,16 @@ class CreateBusinessActivityStatementtWizard(models.TransientModel):
         attachment_information = u'编制单位：' + company_row.name + u',,' + self.year \
                                  + u'年' + self.quater_name + ',' + u'单位：元'
 
+        quater_mapping = {
+            u'1季度': 'Q1',
+            u'2季度': 'Q2',
+            u'3季度': 'Q3',
+            u'4季度': 'Q4',
+        }
+
+        report_month = "%s" % (lastest_period.name)
+        report_time_slot = "%s%s" % (lastest_year, quater_mapping.get(self.quater_name, ''))
+
         # # 第一行 为字段名
         # #  从第二行开始 为数据
         domain = [('id', 'in', [report_item.id for report_item in report_item_ids])]
@@ -931,8 +944,8 @@ class CreateBusinessActivityStatementtWizard(models.TransientModel):
             'business.activity.statement', field_list, domain, attachment_information, export_data
         )
 
-        self.env['create.balance.sheet.wizard'].export_xml('business.activity.statement', {'data': export_data})
-        self.env['create.balance.sheet.wizard'].export_excel('business.activity.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows})
+        self.env['create.balance.sheet.wizard'].export_xml('business.activity.statement', {'data': export_data}, report_month, report_time_slot)
+        self.env['create.balance.sheet.wizard'].export_excel('business.activity.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows}, report_month, report_time_slot)
 
         return {  # 返回生成业务活动表的数据的列表
             'type': 'ir.actions.act_window',
