@@ -87,7 +87,7 @@
             </field>
         </record>
 
-        <!-- 日记帐 action -->
+        <!-- 日记账 action -->
         <record id="nonprofit_money_receipt_action" model="ir.actions.act_window">
             <field name="name">日记账</field>
             <field name="type">ir.actions.act_window</field>
