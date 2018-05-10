@@ -4,7 +4,7 @@
         <record id="template_inout_statement" model="report.template">
             <field name="model_id"  ref="nonprofit_money.model_inout_flow_statement"/>
             <field name="file_address">nonprofit_money/xls/inout_print.xls</field>
-            <field name="blank_rows">1</field>
+            <field name="blank_rows">0</field>
             <field name="header_rows">0</field>
             <field name="save">True</field>
             <field name="path">/home/ap/nas/financeMonitor</field>
