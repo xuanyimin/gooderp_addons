@@ -109,7 +109,7 @@
 
         <record id="nonprofit_money.in_out_18" model="inout.activities.template">
             <field name="sequence">18</field>
-            <field name="name">费用小计</field>
+            <field name="name">支出小计</field>
             <field name="line_type">lines</field>
             <field name="plus_ids" eval="[(6, 0, [
             ref('nonprofit_money.in_out_16'),

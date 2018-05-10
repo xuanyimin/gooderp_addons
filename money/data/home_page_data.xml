@@ -11,7 +11,7 @@
             <field name="action" ref="other_money_statements_report_wizard_action"/>
             <field name="menu_type">report</field>
             <field name="report_type_id" ref="home_report_type_3"/>
-            <field name="note_one">日记帐明细表</field>
+            <field name="note_one">日记账明细表</field>
         </record>
 
         <record id="bank_statements_report_wizard_action_action_report" model="home.page">

@@ -187,6 +187,10 @@ class Voucher(models.Model):
     # 重载write 方法
     @api.multi
     def write(self, vals):
+        if vals.get('name'):
+            self.message_post_with_view('mail.message_origin_link',
+                    values={'self': self, 'origin': self.name, 'edit': True},
+                    subtype_id=self.env['ir.model.data'].xmlid_to_res_id('mail.mt_note'))
         for order in self:  # 还需要进一步优化
             if self.env.context.get('call_module', False) == "checkout_wizard":
                 return super(Voucher, self).write(vals)
@@ -1092,7 +1096,7 @@ class CoreCategory(models.Model):
     '''继承core cotegory，添加科目类型'''
     _inherit = 'core.category'
 
-    account_id = fields.Many2one('finance.account', u'科目', help=u'科目', domain="[('account_type','=','normal'),('exchange','=',False)]")
+    account_id = fields.Many2one('finance.account', u'科目', help=u'科目', domain="[('account_type','=','normal')]")
 
 
 class ChangeVoucherName(models.Model):

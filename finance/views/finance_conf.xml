@@ -79,7 +79,7 @@
                     <field name="parent_id" readonly="1"/>
                     <field name="balance_directions"/>
                     <field name="auxiliary_financing"/>
-                    <field name="currency_id" groups='finance.group_multi_currency'/>
+                    <field name="currency_id" groups='finance.group_multi_currency' options="{'no_open': True, 'no_create': True}"/>
                     <field name="exchange" groups='finance.group_multi_currency'/>
                     <field name='active'  invisible='1'/>
                     <field name='debit' groups="base.group_no_one"/>
