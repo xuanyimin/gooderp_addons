@@ -6,7 +6,7 @@
             <field name="name">other.money.statements.report.tree</field>
             <field name="model">other.money.statements.report</field>
             <field name="arch" type="xml">
-                <tree string="日记帐明细表" create='0'>
+                <tree string="日记账明细表" create='0'>
                 	<field name="date"/>
                     <field name="name"/>
                     <field name="note"/>
