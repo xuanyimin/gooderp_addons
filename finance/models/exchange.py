@@ -122,21 +122,21 @@ class CreateExchangeWizard(models.TransientModel):
             credit = line.credit + credit
         if account.balance_directions == 'in':
             '''科目为借，则生成借方凭证行,差额为0的凭证行不生成'''
-            if currency_amount * vals.get('rate_silent') - debit + credit > 0:
+            if round(currency_amount * vals.get('rate_silent') - debit + credit,2) > 0:
                 self.env['voucher.line'].create({
                     'name': u"汇兑损益",
                     'account_id': account_id,
-                    'debit': currency_amount * vals.get('rate_silent') - debit + credit,
+                    'debit': round(currency_amount * vals.get('rate_silent') - debit + credit,2),
                     'voucher_id': vals.get('vouch_obj_id'),
                     'currency_id': False,
                     'currency_amount': False,
                     'rate_silent': False,
                 })
-            else:
+            elif round(currency_amount * vals.get('rate_silent') - debit + credit,2) < 0:
                 self.env['voucher.line'].create({
                     'name': u"汇兑损益",
                     'account_id': account_id,
-                    'credit': -(currency_amount * vals.get('rate_silent') - debit + credit),
+                    'credit': -round(currency_amount * vals.get('rate_silent') - debit + credit,2),
                     'voucher_id': vals.get('vouch_obj_id'),
                     'currency_id': False,
                     'currency_amount': False,
@@ -144,21 +144,21 @@ class CreateExchangeWizard(models.TransientModel):
                 })
         else:
             '''科目为贷，则生成贷方凭证行,差额为0的凭证行不生成'''
-            if currency_amount * vals.get('rate_silent') - credit + debit > 0:
+            if round(currency_amount * vals.get('rate_silent') - credit + debit,2) > 0:
                 self.env['voucher.line'].create({
                     'name': u"汇兑损益",
                     'account_id': account_id,
-                    'credit': currency_amount * vals.get('rate_silent') - credit + debit,
+                    'credit': round(currency_amount * vals.get('rate_silent') - credit + debit,2),
                     'voucher_id': vals.get('vouch_obj_id'),
                     'currency_id': False,
                     'currency_amount': False,
                     'rate_silent': False,
                 })
-            else:
+            elif round(currency_amount * vals.get('rate_silent') - credit + debit,2) < 0:
                 self.env['voucher.line'].create({
                     'name': u"汇兑损益",
                     'account_id': account_id,
-                    'debit': -(currency_amount * vals.get('rate_silent') - credit + debit),
+                    'debit': -round(currency_amount * vals.get('rate_silent') - credit + debit,2),
                     'voucher_id': vals.get('vouch_obj_id'),
                     'currency_id': False,
                     'currency_amount': False,
@@ -173,25 +173,25 @@ class CreateExchangeWizard(models.TransientModel):
         vouch_obj = vals.get('vouch_obj_id')
         voucher = self.env['voucher'].search([('id', '=', vouch_obj),('date','<=',date)])
         voucher_lines = voucher.line_ids
-        account_id = self.env.ref('finance.account_exchange')
+        account_id = self.env.ref('finance.init_account_530101') #直接取科目
         exp = 0
 
         for line in voucher_lines:
             exp = line.credit - line.debit + exp
-        if exp < 0:
+        if round(exp,2) < 0:
             self.env['voucher.line'].create({
                 'name': u"汇兑损益",
-                'account_id': account_id.account_id.id,
+                'account_id': account_id.id,
                 'credit': -exp,
                 'voucher_id': vals.get('vouch_obj_id'),
                 'currency_id': False,
                 'currency_amount': False,
                 'rate_silent': False,
             })
-        else:
+        elif round(exp,2) <0 :
             self.env['voucher.line'].create({
                 'name': u"汇兑损益",
-                'account_id': account_id.account_id.id,
+                'account_id': account_id.id,
                 'debit': exp,
                 'voucher_id': vals.get('vouch_obj_id'),
                 'currency_id': False,
@@ -227,6 +227,9 @@ class CreateExchangeWizard(models.TransientModel):
 
         if not vouch_obj.line_ids:
             vouch_obj.unlink()
+        else:
+            vouch_obj.voucher_done()
+            return vouch_obj
 
 
 class RatePeriod(models.Model):
