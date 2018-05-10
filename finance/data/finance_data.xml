@@ -599,14 +599,14 @@
             <field name='account_type'>normal</field>
         </record>
 
-        <record id='account_init' model='finance.account'>
+        <!--record id='account_init' model='finance.account'>
             <field name='code'>9999</field>
             <field name='name'>期初余额</field>
             <field name='user_type' ref='base_equity'/>
             <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
             <field name='account_type'>normal</field>
-        </record>
+        </record-->
 
 
         <!-- 资产负债表-->
@@ -1093,8 +1093,8 @@
             <field name='balance'>三、限定性净资产转为非限定性净资产</field>
             <field name='line_num'>40</field>
             <field name='type'>vourch</field>
-            <field name='formula_restricted'>3101~310199999999;-3102~310299999999</field>
-            <field name='formula_unrestricted'>-3101~310199999999;3102~310299999999</field>
+            <field name='formula_restricted'>-3101~310199999999;3102~310299999999</field>
+            <field name='formula_unrestricted'>3101~310199999999;-3102~310299999999</field>
         </record>
         <record id='as_20' model='business.activity.statement'>
             <field name='balance'>四、净资产变动额（若为净资产减少额，以“-”号填列）</field>
@@ -1120,12 +1120,12 @@
         </record>
 
 		<!-- 汇兑损益：-->
-		<record id="account_exchange" model="core.category">
+		<!--record id="account_exchange" model="core.category">
 			<field name="name">汇兑损益</field>
 			<field name="type">other_pay</field>
 			<field name="account_id" ref="init_account_530101"/>
             <field name='note'>由系统创建</field>
-		</record>
+		</record-->
 
         <!--收发类别-->
         <!-- 销售发货 借方科目：主营业务成本>
