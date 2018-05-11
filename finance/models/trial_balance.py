@@ -894,12 +894,13 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                     local_currcy_period)
                 if not local_currcy_period:  # 无下一期间，退出循环。
                     break_flag = False
-                # 无发生额不显示
-                if self.no_occurred and len(occurrence_amount) == 0:
-                    continue
+                # # 无发生额不显示
+                # if self.no_occurred and len(occurrence_amount) == 0:
+                #     continue
                 # 无余额不显示
-                if self.no_balance and cumulative_year_occurrence[0].get('credit') == 0 \
-                        and cumulative_year_occurrence[0].get('debit') == 0:
+                if cumulative_year_occurrence[0].get('credit') == 0 \
+                        and cumulative_year_occurrence[0].get('debit') == 0 \
+                        and cumulative_year_occurrence[0].get('balance') == 0 :
                     continue
                 for vals in create_vals:  # create_vals 值顺序为：期初余额  本期明细  本期本年累计
                     vouchers_summary_ids.append(
