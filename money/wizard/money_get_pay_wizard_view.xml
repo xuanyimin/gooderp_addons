@@ -35,7 +35,7 @@
 
 		<!-- 资金收支报表向导 menu -->
         <menuitem id="menu_money_get_pay" name="资金收支报表"
-                  action="money_get_pay_wizard_action" parent="menu_money_report" sequence="5"/>
+                  action="money_get_pay_wizard_action" parent="menu_money_report" sequence="5" groups='base.group_no_one'/>
 	</data>
 </openerp>
 	

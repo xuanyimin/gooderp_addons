@@ -48,7 +48,7 @@ class CashFlowWizard(models.TransientModel):
                                                                                  ('date', '<=', date_end)])])
         if tem.line_type == 'category':
             # 其他收支单金额合计
-            ret = sum([line.amount for line in self.env['other.money.order.line'].search([('category_id', 'in', [c.id for c in tem.category_ids]),
+            ret = sum([line.cny_amount for line in self.env['other.money.order.line'].search([('category_id', 'in', [c.id for c in tem.category_ids]),
                                                                                           ('other_money_id.state', '=', 'done'),
                                                                                           ('other_money_id.date', '>=', date_start),
                                                                                           ('other_money_id.date', '<=', date_end)])])
@@ -126,7 +126,7 @@ class CashFlowWizard(models.TransientModel):
                                                                                  ('date', '<=', date_end)])])
         if tem.line_type == 'category':
             # 其他收支单金额合计
-            ret = sum([line.amount for line in self.env['other.money.order.line'].search([('category_id', 'in', [c.id for c in tem.category_ids]),
+            ret = sum([line.cny_amount for line in self.env['other.money.order.line'].search([('category_id', 'in', [c.id for c in tem.category_ids]),
                                                                                           ('other_money_id.state', '=', 'done'),
                                                                                           ('other_money_id.date', '>=', date_start),
                                                                                           ('other_money_id.date', '<=', date_end)])])

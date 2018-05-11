@@ -1023,12 +1023,14 @@ class CreateDepreciationWizard(models.TransientModel):
 
     @api.model
     def _get_last_date(self):
-        ''' 取本月的最后一天作为默认折旧日  '''
-        return \
-            self.env['finance.period'].get_period_month_date_range(self.env['finance.period'].get_date_now_period_id())[
-                1]
+        period_obj = self.env['finance.period']
+        period_now = period_obj.get_date_now_period_id()
+        if period_now:
+            return period_obj.get_period_month_date_range(period_now)[1]
+        else:
+            return fields.Date.context_today(self)
 
-    date = fields.Date(u'记账日期', required=True, default=_get_last_date)
+    date = fields.Date(u'记账日期', required=True)
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
@@ -1139,11 +1141,15 @@ class CreateDepreciationWizard(models.TransientModel):
 
         # 没有凭证行则报错
         if not vouch_obj.line_ids:
-            raise UserError(u'本期没有需要折旧的固定资产。')
+            if not self._context.get('no_error'):
+                raise UserError(u'本期没有需要折旧的固定资产。')
         for asset_line_id in asset_line_id_list:
             asset_line = self.env['asset.line'].search([('id','=',asset_line_id)], limit=1)
             asset_line.write({'voucher_number': vouch_obj.id})
-        vouch_obj.voucher_done()
+        if vouch_obj.line_ids:
+            vouch_obj.voucher_done()
+        else:
+            vouch_obj.unlink()
 
         # 界面转到本月折旧明细
         view = self.env.ref('asset.asset_line_tree')

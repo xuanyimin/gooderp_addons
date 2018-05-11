@@ -36,14 +36,15 @@ class OtherMoneyOrderLine(models.Model):
     _inherit ='other.money.order.line'
     _description = u'日记账明细'
 
-    cash_flow_template_id = fields.Many2one(
-        'cash.flow.template', string=u'现金流量表项目')
+    cash_flow_template = fields.Char(string=u'现金流量表项目',compute='_compute_cash_flow_name',)
 
-    @api.onchange('category_id')
-    def onchange_category_id(self):
+
+    @api.depends('category_id')
+    def _compute_cash_flow_name(self):
         '''当类别发生变化时，带出现金流量表项'''
-        if self.category_id:
-            self.cash_flow_template_id = self.category_id.cash_flow_template_id
+        for order in self:
+            if order.category_id:
+                order.cash_flow_template = order.category_id.cash_flow_template_id.name
 
 class OtherMoneyOrder(models.Model):
     _inherit = 'other.money.order'

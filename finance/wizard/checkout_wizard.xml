@@ -9,12 +9,12 @@
                 	<group>
 	                	<group>
 	                		<field name='date'/>
-                            <field name='period_id' invisible='True' style="width: 30%%"/>
+                            <field name='period_id' invisible='True' style="width: 30%%" />
 	                	</group>
                         <footer>
-                            <button name="button_checkout" type="object" string="结账" class="oe_highlight"/>
+                            <button name="button_checkout" type="object" string="结账" class="oe_highlight" />
                             _
-                            <button name="button_counter_checkout" type="object" string="反结账" 
+                            <button name="button_counter_checkout" type="object" string="反结账"
                                                        groups="base.group_no_one" class="oe_highlight"/>
                         </footer>
                 	</group>

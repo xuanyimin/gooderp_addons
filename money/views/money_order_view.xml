@@ -9,9 +9,9 @@
         <menuitem id='bank_account_menu' name='账户' action='core.bank_account_action'
         	parent='menu_money_setting' sequence='1'/>
         <menuitem id='service_menu' name='收支项' action='core.service_action'
-        	parent='menu_money_setting' groups='core.service_groups' sequence='2'/>
+        	parent='menu_money_setting' groups='base.group_no_one' sequence='2' />
         <menuitem id='settle_mode_menu' name='结算方式' action='core.settle_mode_action'
-        	parent='menu_money_setting' groups='core.settle_mode_groups' sequence='3'/>
+        	parent='menu_money_setting' groups='base.group_no_one' sequence='3'/>
 
         <menuitem id='customer_menu' action='core.customer_action' name="客户"  groups="base.group_no_one"
             parent='menu_money_setting' sequence='4'/>
