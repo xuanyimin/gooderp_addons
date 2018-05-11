@@ -226,6 +226,8 @@ class CreateExchangeWizard(models.TransientModel):
         self.create_exchang_line(vals,date)
 
         if not vouch_obj.line_ids:
+            if not self._context.get('no_error'):
+                raise UserError(u'本期没有需要调汇的内容。')
             vouch_obj.unlink()
         else:
             vouch_obj.voucher_done()
