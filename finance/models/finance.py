@@ -209,7 +209,7 @@ class VoucherLine(models.Model):
     '''凭证明细'''
     _name = 'voucher.line'
     _description = u'会计凭证明细'
-    _order = 'debit, credit desc'
+    _order = 'debit desc'
 
     @api.model
     def _default_get(self, data):

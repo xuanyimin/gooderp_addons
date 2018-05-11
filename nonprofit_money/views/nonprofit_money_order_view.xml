@@ -51,19 +51,20 @@
                     </group>
                     <field name="line_ids" context="{'order_type': type}">
                     	<tree string="`明细" editable="bottom">
-                    		<field name="cash_flow_template_id" domain="[('type', '=', parent.type)]" readonly="1"/>
+                    		<field name="cash_flow_template" />
 							<field name="category_id" required="1" domain="[('type', '=', parent.type),('cash_flow_template_id','!=',False)]"  options="{'no_open': True, 'no_create': True}"/>
                     		<field name="auxiliary_id"/>
                             <field name="amount" sum="合计"/>
+                            <field name="tax_amount" sum="合计"/>
                             <field name="note"/>
                        </tree>
                         <form string="非营利收支日记账">
                             <group>
-                                <field name="cash_flow_template_id" domain="[('type', '=', parent.type)]" readonly="1"/>
+                                <field name="cash_flow_template" />
                                 <field name="category_id" required="1" domain="[('type', '=', parent.type),('cash_flow_template_id','!=',False)]"  />
                                 <field name="auxiliary_id"/>
                                 <field name="amount" sum="合计"/>
-                                <field name="tax_amount" invisible="1" sum="合计"/>
+                                <field name="tax_amount" sum="合计"/>
                                 <field name="note"/>
                             </group>
                         </form>

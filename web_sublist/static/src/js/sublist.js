@@ -67,9 +67,12 @@ odoo.define('web.sublist', function(require) {
                     self.records.each(function(record) {
                         _.each(_.keys(containers), function(key) {
                             containers[key]['ids'] = containers[key]['ids'].concat(record.get(key));
+                            // xuan todo
                             // console.log(1);
                             // console.log(containers[key]['ids']);
-                            function sortn(a,b){return a-b;}
+                            // function sortn(a,b){
+                            //
+                            //     return a-b}
 
                             // for (var i=0; i<containers[key]['ids'].length; i++) {
                             //     if (containers[key]['ids'][i] > containers[key]['ids'][i+1]) {
@@ -78,7 +81,7 @@ odoo.define('web.sublist', function(require) {
                             //         containers[key]['ids'][i]=containers[key]['ids'][i]^containers[key]['ids'][i+1];
                             //     }
                             // }
-                            console.log(containers[key]['ids'].sort(sortn));
+                            console.log(containers[key]['ids']);
                         });
                     });
 

@@ -130,6 +130,7 @@ class OtherMoneyOrder(models.Model):
                                compute='_compute_rate_silent',
                                ondelete='restrict', store=True)
 
+
     @api.onchange('date')
     def onchange_date(self):
         if self._context.get('type') == 'other_get':
@@ -206,6 +207,7 @@ class OtherMoneyOrder(models.Model):
                 vouch_obj_line.unlink()
         else:
             voucher.unlink()
+
         return True
 
     @api.multi
@@ -245,6 +247,7 @@ class OtherMoneyOrder(models.Model):
         :return:
         """
         vals = {}
+        total_amount = total_currency_amount =0
         for line in self.line_ids:
             if not line.category_id.account_id:
                 raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
@@ -258,16 +261,23 @@ class OtherMoneyOrder(models.Model):
                          'init_obj': init_obj,
                          })
             if self.bank_id.currency_id.id:
+                amount = (line.amount + line.tax_amount) * rate_silent
+                currency_amount = line.amount + line.tax_amount
                 vals.update({
-                         'amount': (line.amount + line.tax_amount) * rate_silent,
+                         'amount': amount,
                          'currency_id': self.bank_id.currency_id.id,
-                         'currency_amount': abs(line.amount + line.tax_amount),
+                         'currency_amount': currency_amount,
                          'rate_silent': rate_silent,
+                         'total_amount':total_amount,
+                         'total_currency_amount':total_currency_amount,
                          })
             else:
+                amount = (line.amount + line.tax_amount)
+                total_amount += amount
                 vals.update({
-                    'amount': abs(line.amount + line.tax_amount),
+                    'amount': amount,
                 })
+            line.write({'cny_amount': vals.get('amount')})
             # 贷方行
             if not init_obj:
                 self.env['voucher.line'].create({
@@ -290,6 +300,7 @@ class OtherMoneyOrder(models.Model):
                     'voucher_id': vals.get('vouch_obj_id'),
                 })
         # 借方行
+        print vals
         self.env['voucher.line'].create({
             'name': u"%s" % (vals.get('name')),
             'account_id': vals.get('debit_account_id'),
@@ -342,6 +353,7 @@ class OtherMoneyOrder(models.Model):
                 'auxiliary_id': vals.get('debit_auxiliary_id', False),
                 'init_obj': vals.get('init_obj', False),
             })
+            line.write({'cny_amount': vals.get('amount')})
             # 进项税行
             if vals.get('buy_tax_amount'):
                 if not self.env.user.company_id.import_tax_account:
@@ -411,3 +423,6 @@ class OtherMoneyOrderLine(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+
+    cny_amount = fields.Float(u'人民币金额', digits=dp.get_precision('Amount'))
+
