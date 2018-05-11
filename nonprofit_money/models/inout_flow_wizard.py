@@ -168,7 +168,7 @@ class InoutFlowWizard(models.TransientModel):
                 rep_ids.append(new_rep.id)
         view_id = self.env.ref('nonprofit_money.inout_flow_statement_tree').id
         days = calendar.monthrange(int(self.period_id.year), int(self.period_id.month))[1]
-        attachment_information = u'场所名称：' + self.env.user.company_id.name + u',' + self.period_id.year\
+        attachment_information = u'场所名称：' + self.env.user.company_id.name + u',,' + self.period_id.year\
                                  + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
 
         report_time_slot= report_month = "%s" % (self.period_id.name)
