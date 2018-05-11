@@ -99,11 +99,11 @@ class TrialBalance(models.Model):
             diff_ending_balance = res.get('total_ending_balance_debit', 0) - res.get('total_ending_balance_credit', 0)
 
             if diff_year_init != 0:
-                raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_year_init))
+                raise UserError(u'期间：%s 年初借贷不平\n\n差异金额：%s' % (period_id.name, diff_year_init))
             elif diff_cumulative_occurrence != 0:
-                raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_cumulative_occurrence))
+                raise UserError(u'期间：%s 年累计借贷不平\n\n差异金额：%s' % (period_id.name, diff_cumulative_occurrence))
             elif diff_ending_balance != 0:
-                raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_ending_balance))
+                raise UserError(u'期间：%s 年末借贷不平\n\n差异金额：%s' % (period_id.name, diff_ending_balance))
 
         else:
             diff_initial_balance = res.get('total_initial_balance_debit', 0) - res.get('total_initial_balance_credit', 0)
@@ -112,11 +112,11 @@ class TrialBalance(models.Model):
             diff_ending_balance = res.get('total_ending_balance_debit', 0) - res.get('total_ending_balance_credit', 0)
 
             if diff_initial_balance != 0:
-                raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_initial_balance))
+                raise UserError(u'期间：%s 期初借贷不平\n\n差异金额：%s' % (period_id.name, diff_initial_balance))
             elif diff_current_occurrence != 0:
-                raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_current_occurrence))
+                raise UserError(u'期间：%s 本期借贷不平\n\n差异金额：%s' % (period_id.name, diff_current_occurrence))
             elif diff_ending_balance != 0:
-                raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_ending_balance))
+                raise UserError(u'期间：%s 年末借贷不平\n\n差异金额：%s' % (period_id.name, diff_ending_balance))
 
         return True
 
