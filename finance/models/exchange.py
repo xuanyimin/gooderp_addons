@@ -188,7 +188,7 @@ class CreateExchangeWizard(models.TransientModel):
                 'currency_amount': False,
                 'rate_silent': False,
             })
-        elif round(exp,2) <0 :
+        elif round(exp,2) > 0 :
             self.env['voucher.line'].create({
                 'name': u"汇兑损益",
                 'account_id': account_id.id,
