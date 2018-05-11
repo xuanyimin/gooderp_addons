@@ -139,7 +139,7 @@ class CheckTrialBalanceWizard(models.TransientModel):
         is_init_period = False
         if period_id == period_id.get_init_period():
             is_init_period = True
-        trial_balance_items = self.env['trial.balance'].search([('period_id', '=', period_id.id), ('level', '=', 1)])
+        trial_balance_items = self.env['trial.balance'].search([('period_id', '=', period_id.id), ('account_type', '=', 'normal')])
 
         field_list = [
             "total_year_init_debit", "total_year_init_credit", "total_initial_balance_debit",
@@ -757,10 +757,10 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         sql = ''' select vo.date as date, vo.id as voucher_id,COALESCE(vol.debit,0) as debit,vol.name
                   as summary,COALESCE(vol.credit,0) as credit
                   from voucher as vo left join voucher_line as vol
-                  on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id in %s
+                  on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id = %s
                   order by vo.name
                  '''
-        self.env.cr.execute(sql, (period.id, account_ids))
+        self.env.cr.execute(sql, (period.id, subject_name.id))
         sql_results = self.env.cr.dictfetchall()
         last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(
             period)
@@ -799,8 +799,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         current_credit = 0
         current_debit = 0
         if sql_results:
-            current_credit = sql_results[0].get('credit', 0)
-            current_debit = sql_results[0].get('debit', 0)
+            current_credit = sum(row.get('credit', 0) for row in sql_results)
+            current_debit = sum(row.get('debit', 0) for row in sql_results)
         # 本年累计
         # 查找累计区间,作本年累计
         year_balance_debit = year_balance_credit = 0
@@ -815,9 +815,9 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             sql_results = self.env.cr.dictfetchall()
             if sql_results:
                 year_balance_debit = year_balance_debit + \
-                    sql_results[0].get('debit', 0)
+                    sum(row.get('debit', 0) for row in sql_results)
                 year_balance_credit = year_balance_credit + \
-                    sql_results[0].get('credit', 0)
+                    sum(row.get('credit', 0) for row in sql_results)
         direction_tuple_current = self.judgment_lending(initial_balance_new.get('balance', 0) if
                                                         initial_balance_new['direction'] == u'借' else -initial_balance_new.get(
             'balance', 0), current_credit, current_debit)
@@ -894,12 +894,13 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                     local_currcy_period)
                 if not local_currcy_period:  # 无下一期间，退出循环。
                     break_flag = False
-                # 无发生额不显示
-                if self.no_occurred and len(occurrence_amount) == 0:
-                    continue
+                # # 无发生额不显示
+                # if self.no_occurred and len(occurrence_amount) == 0:
+                #     continue
                 # 无余额不显示
-                if self.no_balance and cumulative_year_occurrence[0].get('credit') == 0 \
-                        and cumulative_year_occurrence[0].get('debit') == 0:
+                if cumulative_year_occurrence[0].get('credit') == 0 \
+                        and cumulative_year_occurrence[0].get('debit') == 0 \
+                        and cumulative_year_occurrence[0].get('balance') == 0 :
                     continue
                 for vals in create_vals:  # create_vals 值顺序为：期初余额  本期明细  本期本年累计
                     vouchers_summary_ids.append(

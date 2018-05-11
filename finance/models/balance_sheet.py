@@ -150,9 +150,9 @@ class CreateBalanceSheetWizard(models.TransientModel):
         company_row = self.env['res.company'].browse(force_company)
         days = calendar.monthrange(
             int(self.period_id.year), int(self.period_id.month))[1]
-        attachment_information = u'编制单位：' + company_row.name + u',,,,' + self.period_id.year \
+        attachment_information = u'编制单位：' + company_row.name + u',' + self.period_id.year \
                                  + u'年' + self.period_id.month + u'月' + \
-                                 str(days) + u'日' + u',,,' + u'单位：元'
+                                 str(days) + u'日' + u',' + u'单位：元'
 
         report_month = "%s" % (self.period_id.name)
         report_time_slot = "%s%s" % (self.period_id.name, str(days))
@@ -537,7 +537,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year \
                                  + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
 
-        report_time_slot = report_month = "%s"%(self.name)
+        report_time_slot = report_month = "%s"%(self.period_id.name)
 
         # 第一行 为字段名
         #  从第二行开始 为数据
@@ -621,7 +621,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         operation_row[len(operation_row) - 2] = u'操作时间'
         operation_row[len(operation_row) - 1] = fields.Date.context_today(self)
 
-        excel_data_rows.append(operation_row)
+        # excel_data_rows.append(operation_row)
 
         return xml_data_dict, excel_title_row, excel_data_rows
 
@@ -797,6 +797,14 @@ class CreateBusinessActivityStatementtWizard(models.TransientModel):
 
     @api.onchange('quater')
     def _onchange_quater(self):
+
+        def _too_early(period_ids):
+            lastest_month = max(period_ids.mapped('month'))
+            lastest_year = max(period_ids.mapped('year'))
+            if "%s%s"%(lastest_year,lastest_month) >= time.strftime("%Y%m", time.localtime(time.time())):
+                return False
+            return False
+
         if self.quater == '1':
             period_ids = self.env['finance.period'].search(
                 [('year', '=', self.year), ('month', 'in', ['1', '2', '3'])]
@@ -806,9 +814,7 @@ class CreateBusinessActivityStatementtWizard(models.TransientModel):
                 self.quater = False
                 return {'warning': {'title': '错误', 'message': u"%s没启用！" % self.quater_name}}
             else:
-                lastest_month = max(period_ids.mapped('month'))
-                lastest_year = max(period_ids.mapped('year'))
-                if "%s%s"%(lastest_year,lastest_month) >= time.strftime("%Y%m", time.localtime(time.time())):
+                if _too_early(period_ids):
                     self.quater = False
                     return {'warning': {'title': '错误', 'message': u"%s没结束！" % self.quater_name}}
 
@@ -823,9 +829,7 @@ class CreateBusinessActivityStatementtWizard(models.TransientModel):
                 self.quater = False
                 return {'warning': {'title': '错误', 'message': u"%s没启用！" % self.quater_name}}
             else:
-                lastest_month = max(period_ids.mapped('month'))
-                lastest_year = max(period_ids.mapped('year'))
-                if "%s%s"%(lastest_year,lastest_month) >= time.strftime("%Y%m", time.localtime(time.time())):
+                if _too_early(period_ids):
                     self.quater = False
                     return {'warning': {'title': '错误', 'message': u"%s没结束！" % self.quater_name}}
 
@@ -840,9 +844,7 @@ class CreateBusinessActivityStatementtWizard(models.TransientModel):
                 self.quater = False
                 return {'warning': {'title': '错误', 'message': u"%s没启用！" % self.quater_name}}
             else:
-                lastest_month = max(period_ids.mapped('month'))
-                lastest_year = max(period_ids.mapped('year'))
-                if "%s%s"%(lastest_year,lastest_month) >= time.strftime("%Y%m", time.localtime(time.time())):
+                if _too_early(period_ids):
                     self.quater = False
                     return {'warning': {'title': '错误', 'message': u"%s没结束！" % self.quater_name}}
 
@@ -857,9 +859,7 @@ class CreateBusinessActivityStatementtWizard(models.TransientModel):
                 self.quater = False
                 return {'warning': {'title': '错误', 'message': u"%s没启用！" % self.quater_name}}
             else:
-                lastest_month = max(period_ids.mapped('month'))
-                lastest_year = max(period_ids.mapped('year'))
-                if "%s%s"%(lastest_year,lastest_month) >= time.strftime("%Y%m", time.localtime(time.time())):
+                if _too_early(period_ids):
                     self.quater = False
                     return {'warning': {'title': '错误', 'message': u"%s没结束！" % self.quater_name}}
 

@@ -207,8 +207,8 @@
                             <field name="subject_name_end_id" options="{'no_open':True,'no_create':True}" required="True"/>
                          </group>
                         <group>
-                            <field name="no_occurred" invisible="context.get('create_general_ledger_account')" />
-                            <field name="no_balance"/>
+                            <!-- <field name="no_occurred" invisible="context.get('create_general_ledger_account')" /> -->
+                            <field name="no_balance" invisible="not context.get('create_general_ledger_account')" />
                         </group>
                     </group>
                     <footer>

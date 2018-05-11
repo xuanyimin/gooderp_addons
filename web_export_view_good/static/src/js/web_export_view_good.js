@@ -118,15 +118,15 @@ function button_export_action () {
     new Model('report.template').call('get_time', [this.model], {
                 context: this.dataset.context
             }).done(function (data) {
-                var now_day = data[0];
-                var operation_message = new Array(export_columns_names.length);
+                // var now_day = data[0];
+                // var operation_message = new Array(export_columns_names.length);
                 var header = new Array(export_columns_names.length);
-                for (var i = 0; i < operation_message.length; i++) { operation_message[i] = " "; }
-                operation_message[0] = "操作人";
-                operation_message[1] = view.getParent().session.username;
-                operation_message[operation_message.length - 2] = "操作时间";
-                operation_message[operation_message.length - 1] = now_day.trim();
-                export_rows.push(operation_message);
+                // for (var i = 0; i < operation_message.length; i++) { operation_message[i] = " "; }
+                // operation_message[0] = "操作人";
+                // operation_message[1] = view.getParent().session.username;
+                // operation_message[operation_message.length - 2] = "操作时间";
+                // operation_message[operation_message.length - 1] = now_day.trim();
+                // export_rows.push(operation_message);
                 for(var i=0;i<data[3];i++){
                     export_rows.splice(i, 0, []);
                 }
