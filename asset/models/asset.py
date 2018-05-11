@@ -1093,10 +1093,8 @@ class CreateDepreciationWizard(models.TransientModel):
                                                ('period_id', '!=', self.period_id.id)]):  # 从入账下月开始
             # 本期折旧过，但折旧凭证被删除了
             for line in Asset.line_ids:
-                print '1',self.period_id,line.period_id,line.voucher_number
                 if self.period_id == line.period_id and line.voucher_number :
                     generate_voucher_id = self.env['voucher'].search([('id','=',line.voucher_number)])
-                    print '99999',generate_voucher_id
                     if not generate_voucher_id:
                         line.unlink()
             # 本期间没有折旧过，本期间晚于固定资产入账期间
