@@ -639,7 +639,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
             'balance.sheet': 'liabilities',
             'business.activity.statement': 'business',
             'profit.statement': 'profit',
-            'cash.flow.statement': 'cashFlow'
+            'cash.flow.statement': 'cashFlow',
+            'inout.flow.statement': 'inoutFlow'
         }
 
         folder_name = folder_name_mapping.get(model)

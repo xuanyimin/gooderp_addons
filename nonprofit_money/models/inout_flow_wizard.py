@@ -182,8 +182,8 @@ class InoutFlowWizard(models.TransientModel):
             "database": self.pool._db.dbname,
             "company": self.env.user.company_id.name,
             "date":  self.period_id.year + u'年' + self.period_id.month + u'月' ,
-            "report_name": u"现金流量表",
-            "report_code": u"会民非03表",
+            "report_name": u"收支情况表",
+            "report_code": u"",
             "rows": self.env['inout.flow.statement'].search_count(domain),
             "cols": len(field_list),
             "report_item": []
