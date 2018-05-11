@@ -150,9 +150,9 @@ class CreateBalanceSheetWizard(models.TransientModel):
         company_row = self.env['res.company'].browse(force_company)
         days = calendar.monthrange(
             int(self.period_id.year), int(self.period_id.month))[1]
-        attachment_information = u'编制单位：' + company_row.name + u',' + self.period_id.year \
+        attachment_information = u'编制单位：' + company_row.name + u',,,' + self.period_id.year \
                                  + u'年' + self.period_id.month + u'月' + \
-                                 str(days) + u'日' + u',' + u'单位：元'
+                                 str(days) + u'日' + u',,,' + u'单位：元'
 
         report_month = "%s" % (self.period_id.name)
         report_time_slot = "%s%s" % (self.period_id.name, str(days))
