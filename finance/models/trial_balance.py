@@ -81,7 +81,7 @@ class TrialBalance(models.Model):
     @api.model
     def check_trial_balance(self, period_id):
         res = {}
-        trial_balance_items = self.env['trial.balance'].search([('period_id', '=', period_id.id), ('level', '=', 1)])
+        trial_balance_items = self.env['trial.balance'].search([('period_id', '=', period_id.id), ('account_type', '=', 'normal')])
 
         field_list = [
             "total_year_init_debit", "total_year_init_credit", "total_initial_balance_debit",
@@ -806,7 +806,11 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         year_balance_debit = year_balance_credit = 0
         compute_periods = self.env['finance.period'].search([('year', '=', str(period.year)),
                                                              ('month', '<=', str(period.month))])
+        init_period_id =False
         for line_period in compute_periods:
+            if line_period == line_period.get_init_period():
+                init_period_id = line_period
+
             sql = ''' select  sum(COALESCE(vol.debit,0)) as debit,sum(COALESCE(vol.credit,0)) as credit
              from voucher as vo left join voucher_line as vol
                 on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id in %s
@@ -818,6 +822,12 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                     sum(row.get('debit', 0) for row in sql_results)
                 year_balance_credit = year_balance_credit + \
                     sum(row.get('credit', 0) for row in sql_results)
+
+        if init_period_id:
+            trial_balance_init_period = self.env['trial.balance'].search([('subject_name_id','=', subject_name.id),('period_id','=',init_period_id.id)])
+            year_balance_debit -= sum(trial_balance_init_period.mapped('year_init_debit'))
+            year_balance_credit -= sum(trial_balance_init_period.mapped('year_init_credit'))
+
         direction_tuple_current = self.judgment_lending(initial_balance_new.get('balance', 0) if
                                                         initial_balance_new['direction'] == u'借' else -initial_balance_new.get(
             'balance', 0), current_credit, current_debit)
