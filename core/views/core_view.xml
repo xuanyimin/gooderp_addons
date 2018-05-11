@@ -26,8 +26,7 @@
 				<form string="类别">
 					<group>
 						<group>
-							<field name="name"/>
-							<field name="type"/>
+							<field name="name" readonly="1"/>
 						</group>
 						<group>
 							<field name="note"/>

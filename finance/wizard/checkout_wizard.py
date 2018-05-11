@@ -37,8 +37,8 @@ class CheckoutWizard(models.TransientModel):
         #固定资产折旧
         asset_wizard = self.env['create.depreciation.wizard'].with_context({'no_error': True}).create({'date': self.date})
         asset_wizard.create_depreciation()
-        # 固定资产折旧
-        exchange_wizard = self.env['create.exchange.wizard'].create({'date': self.date})
+        # 月末结汇
+        exchange_wizard = self.env['create.exchange.wizard'].with_context({'no_error': True}).create({'date': self.date})
         exchange_wizard.create_exchange()
         ''' 月末结账：结账 按钮 '''
         for balance in self:

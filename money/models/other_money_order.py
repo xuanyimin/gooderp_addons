@@ -99,7 +99,7 @@ class OtherMoneyOrder(models.Model):
                                   'draft': [('readonly', False)]},
                               help=u'本次其他收支的结算账户')
     line_ids = fields.One2many('other.money.order.line', 'other_money_id',
-                               string=u'收支单行', readonly=True,
+                               string=u'日记帐行', readonly=True,
                                copy=True,
                                states={'draft': [('readonly', False)]},
                                help=u'日记账明细行')

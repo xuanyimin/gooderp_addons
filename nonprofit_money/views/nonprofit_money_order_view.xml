@@ -28,7 +28,6 @@
                 <header>
 					<button name="other_money_done" states="draft" string="审核" type="object" class="oe_highlight"/>
 					<button name="other_money_draft" states="done" string="反审核" type="object"/>
-                    <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
