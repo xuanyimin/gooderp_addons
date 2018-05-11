@@ -621,7 +621,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         operation_row[len(operation_row) - 2] = u'操作时间'
         operation_row[len(operation_row) - 1] = fields.Date.context_today(self)
 
-        excel_data_rows.append(operation_row)
+        # excel_data_rows.append(operation_row)
 
         return xml_data_dict, excel_title_row, excel_data_rows
 
