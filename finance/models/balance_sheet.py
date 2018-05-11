@@ -320,7 +320,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
                             voucher_credit += voucher_line.credit
                         if voucher_credit != update:
                             update += voucher_credit
-                    update +=  sum(begin_balances.mapped('cumulative_occurrence_debit'))
+                        update +=  sum(begin_balances.mapped('cumulative_occurrence_debit'))
                     subject_vals_in.append(update)
                 elif trial_balance.subject_name_id.balance_directions == 'out':
                     update = trial_balance[compute_field_list[1]]-trial_balance[compute_field_list[0]]
@@ -337,7 +337,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
                             voucher_debit += voucher_line.debit
                         if voucher_debit != update:
                             update += voucher_debit
-                    update += sum(begin_balances.mapped('cumulative_occurrence_debit'))
+                        update += sum(begin_balances.mapped('cumulative_occurrence_debit'))
                     subject_vals_out.append(update)
                 if sign_out and sign_in:  # 方向有借且有贷
                     total_sum = sum(subject_vals_out) - sum(subject_vals_in)
