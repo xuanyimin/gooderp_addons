@@ -15,6 +15,7 @@
 			<field name='category_id' ref="Gooderp_ccb"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 			<field name="menu_access" eval="[(4, ref('finance.finance_menu'))]"/>
+			<field name="implied_ids" eval="[(4, ref('finance.group_multi_currency'))]"/>
 			<field name="comment">用于显示会计菜单</field>
 		</record>
 		<record id="ccb_money" model="res.groups">
