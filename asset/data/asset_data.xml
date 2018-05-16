@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
-    <data noupdate="0">
+    <data noupdate="1">
         <!--增加类别-->
         <record id="asset" model='core.category'>
             <field name='name'>固定资产</field>
