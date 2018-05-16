@@ -828,6 +828,9 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             year_balance_debit -= sum(trial_balance_init_period.mapped('year_init_debit'))
             year_balance_credit -= sum(trial_balance_init_period.mapped('year_init_credit'))
 
+            year_balance_debit += sum(trial_balance_init_period.mapped('cumulative_occurrence_debit'))
+            year_balance_credit += sum(trial_balance_init_period.mapped('cumulative_occurrence_credit'))
+
         direction_tuple_current = self.judgment_lending(initial_balance_new.get('balance', 0) if
                                                         initial_balance_new['direction'] == u'借' else -initial_balance_new.get(
             'balance', 0), current_credit, current_debit)
