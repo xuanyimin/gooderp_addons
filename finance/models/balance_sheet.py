@@ -300,8 +300,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
             no, end_date = self.env['finance.period'].get_period_month_date_range(period_id)
             begint_date, no = self.env['finance.period'].get_period_month_date_range(
                 self.env['finance.period'].get_year_fist_period_id())
-            begin_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [
-                subject.id for subject in subject_ids]), ('period_id', '=', self.env['finance.period'].get_year_fist_period_id().id)])
+            begin_balances = self.env['trial.balance'].search([('subject_name_id', 'in', subject_ids.ids),('account_type', '=', 'normal'), ('period_id', '=', self.env['finance.period'].get_year_fist_period_id().id)])
             for trial_balance in trial_balances:
                 if trial_balance.subject_name_id.balance_directions == 'in':
                     update = trial_balance[compute_field_list[0]]-trial_balance[compute_field_list[1]]
@@ -320,7 +319,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
                             voucher_credit += voucher_line.credit
                         if voucher_credit != update:
                             update += voucher_credit
-                        update +=  sum(begin_balances.mapped('cumulative_occurrence_debit'))
+                        # update +=  sum(begin_balances.mapped('cumulative_occurrence_debit'))
                     subject_vals_in.append(update)
                 elif trial_balance.subject_name_id.balance_directions == 'out':
                     update = trial_balance[compute_field_list[1]]-trial_balance[compute_field_list[0]]
@@ -337,15 +336,20 @@ class CreateBalanceSheetWizard(models.TransientModel):
                             voucher_debit += voucher_line.debit
                         if voucher_debit != update:
                             update += voucher_debit
-                        update += sum(begin_balances.mapped('cumulative_occurrence_debit'))
+                        # update += sum(begin_balances.mapped('cumulative_occurrence_debit'))
                     subject_vals_out.append(update)
-                if sign_out and sign_in:  # 方向有借且有贷
-                    total_sum = sum(subject_vals_out) - sum(subject_vals_in)
+
+            if sign_out and sign_in:  # 方向有借且有贷
+                total_sum = sum(subject_vals_out) - sum(subject_vals_in)
+            else:
+                if subject_vals_in:
+                    total_sum = sum(subject_vals_in)
                 else:
-                    if subject_vals_in:
-                        total_sum = sum(subject_vals_in)
-                    else:
-                        total_sum = sum(subject_vals_out)
+                    total_sum = sum(subject_vals_out)
+
+                if 'current' not in compute_field_list[1]:
+                    total_sum += sum(begin_balances.mapped('cumulative_occurrence_debit'))
+                    
             return total_sum
 
     @api.multi
