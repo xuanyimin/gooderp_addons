@@ -307,7 +307,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
                     if 'current' in compute_field_list[0]:
                         checkout_id = self.env['voucher'].search([('is_checkout', '=', True),('period_id', '=', period_id.id)], limit=1)
                         voucher_line = self.env['voucher.line'].search([('voucher_id', '=', checkout_id.id),('account_id','=',trial_balance.subject_name_id.id)])
-                        if voucher_line and voucher_line.debit != update:
+                        if voucher_line and voucher_line.credit != update:
                             update = voucher_line.credit
                     else:
                         checkout_ids = self.env['voucher'].search(
