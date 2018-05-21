@@ -276,7 +276,7 @@ class Asset(models.Model):
             'tax_amount': self.tax,
             'category_id': category and category.id
         })
-        other_money_order_line.onchange_category_id()
+        #other_money_order_line.onchange_category_id()
         other_money_order.other_money_done()
         return other_money_order
 
@@ -415,7 +415,7 @@ class CreateCleanWizard(models.TransientModel):
             'tax_amount': self.sell_tax_amount,
             'category_id': get_category and get_category.id
         })
-        other_money_order_line.onchange_category_id()
+        #other_money_order_line.onchange_category_id()
         other_money_order.other_money_done()
         # 增加变更行，以后需要可以跟据此行做反向处理
         self.env['chang.line'].create({'date': self.date,
@@ -445,7 +445,7 @@ class CreateCleanWizard(models.TransientModel):
             'amount': self.clean_cost,
             'category_id': pay_category and pay_category.id
         })
-        other_money_order_line.onchange_category_id()
+        #other_money_order_line.onchange_category_id()
         other_money_order.other_money_done()
         self.env['chang.line'].create({'date': self.date,
                                        'period_id': self.period_id.id,
@@ -474,7 +474,7 @@ class CreateCleanWizard(models.TransientModel):
             'amount': self.residual_income,
             'category_id': get_category and get_category.id
         })
-        other_money_order_line.onchange_category_id()
+        # other_money_order_line.onchange_category_id()
         other_money_order.other_money_done()
         # 找到结算单对应的凭证行并修改科目
         self.env['chang.line'].create({'date': self.date,
@@ -759,7 +759,7 @@ class CreateChangWizard(models.TransientModel):
             'tax_amount': self.chang_tax,
             'category_id': category and category.id
         })
-        other_money_order_line.onchange_category_id()
+        # other_money_order_line.onchange_category_id()
         other_money_order.other_money_done()
 
         voucher_chang_account = self.env['voucher.line'].search(
@@ -934,7 +934,7 @@ class CreateAssetWizard(models.TransientModel):
             'tax_amount': Asset.tax,
             'category_id': category and category.id
         })
-        other_money_order_line.onchange_category_id()
+        # other_money_order_line.onchange_category_id()
         other_money_order.other_money_done()
 
         chang_account = self.env['voucher.line'].search(

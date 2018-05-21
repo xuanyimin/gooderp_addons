@@ -186,7 +186,7 @@
                                 <field name="date"/>
                                 <field name="tax"/>
                                 <field name="amount"/>
-                                <field name="is_init" groups='core.master_groups'/>
+                                <field name="is_init"/>
                                 <field name="depreciation_previous" attrs="{'invisible': [('is_init', '=', False)]}" />
                               </group>
                               <group>
