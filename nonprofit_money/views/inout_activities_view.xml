@@ -6,7 +6,7 @@
             <field name="model">inout.activities.template</field>
             <field name="arch" type="xml">
                 <tree string="宗教活动场所月收支情况公开表模板">
-                    <field name="sequence" invisible="1"/>
+                    <field name="sequence"/>
                     <field name="name"/>
                     <field name="line_type"/>
                 </tree>
@@ -19,8 +19,9 @@
             <field name="arch" type="xml">
                 <form string="宗教活动场所月收支情况公开表模板">
                     <group>
-                      <field name="name"/>
-                      <field name="line_type"/>
+                        <field name="sequence"/>
+                        <field name="name"/>
+                        <field name="line_type"/>
                     </group>
                     <group>
                         <field name="category_ids" attrs="{'invisible': [('line_type','!=','category')]}" widget="many2many">
