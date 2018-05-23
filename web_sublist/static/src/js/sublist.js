@@ -11,10 +11,29 @@ odoo.define('web.sublist', function(require) {
         format: function(row_data, options) {
             var values = row_data[this.id]['value'],
                 options = pyeval.py_eval(this.options || '{}'),
-                field_value = _.map(_.map(values, function(value) { return value[options.field]; }), function(value) {
+                field_value = _.map(_.map(values, function(value) { return value[options.field]; console(value[options.field])}), function(value) {
                     return _.isArray(value)? value[1]: value;
                 });
-
+                if (values){
+                    for (var i=0;i<=values.length;i++){
+                        
+                        for (var j=i+1;j<values.length;j++) {
+                          if (values[i].debit < values[j].debit){
+                            var a;
+                             a = values[i];
+                             values[i]=values[j];
+                             values[j]=a;
+                          }
+                        }
+                    }
+                    for (var i=0;i<values.length;i++){
+                        if (values[i].debit === 0) {
+                            values[i].debit = '-';
+                        } else if (values[i].credit === 0) {
+                            values[i].credit = '-';
+                        }
+                    }
+                }
             // 通过without去除掉undefined的值
             return core.qweb.render('web_sublist.sublist', {'values': _.without(field_value, undefined)}).trim() 
         }
@@ -81,7 +100,7 @@ odoo.define('web.sublist', function(require) {
                             //         containers[key]['ids'][i]=containers[key]['ids'][i]^containers[key]['ids'][i+1];
                             //     }
                             // }
-                            console.log(containers[key]['ids']);
+                            // console.log(containers[key]['ids']);
                         });
                     });
 
