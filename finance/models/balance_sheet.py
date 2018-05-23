@@ -510,8 +510,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
         balance_wizard.create_trial_balance()
         view_id = self.env.ref('finance.view_business_activity_statement_tree').id
         report_item_ids = self.env['business.activity.statement'].search([])
-        current_fields = ['cumulative_occurrence_debit', 'cumulative_occurrence_credit']
-        cumulative_fields = ['current_occurrence_debit', 'current_occurrence_credit']
+        cumulative_fields = ['cumulative_occurrence_debit', 'cumulative_occurrence_credit']
+        current_fields = ['current_occurrence_debit', 'current_occurrence_credit']
 
         for report_item in report_item_ids:
             cumulative_restricted = self.deal_with_activity_formula(report_item.formula_restricted, self.period_id,
@@ -880,8 +880,8 @@ class CreateBusinessActivityStatementtWizard(models.TransientModel):
 
         view_id = self.env.ref('finance.view_business_activity_statement_tree').id
         report_item_ids = self.env['business.activity.statement'].search([])
-        current_fields = ['cumulative_occurrence_debit', 'cumulative_occurrence_credit']
-        cumulative_fields = ['current_occurrence_debit', 'current_occurrence_credit']
+        cumulative_fields = ['cumulative_occurrence_debit', 'cumulative_occurrence_credit']
+        current_fields = ['current_occurrence_debit', 'current_occurrence_credit']
         lastest_month = max(self.period_ids.mapped('month'))
         lastest_year = max(self.period_ids.mapped('year'))
         lastest_period = self.env['finance.period'].search( [('year','=',lastest_year),('month','=',lastest_month)])
