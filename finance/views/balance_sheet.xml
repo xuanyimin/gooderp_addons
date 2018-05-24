@@ -200,21 +200,20 @@
                 <form>
                     <group>
                         <group>
-                            <label for="year" string="季度" />
-                            <div>
-                                <field name="year" required="1" class="oe_inline" />
-                                <field name="quater" required="1" class="oe_inline" />
-                            </div>
+                            <field name="year" required="1" />
+                            <field name="quater" required="1" />
+                        </group>
+                        <group>
                             <field name="period_ids" options="{'no_open':True,'no_create':True}" widget="many2many_tags" invisible="1" />
                             <field name="quater_name" invisible="1" />
                         </group>
                     </group>
                     <footer>
-                        <button name="create_activity_statement" string="业务活动表" type="object" class="oe_highlight"/> 
+                        <button name="create_activity_statement" string="业务活动表" type="object" class="oe_highlight" />
                     </footer>
                 </form>
             </field>
-        </record>
+        </record>        
         <act_window id="business_activity_statement_wizard_action"
             name='业务活动表（季报）'
             res_model="create.business.activity.statement.wizard"

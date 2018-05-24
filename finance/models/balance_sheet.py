@@ -891,10 +891,12 @@ class CreateBusinessActivityStatementtWizard(models.TransientModel):
                                                                     cumulative_fields, report_item.type, 'cumulative_restricted')
             cumulative_unrestricted = self.env['create.balance.sheet.wizard'].deal_with_activity_formula(report_item.formula_unrestricted, lastest_period,
                                                                       cumulative_fields, report_item.type, 'cumulative_unrestricted')
-            current_restricted = sum( [self.env['create.balance.sheet.wizard'].deal_with_activity_formula(report_item.formula_restricted, period_id,
-                                                                 current_fields, report_item.type, 'current_restricted')  for period_id in self.period_ids ])
-            current_unrestricted =sum( [self.env['create.balance.sheet.wizard'].deal_with_activity_formula(report_item.formula_unrestricted, period_id,
-                                                                   current_fields, report_item.type, 'current_unrestricted') for period_id in self.period_ids ])
+            current_restricted = sum([self.env['create.balance.sheet.wizard'].deal_with_activity_formula(report_item.formula_restricted, period_id, current_fields, report_item.type, 'current_restricted') for period_id in self.period_ids])
+            if report_item.type == 'lines':
+                current_restricted = self.env['create.balance.sheet.wizard'].deal_with_activity_formula(report_item.formula_restricted, lastest_period, current_fields, report_item.type, 'current_restricted')
+            current_unrestricted = sum([self.env['create.balance.sheet.wizard'].deal_with_activity_formula(report_item.formula_unrestricted, period_id, current_fields, report_item.type, 'current_unrestricted') for period_id in self.period_ids])
+            if report_item.type == 'lines':
+                current_unrestricted = self.env['create.balance.sheet.wizard'].deal_with_activity_formula(report_item.formula_unrestricted, lastest_period, current_fields, report_item.type, 'current_unrestricted')
 
             report_item.write({'cumulative_restricted': cumulative_restricted,
                                'cumulative_unrestricted': cumulative_unrestricted,
