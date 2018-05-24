@@ -187,11 +187,10 @@ class Voucher(models.Model):
     # 重载write 方法
     @api.multi
     def write(self, vals):
-        if vals.get('name'):
-            self.message_post_with_view('mail.message_origin_link',
-                    values={'self': self, 'origin': self.name, 'edit': True},
-                    subtype_id=self.env['ir.model.data'].xmlid_to_res_id('mail.mt_note'))
         for order in self:  # 还需要进一步优化
+            if vals.get('name'):
+                msg = (u"凭证号 %s ") % (order.name,)
+                order.message_post(body=msg)
             if self.env.context.get('call_module', False) == "checkout_wizard":
                 return super(Voucher, self).write(vals)
             if order.period_id.is_closed is True:
