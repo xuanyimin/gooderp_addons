@@ -101,13 +101,14 @@ class BankAccount(models.Model):
 
     @api.multi
     def write(self, vals):
-        old_account = vals.get('account_id')
-        wang = self.env['other.money.order'].search([
-            ('bank_id', '=', self.id)])
-        new_account = self.account_id.id
-        if wang and (old_account != new_account or not old_account):
-            raise UserError(u'帐户已被使用，不允许修改科目')
         res = super(BankAccount, self).write(vals)
+        old_account = vals.get('account_id')
+        new_account = self.account_id.id
+        if old_account and new_account == old_account:
+            wang = self.env['other.money.order'].search([
+                ('bank_id', '=', self.id)])
+            if wang:
+                raise UserError(u'科目不可以修改')
         return res
 
     @api.one

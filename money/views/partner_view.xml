@@ -13,7 +13,8 @@
                 </field>
                 <field name="balance" position="after">
                     <field name="currency_id"
-                    	 groups='finance.group_multi_currency' readonly="1"/>
+                    	 groups='finance.group_multi_currency' invisible="1"/>
+                    <field name="currency_id_new" readonly="1"/>
                     <button name="bank_statements" type="object" string="查看现金银行报表" icon="fa-search" class="oe_highlight" groups="base.group_no_one"/>
 				</field>
             </field>
