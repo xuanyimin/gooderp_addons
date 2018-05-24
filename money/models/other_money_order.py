@@ -300,7 +300,6 @@ class OtherMoneyOrder(models.Model):
                     'voucher_id': vals.get('vouch_obj_id'),
                 })
         # 借方行
-        print vals
         self.env['voucher.line'].create({
             'name': u"%s" % (vals.get('name')),
             'account_id': vals.get('debit_account_id'),

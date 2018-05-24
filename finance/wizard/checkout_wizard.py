@@ -324,7 +324,7 @@ class CheckoutWizard(models.TransientModel):
         # 重置后起始数字
         reset_init_number = self.env['ir.values'].get_default(
             'finance.config.settings', 'default_reset_init_number')
-        if auto_reset is True:
+        if auto_reset == 'True' or auto_reset is True:
             # 取ir.sequence中的会计凭证的参数
             force_company = self._context.get('force_company')
             if not force_company:
@@ -373,7 +373,7 @@ class CheckoutWizard(models.TransientModel):
                         {'name': next_voucher_name})
             # 按月重置
             else:
-                last_voucher_number = reset_init_number
+                last_voucher_number = int(reset_init_number)
                 voucher_ids = voucher_obj.search(
                     [('period_id', '=', period_id.id)], order='create_date')
                 for voucher_id in voucher_ids:
