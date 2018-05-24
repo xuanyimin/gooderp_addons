@@ -855,6 +855,19 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         })
         return [current_occurrence, initial_balance_new]
 
+    def _update_trial_balance(self):
+        period_ids = []
+        currcy_period = self.period_begin_id
+        period_ids.append(currcy_period)
+        while currcy_period != self.period_end_id:
+            currcy_period = self.env['create.trial.balance.wizard'].compute_next_period_id(
+            currcy_period)
+            period_ids.append(currcy_period)
+
+        for period_id in period_ids:
+            balance_wizard = self.env['create.trial.balance.wizard'].create({'period_id': period_id.id})
+            balance_wizard.create_trial_balance()
+
     @api.multi
     def create_vouchers_summary(self):
         """创建出根据所选期间范围内的 明细帐记录"""
@@ -865,6 +878,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 raise UserError(u'期间%s未结账，无法取到%s期初余额' %
                                 (last_period.name, self.period_begin_id.name))
         # period_end = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_end_id)
+        self._update_trial_balance()
+
         vouchers_summary_ids = []
         subject_ids = self.env['finance.account'].search([('code', '>=', self.subject_name_id.code),
                                                           ('code', '<=', self.subject_name_end_id.code)])
@@ -908,9 +923,6 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 # # 无发生额不显示
                 if self.no_occurred and len(occurrence_amount) == 0:
                     continue
-                # if local_currcy_period:
-                #     balance_wizard = self.env['create.trial.balance.wizard'].create({'period_id': local_currcy_period.id})
-                #     balance_wizard.create_trial_balance()
                 # 无余额不显示
                 if cumulative_year_occurrence[0].get('credit') == 0 \
                         and cumulative_year_occurrence[0].get('debit') == 0 \
@@ -954,6 +966,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             raise UserError(u'期间%s未结账，无法取到%s期初余额' %
                             (last_period.name, self.period_begin_id.name))
         # period_end = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_end_id)
+        self._update_trial_balance()
+
         vouchers_summary_ids = []
         subject_ids = self.env['finance.account'].search([('code', '>=', self.subject_name_id.code),
                                                          ('code', '<=', self.subject_name_end_id.code)])
@@ -991,9 +1005,6 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                     local_currcy_period)
                 if not local_currcy_period:  # 无下一期间，退出循环。
                     break_flag = False
-                # if local_currcy_period:
-                #     balance_wizard = self.env['create.trial.balance.wizard'].create({'period_id': local_currcy_period.id})
-                #     balance_wizard.create_trial_balance()
                 # 无余额不显示
                 if self.no_balance \
                         and cumulative_year_occurrence[0].get('credit') == 0 \
