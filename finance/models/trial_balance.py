@@ -914,7 +914,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 # 无余额不显示
                 if cumulative_year_occurrence[0].get('credit') == 0 \
                         and cumulative_year_occurrence[0].get('debit') == 0 \
-                        and cumulative_year_occurrence[0].get('balance') == 0 :
+                        and cumulative_year_occurrence[1].get('credit') == 0 \
+                        and cumulative_year_occurrence[1].get('debit') == 0 :
                     continue
                 for vals in create_vals:  # create_vals 值顺序为：期初余额  本期明细  本期本年累计
                     vouchers_summary_ids.append(
