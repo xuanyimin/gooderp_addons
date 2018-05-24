@@ -1,0 +1,283 @@
+@charset 'utf-8';
+
+#blue1{
+  display: inline-block;
+  float: right;
+  width: 15px;
+  height: 15px;
+  background: #4CA8BD;
+}
+#black1{
+  display: inline-block;
+  float: right;
+  width: 15px;
+  height: 15px;
+  background: #00AFDE;
+}
+#white1{
+  display: inline-block;
+  float: right;
+  width: 15px;
+  height: 15px;
+  background: #D47C95;
+}
+.style0{
+  @background: #4CA8BD;
+  @color: #3D8A9D;
+  @listcolor: #EAB976;
+  .navbar-inverse {
+    background-color: @background!important;
+    border-color: @background!important;
+  }
+  
+ 
+ .navbar-inverse .navbar-nav > li > a {
+    color: #fff!important;
+  }
+  .navbar-inverse .navbar-nav > li > a:hover {
+    background-color: @color!important;
+    color: #EBBA77!important;
+  }
+  .navbar-inverse .navbar-nav > li > a > span:hover {
+    background-color: @color!important;
+    color: #EBBA77!important;
+  }
+  .oe_secondary_menu_section {
+    color: @color!important;
+ }
+  .navbar-inverse .navbar-nav > li.active > a {
+    background-color: @color!important;
+    color: #EBBA77!important;
+  }
+  .o_list_buttons .btn-primary {
+    background-color: @listcolor!important;
+  }
+  .btn-primary {
+    background-color: @listcolor!important;
+    border-color: @listcolor!important;
+  }
+  .oe_menu_toggler:hover {
+    background-color: @color!important;
+  }
+  .navbar-inverse .navbar-nav > .open > a:hover {
+    background-color: @color!important;
+  }
+  .oe_highlight {
+    background-color: @color!important;
+  }
+  #o_field_input_4:hover {
+    background-color: @background!important;
+  }
+  .o_form_input .ui-autocomplete-input .ui-autocomplete-loading {
+    background-color: @background!important;
+  }
+  .o_form_input .ui-autocomplete-input:hover {
+    background-color: @background!important;
+  }
+    tbody > tr {
+      &:hover {
+          color: @background!important;
+      }
+  }
+  .o_list_buttons .btn-primary {
+     border: none!important;
+  }
+ 
+   
+  .o_treeview_table {
+    tbody > tr {
+      &:hover {
+          color: @background!important;
+      }
+    }
+  }
+  
+    .o_main {
+        .o_sub_menu {
+          .o_sub_menu_content {
+            .oe_secondary_submenu {
+              >li.active > a {
+                  background-color: @listcolor!important;
+                 
+              }
+            }
+          }
+        }
+      }
+ 
+}
+
+.style1{
+  @background: #00AFDE;
+  @color: #1766A4;
+  @listcolor: #00AFDE;
+  .navbar-inverse {
+    background-color: @background!important;
+    border-color: @background!important;
+  }
+  .oe_secondary_menu_section {
+    color: @color!important;
+ }
+ 
+ .navbar-inverse .navbar-nav > li > a {
+    color: #fff!important;
+  }
+  .navbar-inverse .navbar-nav > li > a:hover {
+    background-color: @color!important;
+    color: @background!important;
+  }
+  .navbar-inverse .navbar-nav > li > a > span:hover {
+    background-color: @color!important;
+    color: #EBBA77!important;
+  }
+
+  .navbar-inverse .navbar-nav > li.active > a {
+    background-color: @color!important;
+    color: @background!important;
+  }
+  .o_list_buttons .btn-primary {
+    background-color: @color!important;
+  }
+  .o_list_buttons .btn-primary {
+     border: none!important;
+  }
+ .btn-primary {
+    background-color: @color!important;
+    border-color: @color!important;
+  }
+  .oe_menu_toggler:hover {
+    background-color: @color!important;
+  }
+  .navbar-inverse .navbar-nav > .open > a:hover {
+    background-color: @color!important;
+  }
+  .oe_highlight {
+    background-color: @color!important;
+  }
+  #o_field_input_4:hover {
+    background-color: @background!important;
+  }
+  .o_form_input .ui-autocomplete-input .ui-autocomplete-loading {
+    background-color: @background!important;
+  }
+  .o_form_input .ui-autocomplete-input:hover {
+    background-color: @background!important;
+  }
+    tbody > tr {
+      &:hover {
+          color: @background!important;
+      }
+  }
+  
+   
+  .o_treeview_table {
+    tbody > tr {
+      &:hover {
+          //background-color: lighten(@odoo-list-grey, 15%);
+          color: @background!important;
+      }
+    }
+  }
+  
+    .o_main {
+        .o_sub_menu {
+          .o_sub_menu_content {
+            .oe_secondary_submenu {
+              >li.active > a {
+                  background-color: @listcolor!important;
+                 
+              }
+            }
+          }
+        }
+      }
+ 
+}
+
+.style2{
+  @background: #D47C95;
+  @color: #6E2A5D;
+  @listcolor: #A396AB;
+  .navbar-inverse {
+    background-color: @background!important;
+    border-color: @background!important;
+  }
+  
+ .oe_secondary_menu_section {
+    color: @color!important;
+ }
+ .navbar-inverse .navbar-nav > li > a {
+    color: #fff!important;
+  }
+  .navbar-inverse .navbar-nav > li > a:hover {
+    background-color: @color!important;
+    color: @background!important;
+  }
+  .navbar-inverse .navbar-nav > li > a > span:hover {
+    background-color: @color!important;
+    color: #EBBA77!important;
+  }
+
+  .navbar-inverse .navbar-nav > li.active > a {
+    background-color: @color!important;
+    color: @background!important;
+  }
+  .o_list_buttons .btn-primary {
+    background-color: @color!important;
+  }
+  .btn-primary {
+    background-color: @color!important;
+    border-color: @color!important;
+  }
+  .o_list_buttons .btn-primary {
+     border: none!important;
+  }
+  .oe_menu_toggler:hover {
+    background-color: @color!important;
+  }
+  .navbar-inverse .navbar-nav > .open > a:hover {
+    background-color: @color!important;
+  }
+  .oe_highlight {
+    background-color:  @color!important;
+  }
+  #o_field_input_4:hover {
+    background-color: @background!important;
+  }
+  .o_form_input .ui-autocomplete-input .ui-autocomplete-loading {
+    background-color: @background!important;
+  }
+  .o_form_input .ui-autocomplete-input:hover {
+    background-color: @background!important;
+  }
+    tbody > tr {
+      &:hover {
+          color: @background!important;
+      }
+  }
+  
+ 
+   
+  .o_treeview_table {
+    tbody > tr {
+      &:hover {
+          color: @background!important;
+      }
+    }
+  }
+  
+    .o_main {
+        .o_sub_menu {
+          .o_sub_menu_content {
+            .oe_secondary_submenu {
+              >li.active > a {
+                  background-color: @listcolor!important;
+                 
+              }
+            }
+          }
+        }
+      }
+ 
+}
+

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="assets_backend" name="theme colour" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/theme_colour/static/src/js/query.js"></script>
+                <link rel="stylesheet" href="/theme_colour/static/src/css/style.css"/>
+                <link rel="stylesheet" href="/theme_colour/static/src/less/home_feature.less"/>
+            </xpath>
+        </template>
+    </data>
+</openerp>

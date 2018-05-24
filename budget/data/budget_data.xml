@@ -1,0 +1,249 @@
+<?xml version="1.0"?>
+<openerp>
+    <data  noupdate="1">
+         <record id='as_1' model='budget.create.sheet'>
+            <field name='balance'>其中：捐赠收入</field>
+            <field name='line_num'>1</field>
+<!--             <field name='current_restricted'>410102~410102999999</field>
+            <field name='current_unrestricted'>410101~410101999999</field> -->
+        </record>
+        <record id='as_2' model='budget.create.sheet'>
+            <field name='balance'>会费收入</field>
+            <field name='line_num'>2</field>
+<!--             <field name='current_restricted'>420102~420102999999</field>
+            <field name='current_unrestricted'>420101~420101999999</field> -->
+        </record>
+        <record id='as_3' model='budget.create.sheet'>
+            <field name='balance'>提供服务收入</field>
+            <field name='line_num'>3</field>
+<!--             <field name='current_restricted'>430102~430102999999</field>
+            <field name='current_unrestricted'>430101~430101999999</field> -->
+        </record>
+        <record id='as_4' model='budget.create.sheet'>
+            <field name='balance'>商品销售收入</field>
+            <field name='line_num'>4</field>
+<!--             <field name='current_restricted'>450102~450102999999</field>
+            <field name='current_unrestricted'>450101~450101999999</field> -->
+        </record>
+        <record id='as_5' model='budget.create.sheet'>
+            <field name='balance'>政府补助收入</field>
+            <field name='line_num'>5</field>
+<!--             <field name='current_restricted'>440102~440102999999</field>
+            <field name='current_unrestricted'>440101~440101999999</field> -->
+        </record>
+        <record id='as_6' model='budget.create.sheet'>
+            <field name='balance'>投资收益</field>
+            <field name='line_num'>6</field>
+<!--             <field name='current_restricted'>460102~460102999999</field>
+            <field name='current_unrestricted'>460101~460101999999</field> -->
+        </record>
+        <record id='as_7' model='budget.create.sheet'>
+            <field name='balance'>其他收入</field>
+            <field name='line_num'>9</field>
+<!--             <field name='current_restricted'>490102~490102999999</field>
+            <field name='current_unrestricted'>490101~490101999999</field> -->
+        </record>
+        <record id='as_8' model='budget.create.sheet'>
+            <field name='balance'>收入合计</field>
+            <field name='line_num'>11</field>
+<!--             <field name='current_restricted'>410102~410102999999;420102~420102999999;430102~430102999999;450102~450102999999;440102~440102999999;460102~460102999999;490102~490102999999</field> -->
+<!--             <field name='current_unrestricted'>410101~410101999999;420101~420101999999;430101~430101999999;440101~440101999999;450101~450101999999;460101~460101999999;490101~490101999999</field> -->
+        </record>
+        <record id='as_9' model='budget.create.sheet'>
+            <field name='balance'>二、费用</field>
+            <field name='line_num'></field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+        <record id='as_10' model='budget.create.sheet'>
+            <field name='balance'>（一）业务活动成本</field>
+            <field name='line_num'>12</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'>5101~510199999999</field> -->
+        </record>
+        <record id='as_11' model='budget.create.sheet'>
+            <field name='balance'>其中：</field>
+            <field name='line_num'>13</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+        <record id='as_12' model='budget.create.sheet'>
+            <field name='balance'></field>
+            <field name='line_num'>14</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+        <record id='as_13' model='budget.create.sheet'>
+            <field name='balance'></field>
+            <field name='line_num'>15</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+        <record id='as_14' model='budget.create.sheet'>
+            <field name='balance'></field>
+            <field name='line_num'>16</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+        <record id='as_15' model='budget.create.sheet'>
+            <field name='balance'>（二）管理费用</field>
+            <field name='line_num'>21</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'>5201~520199999999</field> -->
+        </record>
+        <record id='as_16' model='budget.create.sheet'>
+            <field name='balance'>（三）筹资费用</field>
+            <field name='line_num'>24</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'>5301~530199999999</field> -->
+        </record>
+        <record id='as_17' model='budget.create.sheet'>
+            <field name='balance'>（四）其他费用</field>
+            <field name='line_num'>28</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'>5401~540199999999</field> -->
+        </record>
+        <record id='as_18' model='budget.create.sheet'>
+            <field name='balance'>费用合计</field>
+            <field name='line_num'>35</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'>5101~540199999999</field> -->
+        </record>
+        <record id='as_19' model='budget.create.sheet'>
+            <field name='balance'>三、限定性净资产转为非限定性净资产</field>
+            <field name='line_num'>40</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+        <record id='as_20' model='budget.create.sheet'>
+            <field name='balance'>四、净资产变动额（若为净资产减少额，以“-”号填列）</field>
+            <field name='line_num'>45</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+
+
+
+
+        <record id='as_1' model='budget.query.sheet'>
+            <field name='balance'>其中：捐赠收入</field>
+            <field name='line_num'>1</field>
+<!--             <field name='current_restricted'>410102~410102999999</field>
+            <field name='current_unrestricted'>410101~410101999999</field> -->
+        </record>
+        <record id='as_2' model='budget.query.sheet'>
+            <field name='balance'>会费收入</field>
+            <field name='line_num'>2</field>
+<!--             <field name='current_restricted'>420102~420102999999</field>
+            <field name='current_unrestricted'>420101~420101999999</field> -->
+        </record>
+        <record id='as_3' model='budget.query.sheet'>
+            <field name='balance'>提供服务收入</field>
+            <field name='line_num'>3</field>
+<!--             <field name='current_restricted'>430102~430102999999</field>
+            <field name='current_unrestricted'>430101~430101999999</field> -->
+        </record>
+        <record id='as_4' model='budget.query.sheet'>
+            <field name='balance'>商品销售收入</field>
+            <field name='line_num'>4</field>
+<!--             <field name='current_restricted'>450102~450102999999</field>
+            <field name='current_unrestricted'>450101~450101999999</field> -->
+        </record>
+        <record id='as_5' model='budget.query.sheet'>
+            <field name='balance'>政府补助收入</field>
+            <field name='line_num'>5</field>
+<!--             <field name='current_restricted'>440102~440102999999</field>
+            <field name='current_unrestricted'>440101~440101999999</field> -->
+        </record>
+        <record id='as_6' model='budget.query.sheet'>
+            <field name='balance'>投资收益</field>
+            <field name='line_num'>6</field>
+<!--             <field name='current_restricted'>460102~460102999999</field>
+            <field name='current_unrestricted'>460101~460101999999</field> -->
+        </record>
+        <record id='as_7' model='budget.query.sheet'>
+            <field name='balance'>其他收入</field>
+            <field name='line_num'>9</field>
+<!--             <field name='current_restricted'>490102~490102999999</field>
+            <field name='current_unrestricted'>490101~490101999999</field> -->
+        </record>
+        <record id='as_8' model='budget.query.sheet'>
+            <field name='balance'>收入合计</field>
+            <field name='line_num'>11</field>
+<!--             <field name='current_restricted'>410102~410102999999;420102~420102999999;430102~430102999999;450102~450102999999;440102~440102999999;460102~460102999999;490102~490102999999</field> -->
+<!--             <field name='current_unrestricted'>410101~410101999999;420101~420101999999;430101~430101999999;440101~440101999999;450101~450101999999;460101~460101999999;490101~490101999999</field> -->
+        </record>
+        <record id='as_9' model='budget.query.sheet'>
+            <field name='balance'>二、费用</field>
+            <field name='line_num'></field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+        <record id='as_10' model='budget.query.sheet'>
+            <field name='balance'>（一）业务活动成本</field>
+            <field name='line_num'>12</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'>5101~510199999999</field> -->
+        </record>
+        <record id='as_11' model='budget.query.sheet'>
+            <field name='balance'>其中：</field>
+            <field name='line_num'>13</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+        <record id='as_12' model='budget.query.sheet'>
+            <field name='balance'></field>
+            <field name='line_num'>14</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+        <record id='as_13' model='budget.query.sheet'>
+            <field name='balance'></field>
+            <field name='line_num'>15</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+        <record id='as_14' model='budget.query.sheet'>
+            <field name='balance'></field>
+            <field name='line_num'>16</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+        <record id='as_15' model='budget.query.sheet'>
+            <field name='balance'>（二）管理费用</field>
+            <field name='line_num'>21</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'>5201~520199999999</field> -->
+        </record>
+        <record id='as_16' model='budget.query.sheet'>
+            <field name='balance'>（三）筹资费用</field>
+            <field name='line_num'>24</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'>5301~530199999999</field> -->
+        </record>
+        <record id='as_17' model='budget.query.sheet'>
+            <field name='balance'>（四）其他费用</field>
+            <field name='line_num'>28</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'>5401~540199999999</field> -->
+        </record>
+        <record id='as_18' model='budget.query.sheet'>
+            <field name='balance'>费用合计</field>
+            <field name='line_num'>35</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'>5101~540199999999</field> -->
+        </record>
+        <record id='as_19' model='budget.query.sheet'>
+            <field name='balance'>三、限定性净资产转为非限定性净资产</field>
+            <field name='line_num'>40</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+        <record id='as_20' model='budget.query.sheet'>
+            <field name='balance'>四、净资产变动额（若为净资产减少额，以“-”号填列）</field>
+            <field name='line_num'>45</field>
+<!--             <field name='current_restricted'></field>
+            <field name='current_unrestricted'></field> -->
+        </record>
+    </data>
+</openerp>

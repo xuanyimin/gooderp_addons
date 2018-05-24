@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<openerp>
+    <data>
+        <record id="view_budget_tree_create" model="ir.ui.view">
+            <field name="name">view.budget.tree.create</field>
+            <field name="model">budget.create.sheet</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" string="预算申报表">
+                    <field name="balance"/>
+                    <field name="line_num"/>
+                    <field name="current_unrestricted"  widget="bgcolor" color="success"/>
+                    <field name="current_restricted"  widget="bgcolor" color="success"/>
+                    <field name="current_total"  widget="bgcolor" color="success"/>
+                </tree>
+            </field>
+        </record>
+
+		<record id="view_budget_tree_query" model="ir.ui.view">
+            <field name="name">view.budget.tree.query</field>
+            <field name="model">budget.query.sheet</field>
+<!--             <field name="type">tree</field>
+            <field name="mode">primary</field>
+            <field name="priority" eval="16" />
+            <field name="active" eval="True" /> -->
+            <field name="arch" type="xml">
+                <tree editable="TOP" string="预算查询表">
+                    <field name="balance" readonly="1"/>
+                    <field name="line_num" readonly="1"/>
+                    <field name="current_unrestricted" readonly="1" widget="bgcolor" color="success"/>
+                    <field name="current_restricted" readonly="1" widget="bgcolor" color="primary"/>
+                    <field name="activity_unrestricted" readonly="1" widget="bgcolor" color="success"/>
+                    <field name="activity_restricted" readonly="1" widget="bgcolor" color="primary"/>
+                    <field name="compute_total"  widget="bgcolor" color="primary" />
+                </tree>
+            </field>
+        </record>
+
+<!-- 向导视图 -->
+       <record id="create_balance_sheet_wizard_form" model="ir.ui.view">
+            <field name="name">create.budget.sheet.wizard.form</field>
+            <field name="model">create.budget.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group>
+                            <field name="year" options="{'no_open':True,'no_create':True}" required="True" style="width: 60%%"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="create_budget_sheet" string="预算申报" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+       <record id="query_balance_sheet_wizard_form" model="ir.ui.view">
+            <field name="name">create.budget.sheet.wizard.form</field>
+            <field name="model">create.budget.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group>
+                            <field name="year" options="{'no_open':True,'no_create':True}" required="True" style="width: 60%%"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="query_budget_sheet" string="预算查询" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+ <!-- 创建向导 -->
+
+		<act_window id="create_budget_sheet_wizard_action"
+			name='预算申报'
+			res_model="create.budget.wizard"
+			multi="True"
+			view_type="form"
+			view_mode="form"
+            view_id="create_balance_sheet_wizard_form"
+			target="new"
+            context="{'budget_query_sheet':True}"
+			/>
+<!-- context="{'budget_sheet':True}" -->
+        <act_window id="query_budget_sheet_wizard_action"
+            name='预算查询'
+            res_model="create.budget.wizard"
+            multi="True"
+            view_type="form"
+            view_mode="form"
+            view_id="query_balance_sheet_wizard_form"
+            target="new"
+            context="{'budget_query_sheet':True}"
+            />
+
+<!-- 创建标题 -->
+        <menuitem id='budget_menu' name='预算'  sequence='30' />
+        <menuitem id='second_budget_menu' name='预算申报' parent='budget.budget_menu'
+        	action='create_budget_sheet_wizard_action' sequence='4' />
+        <menuitem id='third_budget_menu' name='预算查询' parent='budget.budget_menu'
+            action='query_budget_sheet_wizard_action' sequence='5' />
+
+    </data>
+</openerp>
