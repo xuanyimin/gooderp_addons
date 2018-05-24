@@ -1,4 +1,4 @@
-odoo.define('web.gooderp_dialog', function(require) {
+﻿odoo.define('web.gooderp_dialog', function(require) {
     var crash_manager = require('web.CrashManager');
     var core = require('web.core');
     var session = require('web.session');
@@ -27,8 +27,7 @@ odoo.define('web.gooderp_dialog', function(require) {
             audio.play();
             new Dialog(this, {
                 size: 'medium',
-                title: "Gooderp " + (_.str.capitalize(error.type) || core._t("Warning")),
-                subtitle: error.data.title,
+                title: "警告",
                 $content: $('<div>').html(core.qweb.render('CrashManager.warning', {error: error})),
                 buttons: warning_buttons || default_buttons || warning_buttons,
             }).open();
@@ -38,7 +37,7 @@ odoo.define('web.gooderp_dialog', function(require) {
                 return;
             }
             new Dialog(this, {
-                title: "Gooderp " + _.str.capitalize(error.type),
+                title: "" + _.str.capitalize(error.type),
                 $content: core.qweb.render('CrashManager.error', {error: error}),
                 buttons: error.buttons || error_buttons || default_buttons || warning_buttons,
             }).open();
