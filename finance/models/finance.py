@@ -805,7 +805,7 @@ class FinanceAccount(models.Model):
 
             ir_record = self.env['ir.model.data'].search([('model','=','finance.account'),('res_id','=', record.id)])
             if ir_record:
-                ir_record.res_id = record.parent_id.id
+                ir_record.sudo().res_id = record.parent_id.id
     
         result = super(FinanceAccount, self).unlink()
         
