@@ -26,7 +26,7 @@
             <field name="arch" type="xml">
                 <form string="非营利收支日记账">
                 <header>
-					<button name="other_money_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+					<button name="other_money_done" states="draft" string="审核" type="object" class="oe_highlight" />
 					<button name="other_money_draft" states="done" string="反审核" type="object"/>
                     <field name="state" widget="statusbar"/>
                 </header>
@@ -97,6 +97,7 @@
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('nonprofit_money.nonprofit_money_order_tree')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('nonprofit_money.nonprofit_money_order_form')})]"/>
             <field name="domain">[]</field>
+            <field name="context">{'modify_from_webclient':True}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 点击创建日记账
