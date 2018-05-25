@@ -101,14 +101,15 @@ class BankAccount(models.Model):
 
     @api.multi
     def write(self, vals):
-        old_account = vals.get('account_id')
-        wang = self.env['other.money.order'].search([
-            ('bank_id', '=', self.id)])
-        new_account = self.account_id.id
-        if wang and old_account and new_account!=old_account :
-            raise UserError(u'帐户已被使用，不允许修改科目')
-        if wang and not old_account and self.balance:
-            raise UserError(u'帐户已被使用，不允许修改科目')
+
+        for bank_account in self:
+            old_account = vals.get('account_id')
+            wang = bank_account.env['other.money.order'].search([
+                ('bank_id', '=', self.id)])
+            new_account = bank_account.account_id.id
+            if not self.env.context.get('modify_from_webclient'):
+                if wang and (old_account != new_account or not old_account):
+                    raise UserError(u'帐户已被使用，不允许修改科目')
         res = super(BankAccount, self).write(vals)
         return res
 
@@ -131,7 +132,7 @@ class BankAccount(models.Model):
                 other_money_id.other_money_draft()
                 other_money_id.unlink()
             # 资金期初 生成 其他收入
-            other_money_init = self.with_context(type='other_get').env['other.money.order'].create({
+            other_money_init = self.with_context(type='other_get',modify_from_webclient=True).env['other.money.order'].create({
                 'bank_id': self.id,
                 'date': self.env.user.company_id.start_date,
                 'is_init': True,
