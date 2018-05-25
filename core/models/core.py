@@ -110,7 +110,7 @@ class CoreCategory(models.Model):
                             default=lambda self: self._context.get('type'))
     note = fields.Text(u'备注')
     active = fields.Boolean(u'启用', default=True)
-    is_customise = fields.Boolean(u'是否是系统初始化数据', default=True)
+    is_customise = fields.Boolean(u'是否是自定义类别', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

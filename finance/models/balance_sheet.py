@@ -79,7 +79,7 @@ class CreateBalanceSheetWizard(models.TransientModel):
         """
         return self.env['finance.period'].get_date_now_period_id()
 
-    period_id = fields.Many2one('finance.period', string=u'会计期间', domain=_default_period_domain,
+    period_id = fields.Many2one('finance.period', string=u'会计期间', 
                                 default=_default_period_id, help=u'用来设定报表的期间')
 
     @api.multi

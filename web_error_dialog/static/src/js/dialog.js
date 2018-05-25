@@ -13,8 +13,7 @@
         window.open("http://shang.qq.com/wpa/qunwpa?idkey=f0b47f9891e6f5361c4bdc841c424eb13035d981da9451995eca13cb42273725");
     };
     var warning_buttons = error_buttons = message_buttons = default_buttons =
-        [{text: core._t("确定"), close: true, classes: 'btn btn-primary'},
-            {text: core._t("请求官方服务"), click: open_help_page, classes: 'btn btn-warning'}];
+        [{text: core._t("确定"), close: true, classes: 'btn btn-primary'}];
 
     crash_manager.include({
         show_warning: function(error) {
