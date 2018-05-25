@@ -105,7 +105,9 @@ class BankAccount(models.Model):
         wang = self.env['other.money.order'].search([
             ('bank_id', '=', self.id)])
         new_account = self.account_id.id
-        if wang and (old_account != new_account or not old_account):
+        if wang and old_account and new_account!=old_account :
+            raise UserError(u'帐户已被使用，不允许修改科目')
+        if wang and not old_account and self.balance:
             raise UserError(u'帐户已被使用，不允许修改科目')
         res = super(BankAccount, self).write(vals)
         return res
