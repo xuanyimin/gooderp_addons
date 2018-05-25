@@ -32,6 +32,7 @@ unlink_original = models.BaseModel.unlink
 def unlink(self):
     for record in self:
         if 'state' in record._fields.keys():
+            print (record)
             if record.state == 'done':
                 raise UserError(u'不能删除已确认的单据！')
 
@@ -49,7 +50,7 @@ class BaseModelExtend(models.AbstractModel):
     '''
     def _register_hook(self):
         '''
-        Register method in BaseModel 
+        Register method in BaseModel
         '''
         @api.multi
         def action_cancel(self):
@@ -109,6 +110,7 @@ class CoreCategory(models.Model):
                             default=lambda self: self._context.get('type'))
     note = fields.Text(u'备注')
     active = fields.Boolean(u'启用', default=True)
+    is_customise = fields.Boolean(u'是否是自定义类别', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -118,7 +120,15 @@ class CoreCategory(models.Model):
     _sql_constraints = [
         ('name_uniq', 'unique(type, name)', '同类型的类别不能重名')
     ]
+    unlink_original = models.BaseModel.unlink
+    @api.multi
+    def unlink(self):
+        for line in self:
+            if not line.is_customise:
+                raise UserError(u'不能删除系统自带的类别')
+            return unlink_original(line)
 
+    # models.BaseModel.unlink = unlink
 
 class Uom(models.Model):
     _name = 'uom'

@@ -1,20 +1,18 @@
 <?xml version="1.0"?>
 <openerp>
     <data noupdate="1">
-        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_reset_period'))]"/>
-        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_reset_init_number'))]"/>
-        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_period_domain'))]"/>
-        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_voucher_date'))]"/>
-        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_account_hierarchy_level'))]"/>
-        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_top_length'))]"/>
-        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_child_step'))]"/>
+        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_reset_period'))]" />
+        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_reset_init_number'))]" />
+        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_period_domain'))]" />
+        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_voucher_date'))]" />
+        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_account_hierarchy_level'))]" />
+        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_top_length'))]" />
+        <delete model='ir.values' search="[('id', '=', ref('finance.account_code_default_child_step'))]" />
     </data>
-    <data noupdate="1">
+    <data noupdate="0">
         <function model="finance.config.settings" name="set_defaults" />
     </data>
-    <data  noupdate="1">
-
-
+    <data noupdate="1">
         <!--<record id="account_code_default_reset_period" model="ir.values">-->
             <!--<field name="name">default_reset_period</field>-->
             <!--<field name="model">finance.config.settings</field>-->

@@ -805,7 +805,7 @@ class FinanceAccount(models.Model):
 
             ir_record = self.env['ir.model.data'].search([('model','=','finance.account'),('res_id','=', record.id)])
             if ir_record:
-                ir_record.res_id = record.parent_id.id
+                ir_record.sudo().res_id = record.parent_id.id
     
         result = super(FinanceAccount, self).unlink()
         
@@ -1043,7 +1043,13 @@ class BankAccount(models.Model):
     account_id = fields.Many2one('finance.account', u'科目', domain="[('account_type','=','normal'),('costs_types','=','assets')]")
     currency_id = fields.Many2one(
         'res.currency', u'外币币别', related='account_id.currency_id', store=True)
+    currency_id_new = fields.Char(u'外币币别', compute='_compute_currency_id_new')
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision('Amount'))
+    
+    @api.depends('currency_id')
+    def _compute_currency_id_new(self):
+         for record in self:
+            record.currency_id_new = record.currency_id.name
 
     @api.model
     def report_xml(self):

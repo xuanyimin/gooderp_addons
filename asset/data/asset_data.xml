@@ -8,6 +8,7 @@
             <field name='type'>other_pay</field>
             <field name='cash_flow_template_id' ref="money.cft_35"/>
             <field name='note'>由系统创建</field>
+            <field name='is_customise'>False</field>
         </record>
         <record id="cultural" model='core.category'>
             <field name='name'>文物文化资产</field>
@@ -15,6 +16,7 @@
             <field name='type'>other_pay</field>
             <field name='cash_flow_template_id' ref="money.cft_35"/>
             <field name='note'>由系统创建</field>
+            <field name='is_customise'>False</field>
         </record>
         <record id="land" model='core.category'>
             <field name='name'>土地</field>
@@ -22,6 +24,7 @@
             <field name='type'>other_pay</field>
             <field name='cash_flow_template_id' ref="money.cft_35"/>
             <field name='note'>由系统创建</field>
+            <field name='is_customise'>False</field>
         </record>
         <!--record id="asset_expense" model='core.category'>
             <field name='name'>固定资产(应付)</field>
@@ -36,6 +39,7 @@
             <field name='type'>other_get</field>
             <field name='cash_flow_template_id' ref="money.cft_27"/>
             <field name='note'>由系统创建</field>
+            <field name='is_customise'>False</field>
         </record>
         <record id="asset_clean_pay" model='core.category'>
             <field name='name'>固定资产清理支出</field>
@@ -43,6 +47,7 @@
             <field name='type'>other_pay</field>
             <field name='cash_flow_template_id' ref="money.cft_27"/>
             <field name='note'>由系统创建</field>
+            <field name='is_customise'>False</field>
         </record>
         <!--增加科目-->
 
