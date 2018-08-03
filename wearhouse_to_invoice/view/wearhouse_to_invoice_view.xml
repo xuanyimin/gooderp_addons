@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+        <!--开xml弹窗-->
+        <record id="create_invoice_xml_wizard_form" model="ir.ui.view">
+            <field name="name">create.invoice.xml.wizard.form</field>
+            <field name="model">create.invoice.xml.wizard</field>
+            <field name="arch" type="xml">
+            	<form>
+            		<group>
+                        <group>
+                            <field name="xml_type"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="moveline_to_invoice"  string="生成发票XML" attrs="{'invisible': [('xml_type', '=','dz')]}" type="object" class="oe_highlight"/>
+                        <button name="moveline_to_dzinvoice"  string="生成发票XML" attrs="{'invisible': [('xml_type', '=','zz')]}" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+            	</form>
+            </field>
+        </record>
+        <!--开xml按钮-->
+        <record id="create_invoice_xml_action" model="ir.actions.act_window">
+            <field name="name">生成XML导入文件</field>
+            <field name="res_model">create.invoice.xml.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="create_invoice_xml_wizard_form"/>
+            <field name="target">new</field>
+            <field name="multi">True</field>
+        </record>
+
+		<!--出库开票tree-->
+        <record id='wearhouse_to_invoice_tree' model='ir.ui.view'>
+			<field name='name'>wearhouse.to.invoice.tree</field>
+			<field name='model'>wearhouse.to.invoice</field>
+			<field name='arch' type='xml'>
+				<tree string='已认证发票'>
+                    <field name='end_date'/>
+                    <field name="partner_id"/>
+                    <field name="amount"/>
+                    <field name='state'/>
+				</tree>
+			</field>
+		</record>
+		<!--出库开票from-->
+		<record id='wearhouse_to_invoice_form' model='ir.ui.view'>
+			<field name='name'>wearhouse.to.invoice.form</field>
+			<field name='model'>wearhouse.to.invoice</field>
+			<field name='arch' type='xml'>
+                <form string="已认证发票">
+	                <header>
+                        <button name="%(create_invoice_xml_action)d" string="生成导入XML" type="action" class="oe_highlight" states="draft"/>
+	                	<button name='tax_invoice_done' states="draft" string="确认" type="object" class="oe_highlight"/>
+	                	<button name='tax_invoice_draft' states="done" string="反确认" type="object" />
+	                    <field name="state" widget="statusbar" readonly="1"/>
+	                </header>
+			    	<sheet>
+                        <div class="oe_button_box">
+                            <button name="action_get_attachment_view"
+                                class="oe_stat_button"
+                                icon="fa-book"
+                                type="object">
+                                <field name="attachment_number" widget="statinfo" string="附件"/>
+                            </button>
+                        </div>
+                        <group>
+							<field name="partner_id"/>
+                        </group>
+                        <group>
+                            <field name="end_date"/>
+                            <field name="amount" readonly="1"/>
+                        </group>
+                        <notebook>
+                            <page string="出库明细">
+                                <field name="wearhouse_ids" nolabel="1" widget="many2many" domain="[('state', '=','done'),('type', '=', 'out'),('partner_id', '=', partner_id),('date',' &lt;=', end_date),('is_invoice','=', False)]" options="{'not_delete': True, 'reload_on_button': True, 'no_create': True}">
+                                    <tree string="明细行" editable="bottom">
+                                        <field name='move_id' string='单据编号' />
+                                        <field name='goods_id' />
+                                        <field name='goods_qty' sum='基本数量合计' />
+                                        <field name='uom_id' />
+                                        <field name='type' />
+                                        <field name='amount' sum='金额合计'/>
+                                    </tree>
+                                </field>
+                                <field name="invoice_ids" nolabel="1" widget="many2many" options="{'not_delete': True, 'reload_on_button': True, 'no_create': True}">
+                                    <tree string="发票行" editable="bottom">
+                                        <field name='name'/>
+                                        <field name='invoice_amount' sum='金额合计'/>
+                                        <field name='invoice_tax' sum='税额合计'/>
+                                        <field name='invoice_date' />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+			</field>
+		</record>
+
+	</data>
+</openerp>

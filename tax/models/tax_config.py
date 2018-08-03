@@ -123,6 +123,18 @@ class tax_category(models.Model):
     help = fields.Text(u'说明')
     tax_rate = fields.Char(u'税率', help='因为有可能有多个税率在这里面，所以现在很奇怪')
 
+class k3_category(models.Model):
+    _name = 'k3.category'
+
+    code = fields.Char(u'对应数据库帐套', required=True, help=u'帐套管理中的数据库实体')
+    name = fields.Char(u'公司名称', required=True,)
+    income_code_in = fields.Char(u'采购收入代码')
+    cost_code_in = fields.Char(u'采购成本代码')
+    stock_code_in = fields.Char(u'采购库存代码')
+    income_code_out = fields.Char(u'销售收入代码')
+    cost_code_out = fields.Char(u'销售成本代码')
+    stock_code_out = fields.Char(u'销售库存代码')
+
 class CoreCategory(models.Model):
     _inherit = 'core.category'
     tax_category_id = fields.Many2one(
@@ -147,6 +159,20 @@ class TaxConfigWizard(models.TransientModel):
     default_province_password = fields.Char(u'国税密码')
     default_dmpt_name = fields.Char(u'打码平台用户名')
     default_dmpt_password = fields.Char(u'打码平台密码')
+    default_invoice_topamount = fields.Float(u'发票金额上限')
+    default_invoice_spbmbbh = fields.Float(u'税收分类版本号')
+
+    @api.multi
+    def set_default_invoice_topamount(self):
+        res = self.env['ir.values'].sudo().set_default(
+            'tax.config.settings', 'default_invoice_topamount', self.default_invoice_topamount)
+        return res
+
+    @api.multi
+    def set_default_invoice_spbmbbh(self):
+        res = self.env['ir.values'].sudo().set_default(
+            'tax.config.settings', 'default_invoice_spbmbbh', self.default_invoice_spbmbbh)
+        return res
 
     @api.multi
     def set_default_goods_supplier(self):

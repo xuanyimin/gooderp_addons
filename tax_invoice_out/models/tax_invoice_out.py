@@ -168,7 +168,7 @@ class create_slae_invoice_wizard(models.TransientModel):
                 app = {}
                 for i in range(len(colnames)):
                    app[colnames[i]] = row[i]
-                if app.get(u'金额') and app.get(u'金额')!=u'金额':
+                if app.get(u'税率') and app.get(u'税率') != u'税率':
                     list.append(app)
                     newcows += 1
         #数据读入。

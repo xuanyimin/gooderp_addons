@@ -71,6 +71,16 @@
                                 <field name="default_dmpt_password" class="oe_inline"/>
                             </div>
                         </group>
+                        <group string="开发票设置">
+                            <label for="id" string="税收分类版本号"/>
+                            <div>
+                                <field name="default_invoice_spbmbbh" class="oe_inline" />
+                            </div>
+                            <label for="id" string="发票金额上限"/>
+                            <div>
+                                <field name="default_invoice_topamount" class="oe_inline"/>
+                            </div>
+                        </group>
                     </div>
                 </form>
             </field>

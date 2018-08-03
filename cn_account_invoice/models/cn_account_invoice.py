@@ -242,7 +242,7 @@ class cn_account_invoice_line(models.Model):
     _description = u'中国发票明细'
     _rec_name='product_name'
 
-    order_id = fields.Many2one('cn_account_invoice', u'发票',help=u'关联发票',copy=False)
+    order_id = fields.Many2one('cn.account.invoice', u'发票',help=u'关联发票',copy=False)
     product_name = fields.Char(u"货物名称",copy=False)
     product_type = fields.Char(u"规格型号",copy=False)
     product_unit = fields.Char(u"单位",copy=False)
