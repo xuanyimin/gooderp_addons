@@ -42,18 +42,18 @@
                         <notebook>
                             <page string="采购">
                                 <group>
-                                    <field name="income_code_in"/>
-                                    <field name="cost_code_in"/>
-                                    <field name="stock_code_in"/>
+                                    <field name="income_code_in" required="1"/>
+                                    <field name="cost_code_in" required="1"/>
+                                    <field name="stock_code_in" required="1"/>
+                                    <field name="tax_category_ids" widget="many2many_tags"/>
                                 </group>
                             </page>
-                        </notebook>
-                        <notebook>
                             <page string="销售">
                                 <group>
-                                    <field name="income_code_out"/>
-                                    <field name="cost_code_out"/>
-                                    <field name="stock_code_out"/>
+                                    <field name="ke_sale_id" required="1"/>
+                                    <field name="income_code_out" required="1"/>
+                                    <field name="cost_code_out" required="1"/>
+                                    <field name="stock_code_out" required="1"/>
                                 </group>
                             </page>
                         </notebook>

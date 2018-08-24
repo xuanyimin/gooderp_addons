@@ -132,8 +132,10 @@ class k3_category(models.Model):
     cost_code_in = fields.Char(u'采购成本代码')
     stock_code_in = fields.Char(u'采购库存代码')
     income_code_out = fields.Char(u'销售收入代码')
+    ke_sale_id = fields.Char(u'K3往来科目代码')
     cost_code_out = fields.Char(u'销售成本代码')
     stock_code_out = fields.Char(u'销售库存代码')
+    tax_category_ids = fields.Many2many('tax.category',string = '原材料税收分类')
 
 class CoreCategory(models.Model):
     _inherit = 'core.category'

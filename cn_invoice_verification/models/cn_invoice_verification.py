@@ -248,7 +248,7 @@ class cn_account_invoice(models.Model):
         driver.close()
         driver = False
         # 上传附件
-        f = open('/log/fapiao.png', 'rb')
+        f = open('./log/fapiao.png', 'rb')
         self.env['ir.attachment'].create({
             'datas': base64.b64encode(f.read()),
             'name': u'发票',
