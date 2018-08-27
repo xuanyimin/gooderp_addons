@@ -87,7 +87,7 @@ class tax_invoice_out(models.Model):
             'target': 'new',
         }
 
-#增加按月进项发票
+#增加按月销项发票
 class cn_account_invoice(models.Model):
     _inherit = 'cn.account.invoice'
     _description = u'中国发票'
@@ -168,10 +168,12 @@ class create_slae_invoice_wizard(models.TransientModel):
                 app = {}
                 for i in range(len(colnames)):
                    app[colnames[i]] = row[i]
-                if app.get(u'税率') and app.get(u'税率') != u'税率':
+                #过滤掉不需要的行，详见销货清单的会在清单中再次导入
+                if app.get(u'税率') and app.get(u'税率') != u'税率' and app.get(u'商品名称') != u'(详见销货清单)':
                     list.append(app)
                     newcows += 1
         #数据读入。
+        invoice_id = False
         for data in range(0,newcows):
             in_xls_data = list[data]
             invoice_code = in_xls_data.get(u'发票代码')
@@ -195,8 +197,9 @@ class create_slae_invoice_wizard(models.TransientModel):
                 invoice_type = 'pt'
             else:
                 invoice_type = 'zy'
-            #创建销售发票
-            if in_xls_data.get(u'购方税号'):
+            old_invoice_id = self.env['cn.account.invoice'].search([('name', '=', in_xls_data.get(u'发票号码'))])
+            #创建销售发票,已有的发票跳过
+            if in_xls_data.get(u'购方税号') and not old_invoice_id:
                 invoice_id = self.env['cn.account.invoice'].create({
                     'type': 'out',
                     'partner_name_out': partner_name,
@@ -212,10 +215,7 @@ class create_slae_invoice_wizard(models.TransientModel):
                     'invoice_tax': product_tax,
                     'invoice_out_id': invoice_out.id or '',
                 })
-            if in_xls_data.get(u'商品名称') and in_xls_data.get(u'商品名称') == u'小计':
-                invoice_id.write({'invoice_amount': product_amount,'invoice_tax':product_tax})
-                continue
-            if in_xls_data.get(u'商品名称') and in_xls_data.get(u'商品名称') != u'小计':
+            if invoice_id and (in_xls_data.get(u'商品名称') and in_xls_data.get(u'商品名称') != u'小计'):
                 self.env['cn.account.invoice.line'].create({
                     'order_id': invoice_id.id,
                     'product_name': goods_name or '',
@@ -228,7 +228,6 @@ class create_slae_invoice_wizard(models.TransientModel):
                     'product_tax': product_tax or '0',
                     'tax_type': tax_type or '',
                     })
-
 
     def excel_date(self,data):
         #将excel日期改为正常日期

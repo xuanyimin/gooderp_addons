@@ -104,7 +104,7 @@ class GoodK3ErpOut(models.Model):
         user_code,user_name = self.search_user(conn)
         for i in excel:
             # 修改内容。
-            i[u'审核日期'] = i[u'日      期'] = i['收款日期'] = line.invoice_date
+            i[u'审核日期'] = i[u'日      期'] = i[u'收款日期'] = line.invoice_date
             i[u'发票号码'] = line.name
             i[u'购货单位_FNumber'] = partner_code
             i[u'购货单位_FName'] = line.partner_name_out
@@ -113,7 +113,7 @@ class GoodK3ErpOut(models.Model):
             i[u'制单人_FName'] = i[u'审核人_FName'] = u'宣一敏'
             i[u'主管_FNumber'] = i[u'业务员_FNumber'] = user_code
             i[u'主管_FName'] = i[u'业务员_FName'] = user_name.encode('latin-1').decode('gbk')
-
+            i[u'往来科目_FNumber'] = self.k3_sql.ke_sale_id
         j = 0
         for key in colnames:
             # 写入excel
@@ -124,6 +124,8 @@ class GoodK3ErpOut(models.Model):
     @api.multi
     def createinvoiceline(self, conn, line, excel, worksheet, colnames, number, line_number):
         good_id = self.search_goods(conn, line)
+        if not good_id:
+            raise UserError('请到K3系统增加产品：%s。'% (line.product_name))
         good_code, good_name, good_model = good_id
         unit_code = self.search_groups_name(conn, line)
         for i in excel:
@@ -172,6 +174,8 @@ class GoodK3ErpOut(models.Model):
             self.createinvoice(conn, invoice, excel1, worksheet, colnames1, number)
             line_number = 0
             for line in invoice.line_ids:
+                if line.product_amount <= 0:
+                    continue
                 number2 += 1
                 line_number += 1
                 self.createinvoiceline(conn, line, excel2, worksheet2, colnames2, number2, line_number)
@@ -211,7 +215,12 @@ class GoodK3ErpOut(models.Model):
         good = []
         values = self.k3_sql.stock_code_out
         max_code = self.search_max_code(conn,values)[0]
-        o,a,b = max_code.split('.')
+        c = max_code.split('.')
+        if len(c) == 2:
+            a,b = c
+        elif len(c) == 3:
+            o,a,b =c
+        changdu = len(b)
         for key in colnames:
             worksheet.write(0,j,key)
             j += 1
@@ -224,7 +233,10 @@ class GoodK3ErpOut(models.Model):
                     good.append(line.product_name + line.product_type)
                     groups_name = self.search_groups_name(conn, line)[0]
                     i += 1
-                    code = '%s.%s'%(a,int(b)+i)
+                    x = int(b) + i
+                    changdu2 = len(str(x))
+                    j = b[0:(changdu-changdu2)] + str(x)
+                    code = '%s.%s'%(a,j)
                     self.createexcel(excel, line, worksheet, i, groups_name.encode('latin-1').decode('gbk'), code, colnames)
 
         workbook.save(u'goods.xls')
@@ -286,7 +298,7 @@ class GoodK3ErpOut(models.Model):
             cursor.execute("select fname from t_UnitGroup WHERE Funitgroupid='%s';"%(groups_id))
             groups_name = cursor.fetchone()
         else:
-            raise UserError('请到K3系统增加计量单位%s.'% line.product_unit)
+            raise UserError('请到K3系统增加计量单位%s。产品：%s。'% (line.product_unit,line.product_name))
         return groups_name
 
     # 查询单位CODE

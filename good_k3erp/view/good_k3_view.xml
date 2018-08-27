@@ -2,6 +2,17 @@
 <openerp>
 	<data>
 
+        <record id="tax_invoice_out_tree_inherit2" model="ir.ui.view">
+            <field name="name">tax_invoice_out_tree_inherit2</field>
+            <field name="model">tax.invoice.out</field>
+            <field name='inherit_id' ref='tax_invoice_out.tax_invoice_out_tree' />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="k3_sql"/>
+				</xpath>
+            </field>
+        </record>
+
         <record id="tax_invoice_out_form_inherit2" model="ir.ui.view">
             <field name="name">tax_invoice_out_form_inherit2</field>
             <field name="model">tax.invoice.out</field>

@@ -37,15 +37,26 @@
                             <group>
                                 <field name='name'/>
                                 <field name='code'/>
+                                <field name="is_manage"/>
 							</group>
                         </group>
                         <notebook>
                             <page string="采购">
-                                <group>
-                                    <field name="income_code_in" required="1"/>
-                                    <field name="cost_code_in" required="1"/>
-                                    <field name="stock_code_in" required="1"/>
-                                    <field name="tax_category_ids" widget="many2many_tags"/>
+                                <field name="category_lines" editable="bottom" attrs="{'invisible': [('is_manage', '=', False)]}">
+                                     <tree string="高级配置明细" editable="bottom">
+                                         <field name="tax_category_ids"/>
+                                         <field name="income_code_in"/>
+                                         <field name="cost_code_in"/>
+                                         <field name="stock_code_in"/>
+                                         <field name="k3_code"/>
+                                         <field name="note"/>
+                                     </tree>
+                                </field>
+                                <group attrs="{'invisible': [('is_manage', '=', True)]}">
+                                    <field name="income_code_in" attrs="{'invisible': [('is_manage', '=', True)],'required':[('is_manage', '=', False)]}" />
+                                    <field name="cost_code_in" attrs="{'invisible': [('is_manage', '=', True)],'required':[('is_manage', '=', False)]}" />
+                                    <field name="stock_code_in" attrs="{'invisible': [('is_manage', '=', True)],'required':[('is_manage', '=', False)]}" />
+                                    <field name="tax_category_ids" widget="many2many_tags" attrs="{'invisible': [('is_manage', '=', True)],'required':[('is_manage', '=', False)]}" />
                                 </group>
                             </page>
                             <page string="销售">

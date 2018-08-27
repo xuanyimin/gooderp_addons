@@ -128,6 +128,7 @@ class k3_category(models.Model):
 
     code = fields.Char(u'对应数据库帐套', required=True, help=u'帐套管理中的数据库实体')
     name = fields.Char(u'公司名称', required=True,)
+    is_manage= fields.Boolean(u'高级模式')
     income_code_in = fields.Char(u'采购收入代码')
     cost_code_in = fields.Char(u'采购成本代码')
     stock_code_in = fields.Char(u'采购库存代码')
@@ -136,6 +137,20 @@ class k3_category(models.Model):
     cost_code_out = fields.Char(u'销售成本代码')
     stock_code_out = fields.Char(u'销售库存代码')
     tax_category_ids = fields.Many2many('tax.category',string = '原材料税收分类')
+    category_lines = fields.One2many('k3.category.line',
+                               'order_id', u'资产负债表',
+                               copy=False, required=True)
+
+class K3CategoryLine(models.Model):
+    _name = 'k3.category.line'
+
+    order_id = fields.Many2one('k3.category', u'设置项', copy=False)
+    tax_category_ids = fields.Many2one('tax.category', string='原材料税收分类')
+    income_code_in = fields.Char(u'采购收入代码')
+    cost_code_in = fields.Char(u'采购成本代码')
+    stock_code_in = fields.Char(u'采购库存代码')
+    k3_code = fields.Char(u'K3分类代码')
+    note = fields.Char(u'分类关键字')
 
 class CoreCategory(models.Model):
     _inherit = 'core.category'
